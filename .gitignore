@@ -1,0 +1,34 @@
+# dependencies
+/node_modules
+# Note: bun.lock is committed, not ignored.
+
+# next.js
+/.next/
+/out/
+next-env.d.ts
+
+# production build
+/build
+/dist
+
+# testing / coverage
+/coverage
+
+# typescript
+*.tsbuildinfo
+
+# env files (never commit secrets — only .env.example is tracked)
+.env
+.env.*
+!.env.example
+
+# logs
+*.log
+.bun/
+
+# editor / os
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.pem

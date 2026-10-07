@@ -1,8 +1,12 @@
 # Architecture
 
-Status: **Phase 0 (foundation)**. This document describes the target software
-architecture the prototype is being built toward. Feature code is added in later
-phases; the layers below currently exist as documented seams.
+Status: **Phase 1 (core domain model)**. This document describes the target
+software architecture the prototype is being built toward. The `core` domain
+model + Zod schemas now exist, along with the `VisionProvider` interface
+(contract only), typed env config, the typed error taxonomy, and a minimal
+accessible UI shell with a client-held session. The remaining feature layers
+(`perception`, `safety`, `navigation`, `decision`, `speech` logic) still exist
+as documented seams and gain real logic in later phases.
 
 ## 1. Goals and non-goals
 
@@ -177,14 +181,36 @@ Enforced in part by `eslint-plugin-jsx-a11y` (bundled via `eslint-config-next`).
 - Parse at the boundary; pass typed, validated values inward. Parse failures are
   handled states, not exceptions that crash the pipeline.
 
-## 13. Roadmap (phases)
+## 13. Session, configuration & errors (added in Phase 1)
+
+- **Session.** A `NavigationSession` (in `core`) is the top-level, client-held
+  unit of a run: id, timestamps, mode (`navigate` | `explore`), optional
+  destination, latest location/heading/route, and the current `PerceptionStatus`
+  and `SafetyAssessment`. A fresh session is honest about uncertainty —
+  perception starts `unavailable` and safety starts `unknown` + degraded. There
+  is **no database**: sessions live in memory and are persisted to
+  `sessionStorage`, validated with Zod on read (`src/app/_session`). The pure
+  factory/transitions live in `core`; the client store uses
+  `useSyncExternalStore`.
+- **Configuration.** `src/config` holds Zod-validated environment config. Server
+  secrets (`server-env.ts`) are guarded against browser import and never
+  prefixed `NEXT_PUBLIC_`; only non-secret `NEXT_PUBLIC_*` values live in
+  `public-env.ts`.
+- **Error taxonomy.** `core/errors.ts` defines typed `AppError`s with stable
+  codes (permission denied, unavailable, timeout, network, AI error, invalid
+  model response, unsupported feature), plus a Zod-validated serialised form so
+  failures can cross the client/server boundary and be reconstructed.
+
+## 14. Roadmap (phases)
 
 Phase boundaries are gates: **each phase ends with a summary and stops** — the
 next phase is not started automatically.
 
-0. **Foundation (this phase):** tooling, config, docs, architecture skeleton.
-1. Core domain model + Zod schemas (Scene Representation) with tests.
-2. `VisionProvider` interface + a mock provider + server route handler + the
+0. **Foundation (done):** tooling, config, docs, architecture skeleton.
+1. **Core domain model + Zod schemas (done):** domain types, session, typed env
+   config, error taxonomy, and a minimal accessible UI shell with tests. The
+   `VisionProvider` interface (contract only) was pulled forward into this phase.
+2. A mock `VisionProvider` implementation + server route handler + the
    validation/concurrency harness (no real camera yet).
 3. Client camera capture + the multi-rate pipeline wired to the mock provider.
 4. Real Gemini provider (`@google/genai`, structured output).

@@ -103,7 +103,16 @@ required and documented. Secrets stay on the server.
 
 ## Current status
 
-**Phase 0 — foundation complete; no application features implemented.** Next up
-is Phase 1 (core domain model + Zod schemas). See the roadmap in
+**Phase 1 — core domain model complete.** `src/core` holds the domain types and
+Zod schemas (Scene Representation, session, safety, navigation, decision,
+speech) plus the typed error taxonomy; `src/providers` defines the
+`VisionProvider` interface and boundary schemas (interface only — no Gemini);
+`src/config` holds the typed env; and `src/app` has a minimal accessible shell
+(home + session creation, `/navigate` and `/explore` placeholders) with a
+client-held session (memory + `sessionStorage`). Unit tests (Vitest) and an
+e2e smoke suite (Playwright) are in place.
+
+Next up is **Phase 2** (a mock `VisionProvider` + server route handler + the
+validation/concurrency harness). See the roadmap in
 [`docs/architecture.md`](docs/architecture.md). Do not start it without being
 asked.

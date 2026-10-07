@@ -219,3 +219,123 @@ states).
 - Stricter compiler settings surface bugs early at the cost of occasional extra
   annotations — an acceptable trade for an assistive system.
 - Vitest shares Vite config/ESM ergonomics with the front end and runs fast.
+
+---
+
+## ADR 0010 — Domain model lives in `core` as Zod schemas (single source of truth)
+
+**Status:** Accepted (2026-10-07)
+
+**Context.** Phase 1 needs the canonical domain model (session, scene,
+obstacle, safety, navigation, decision, speech). The architecture also mandates
+that every value crossing a trust boundary is validated with Zod and that types
+never drift from validation.
+
+**Decision.** Define each domain type as a **Zod schema in `src/core`** and
+derive the TypeScript type via `z.infer`. Schemas are the single source of
+truth; the barrel `@/core` is the only import surface. The task's suggested
+`src/lib/*` / `src/types` layout was **not** adopted — CLAUDE.md's layered
+structure (`core ← providers/perception/safety/navigation → decision → speech →
+app`) governs, and domain types belong in `core`.
+
+**Consequences.**
+
+- One definition per concept; validation and types cannot diverge.
+- Uncertainty is encoded in the model itself (explicit `availability`,
+  `confidence`, `degraded`, and `"unknown"` members), not bolted on later.
+- Layer-type ownership is unambiguous: `SafetyAssessment`/`NavigationDecision`
+  types live in `core`; the engines that produce them live in their own layers.
+
+---
+
+## ADR 0011 — Client-held session: memory + `sessionStorage`, no Zustand, no DB
+
+**Status:** Accepted (2026-10-07)
+
+**Context.** A run needs session state (mode, destination, latest inputs) that
+survives client-side route changes. The task listed Zustand "only where client
+state is actually required" and forbade a database and unnecessary state
+libraries.
+
+**Decision.** Keep the session **client-held**: pure factory/transitions in
+`core`, a small external store read via **`useSyncExternalStore`**, and
+**`sessionStorage`** for persistence (validated with Zod on every read; invalid
+data is dropped, never trusted). No Zustand and no database were added — the
+standard React primitive covers this need without a dependency, and
+`sessionStorage` (not `localStorage`) matches the transient, privacy-first
+nature of a navigation run.
+
+**Consequences.**
+
+- No new runtime dependency; behaviour is driven by the tested `core` helpers.
+- SSR-safe (`getServerSnapshot`) with no effect-driven `setState`.
+- State is per-tab and transient by design; durable/multi-device persistence is
+  explicitly out of scope.
+
+---
+
+## ADR 0012 — Typed application error taxonomy with a serialisable wire form
+
+**Status:** Accepted (2026-10-07)
+
+**Context.** The architecture requires failure modes (permission denial,
+unavailability, timeout, network, AI error, invalid model response, unsupported
+feature) to be represented explicitly, and errors must be able to cross the
+client/server boundary (route handler → browser).
+
+**Decision.** Define an `AppError` base with a stable `code` discriminant and
+concrete subclasses in `core/errors.ts`, plus a Zod-validated
+`SerializedAppError` form with `toSerializedAppError` / `fromSerializedAppError`.
+`InvalidModelResponseError.fromZodError` bridges failed model-output validation.
+
+**Consequences.**
+
+- Callers branch on `code`/`instanceof` and `retryable` instead of string
+  matching.
+- Errors survive JSON transport and are reconstructed as typed errors.
+- The taxonomy is shared (one source of truth); provider code re-exports the
+  AI-relevant members rather than redefining them.
+
+---
+
+## ADR 0013 — Playwright for end-to-end testing (separate from Vitest)
+
+**Status:** Accepted (2026-10-07)
+
+**Context.** Unit tests (Vitest) cover `core`/schemas/session, but the
+accessible shell (keyboard operability, skip link, session flow, emergency
+stop) needs browser-level verification.
+
+**Decision.** Add **Playwright** with `testDir: ./e2e`, a `webServer` that boots
+`bun run dev`, and a `test:e2e` script. Browsers are not bundled
+(`bunx playwright install chromium` is run once). E2E stays separate from the
+Vitest suite, which remains scoped to `src/**`.
+
+**Consequences.**
+
+- Accessibility affordances are exercised in a real browser.
+- E2E is intentionally excluded from `bun run check` (no browser download in the
+  fast gate); run it explicitly with `bun run test:e2e`.
+
+---
+
+## ADR 0014 — Retain accessibility-first CSS; defer Tailwind and shadcn/ui
+
+**Status:** Accepted (2026-10-07)
+
+**Context.** The Phase 1 task suggested Tailwind CSS and shadcn/ui. The Phase 0
+foundation deliberately uses hand-written, accessibility-first CSS (custom
+properties, visible focus rings, skip link, reduced-motion, no colour-only
+meaning), and the Phase 1 UI is only minimal placeholder pages.
+
+**Decision.** For this phase, **keep the existing accessibility-first CSS** and
+do **not** add Tailwind or shadcn/ui (confirmed with the requester). Revisit and
+add them via a future ADR if and when richer UI justifies the dependency and
+build change.
+
+**Consequences.**
+
+- No new styling dependencies or build changes; the deliberate a11y-first base
+  is preserved and extended for the shell.
+- If adopted later, base styles will need migration; that cost is deferred until
+  there is real UI to benefit from it.

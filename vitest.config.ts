@@ -10,12 +10,10 @@ export default defineConfig({
     },
   },
   test: {
-    // jsdom lets us test React components and browser-ish code.
     environment: "jsdom",
     globals: true,
     setupFiles: ["./vitest.setup.ts"],
     include: ["src/**/*.{test,spec}.{ts,tsx}"],
-    // Foundation phase ships the harness before most feature tests exist.
     passWithNoTests: true,
     coverage: {
       provider: "v8",

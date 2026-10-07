@@ -18,9 +18,12 @@ software architecture.
 
 ## Status
 
-**Phase 0 — Engineering foundation.** Tooling, configuration, documentation, and
-the layered-architecture skeleton are in place. **No application features are
-implemented yet** (no live camera, AI, GPS, navigation, or speech). See
+**Phase 1 — Core domain model.** The `core` domain types + Zod schemas (Scene
+Representation, session, safety, navigation, decision, speech), the typed error
+taxonomy, the `VisionProvider` interface (contract only), typed env config, and
+a minimal accessible UI shell (home + session creation, `/navigate` and
+`/explore` placeholders) are in place, with unit (Vitest) and e2e (Playwright)
+tests. **No live features yet** (no camera, AI, GPS, routing, or speech). See
 [`docs/architecture.md`](docs/architecture.md) for the design and the planned
 phases.
 
@@ -33,7 +36,7 @@ phases.
 - **Zod 4** — all external/model data is validated; arbitrary model JSON is
   never trusted.
 - **ESLint 10** (flat config, incl. `jsx-a11y`) + **Prettier**.
-- **Vitest** + Testing Library (jsdom).
+- **Vitest** + Testing Library (jsdom) for unit tests; **Playwright** for e2e.
 - AI vision via the official **`@google/genai`** SDK (added in a later phase),
   behind a replaceable provider abstraction.
 
@@ -61,6 +64,7 @@ bun run dev                  # http://localhost:3000
 | `bun run format`      | Prettier write (`format:check` to verify)         |
 | `bun run typecheck`   | `tsc --noEmit`                                    |
 | `bun run test`        | Run unit tests (`test:watch`, `test:coverage`)    |
+| `bun run test:e2e`    | Playwright e2e (run `bunx playwright install` first) |
 | `bun run check`       | format:check + lint + typecheck + test (one shot) |
 
 ## Project layout
@@ -68,13 +72,19 @@ bun run dev                  # http://localhost:3000
 ```
 src/
   app/          Next.js App Router (UI + server route handlers under app/api)
-  core/         Shared domain types + Zod schemas (Scene Representation)
+    _components/   Shell UI components (session creator, details, stop)
+    _session/      Client-held session: store + sessionStorage persistence
+    navigate/      Navigate-mode placeholder route
+    explore/       Explore-mode placeholder route
+  core/         Shared domain types + Zod schemas + errors (single source of truth)
+  config/       Typed, Zod-validated env (server-only + client-safe public)
   perception/   Sensor input → validated Scene Representation
   providers/    Replaceable AI vision provider abstraction (server-only)
   safety/       Deterministic safety engine (independent of the LLM)
   navigation/   Route / GPS / position / heading reasoning
   decision/     Reconciles safety + navigation + scene into decisions
   speech/        Audio output (primary user channel)
+e2e/            Playwright end-to-end specs
 docs/
   architecture.md   System design, data flow, constraints
   decisions.md      Architecture Decision Records (ADRs)

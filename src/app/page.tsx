@@ -1,11 +1,5 @@
-/**
- * Placeholder landing page for the foundation phase.
- *
- * This intentionally contains NO application features (no camera, AI,
- * navigation, GPS, or speech). It exists so the scaffold builds, renders, and
- * can be verified for baseline accessibility. Feature work begins in a later
- * phase per docs/architecture.md.
- */
+import { SessionPanel } from "./_components/session-panel";
+
 export default function HomePage() {
   return (
     <section aria-labelledby="page-heading" className="container">
@@ -20,11 +14,8 @@ export default function HomePage() {
         not rely on it for safety. Always use your established mobility aids and
         techniques.
       </p>
-      <p>
-        The engineering foundation is in place. Application features are not yet
-        implemented. See <code>docs/architecture.md</code> for the planned
-        system design.
-      </p>
+
+      <SessionPanel />
     </section>
   );
 }

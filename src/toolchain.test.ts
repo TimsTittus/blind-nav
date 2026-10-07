@@ -1,14 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { z } from "zod";
 
-/**
- * Foundation-phase smoke test.
- *
- * This does not test any application feature. It verifies that the test
- * harness runs and that Zod — the validation library the architecture relies
- * on for all external/model data — is importable and behaves as expected.
- * Real domain tests arrive with their features.
- */
 describe("toolchain", () => {
   it("runs the Vitest harness", () => {
     expect(true).toBe(true);

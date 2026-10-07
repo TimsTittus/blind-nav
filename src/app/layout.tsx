@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import Link from "next/link";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -20,10 +21,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        {/* Skip link for keyboard / screen-reader users. */}
         <a className="skip-link" href="#main">
           Skip to main content
         </a>
+        <nav aria-label="Primary" className="primary-nav">
+          <Link href="/">Home</Link>
+          <Link href="/navigate">Navigate</Link>
+          <Link href="/explore">Explore</Link>
+        </nav>
         <main id="main">{children}</main>
       </body>
     </html>

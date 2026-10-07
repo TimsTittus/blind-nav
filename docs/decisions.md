@@ -339,3 +339,24 @@ build change.
   is preserved and extended for the shell.
 - If adopted later, base styles will need migration; that cost is deferred until
   there is real UI to benefit from it.
+
+---
+
+## ADR 0015 — Phase 2 is the Navigation Mode UI; provider harness moves to Phase 3
+
+**Status:** Accepted (2026-10-07)
+
+**Context.** The roadmap listed the mock `VisionProvider` + route handler as
+Phase 2. The requested Phase 2 is instead an audio-first Navigation Mode UI with
+mocked state.
+
+**Decision.** Build the UI first (`src/app/_navigation`), with UI-level status
+categories (adds DANGER between `caution` and `stop`; `core` is unchanged until
+the Safety Engine exists) and mock scenarios. Debug tooling is gated by an
+inlined `process.env.NODE_ENV` check in the component module so production
+bundles exclude it. The mock-provider/route-handler work shifts to Phase 3.
+
+**Consequences.** The UI can be exercised in every state before real inputs
+exist. The `StatusCategory` ↔ `SafetyLevel` mapping must be revisited in the
+Safety Engine phase.
+

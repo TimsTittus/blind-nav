@@ -1,6 +1,6 @@
 # Architecture
 
-Status: **Phase 1 (core domain model)**. This document describes the target
+Status: **Phase 2 (Navigation Mode UI, mocked)**. Phase 1 added the core domain model. This document describes the target
 software architecture the prototype is being built toward. The `core` domain
 model + Zod schemas now exist, along with the `VisionProvider` interface
 (contract only), typed env config, the typed error taxonomy, and a minimal
@@ -210,14 +210,41 @@ next phase is not started automatically.
 1. **Core domain model + Zod schemas (done):** domain types, session, typed env
    config, error taxonomy, and a minimal accessible UI shell with tests. The
    `VisionProvider` interface (contract only) was pulled forward into this phase.
-2. A mock `VisionProvider` implementation + server route handler + the
+2. **Navigation Mode UI (done, mocked):** audio-first `/navigate` screen —
+   `src/app/_navigation` (see §15). No camera, GPS, AI, routing, or speech.
+3. A mock `VisionProvider` implementation + server route handler + the
    validation/concurrency harness (no real camera yet).
-3. Client camera capture + the multi-rate pipeline wired to the mock provider.
-4. Real Gemini provider (`@google/genai`, structured output).
-5. Deterministic Safety Engine.
-6. Navigation Engine (destination, route, position, heading).
-7. Decision Engine (reconciliation + cadence).
-8. Speech Engine + full accessibility pass.
-9. Hardening: failure/lifecycle edge cases end-to-end.
+4. Client camera capture + the multi-rate pipeline wired to the mock provider.
+5. Real Gemini provider (`@google/genai`, structured output).
+6. Deterministic Safety Engine.
+7. Navigation Engine (destination, route, position, heading).
+8. Decision Engine (reconciliation + cadence).
+9. Speech Engine + full accessibility pass.
+10. Hardening: failure/lifecycle edge cases end-to-end.
 
 Later/future: local CV, vest-mounted camera, depth/sensor fusion.
+
+## 15. Navigation Mode UI (added in Phase 2)
+
+Audio is primary; this screen serves status, caregivers/developers, setup,
+fallback interaction, and debugging. Code: `src/app/_navigation`.
+
+- **Model (pure, tested):** `status.ts` (SAFE / CAUTION / DANGER / CRITICAL /
+  UNKNOWN; `categoryFromSafety` maps core levels and never reports SAFE for a
+  degraded assessment), `announcement.ts` (CRITICAL / HIGH / NAVIGATION /
+  NORMAL), `mock-scenarios.ts`, `view-model.ts`.
+- **Not colour alone:** each category has text, a glyph, and a distinct border
+  style; UNKNOWN is dashed with "?" and "Path not confirmed".
+- **ARIA live:** only the instruction text is live. CRITICAL/HIGH use the
+  assertive region; NAVIGATION/NORMAL the polite one. Status badges, system
+  status, and the debug overlay are not live, so tiny changes are not announced.
+- **Mocked state:** default scenario reflects the real session (perception
+  unavailable → UNKNOWN). Pausing degrades to UNKNOWN. A "Simulated data" badge
+  is always shown.
+- **Debug overlay:** development only (`NODE_ENV !== "production"`, inlined so it
+  is dead-code-eliminated from production). Shows session id, mode,
+  perception/GPS/AI status, safety level, last analysis time, latency, and a
+  simulated-scenario switcher. It reads no env/secrets.
+- **Responsive:** camera keeps 16:9 (landscape) / 4:3 (portrait) via
+  `aspect-ratio`, capped by viewport height; short landscape screens place the
+  camera beside the panel; controls are sticky at the bottom.

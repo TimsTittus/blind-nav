@@ -103,16 +103,17 @@ required and documented. Secrets stay on the server.
 
 ## Current status
 
-**Phase 1 — core domain model complete.** `src/core` holds the domain types and
-Zod schemas (Scene Representation, session, safety, navigation, decision,
-speech) plus the typed error taxonomy; `src/providers` defines the
-`VisionProvider` interface and boundary schemas (interface only — no Gemini);
-`src/config` holds the typed env; and `src/app` has a minimal accessible shell
-(home + session creation, `/navigate` and `/explore` placeholders) with a
-client-held session (memory + `sessionStorage`). Unit tests (Vitest) and an
-e2e smoke suite (Playwright) are in place.
+**Phase 2 — Navigation Mode UI (mocked) complete**, on top of Phase 1 (core
+domain model, `VisionProvider` interface, typed env, minimal shell). `/navigate`
+renders `src/app/_navigation`: pure model files (`status.ts`, `announcement.ts`,
+`mock-scenarios.ts`, `view-model.ts`) plus the components `CameraViewport`,
+`NavigationStatusOverlay`, `NavigationInstruction` (speech-priority-aware, two
+persistent live regions), `DestinationStatus`, `SystemStatus`,
+`SafetyIndicator`, `SessionControls`, `EmergencyStop`, and a dev-only
+`DebugOverlay`. All data is mocked; the default state is honestly UNKNOWN. No
+camera, GPS, Gemini, routing, or speech yet. Vitest + Playwright cover it.
 
-Next up is **Phase 2** (a mock `VisionProvider` + server route handler + the
-validation/concurrency harness). See the roadmap in
-[`docs/architecture.md`](docs/architecture.md). Do not start it without being
+Next up is **Phase 3** (mock `VisionProvider` + server route handler +
+validation/concurrency harness; see the roadmap in
+[`docs/architecture.md`](docs/architecture.md)). Do not start it without being
 asked.

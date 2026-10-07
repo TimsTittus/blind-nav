@@ -18,6 +18,14 @@ software architecture.
 
 ## Status
 
+**Phase 2 — Navigation Mode UI (mocked).** `/navigate` is now an audio-first,
+high-contrast screen: camera placeholder, safety category (SAFE / CAUTION /
+DANGER / CRITICAL / UNKNOWN — text + glyph + border style, never colour alone),
+a speech-priority-aware instruction with careful ARIA live regions, destination
+and system status, VOICE / PAUSE / STOP controls, and a development-only debug
+overlay (with a simulated-scenario switcher). All state is **mocked**; there is
+no camera, GPS, Gemini, routing, or speech.
+
 **Phase 1 — Core domain model.** The `core` domain types + Zod schemas (Scene
 Representation, session, safety, navigation, decision, speech), the typed error
 taxonomy, the `VisionProvider` interface (contract only), typed env config, and

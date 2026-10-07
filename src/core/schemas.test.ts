@@ -12,55 +12,74 @@ import {
 } from "./index";
 
 describe("ObstacleSchema", () => {
+  const obstacle = {
+    type: "person",
+    position: "center",
+    relativeDistance: "near",
+    severity: "medium",
+    confidence: 0.8,
+    movement: "approaching",
+  };
+
   it("accepts a well-formed obstacle", () => {
-    const result = ObstacleSchema.safeParse({
-      id: "o1",
-      kind: "person",
-      confidence: 0.8,
-      direction: "center",
-      proximity: "near",
-    });
-    expect(result.success).toBe(true);
+    expect(ObstacleSchema.safeParse(obstacle).success).toBe(true);
   });
 
   it("rejects confidence outside [0, 1]", () => {
     expect(
-      ObstacleSchema.safeParse({ id: "o1", kind: "person", confidence: 1.5 })
-        .success,
+      ObstacleSchema.safeParse({ ...obstacle, confidence: 1.5 }).success,
     ).toBe(false);
   });
 
-  it("rejects an unknown obstacle kind", () => {
+  it("rejects an unknown obstacle type", () => {
     expect(
-      ObstacleSchema.safeParse({ id: "o1", kind: "dragon", confidence: 0.5 })
-        .success,
+      ObstacleSchema.safeParse({ ...obstacle, type: "dragon" }).success,
     ).toBe(false);
+  });
+
+  it("has no field for a precise distance in meters", () => {
+    // The system has no depth sensor: obstacles carry only a relative category.
+    expect("distanceMeters" in ObstacleSchema.shape).toBe(false);
   });
 });
 
 describe("SceneAnalysisSchema", () => {
   const valid = {
-    analysisId: "a1",
+    analysisId: "11111111-1111-4111-8111-111111111111",
     capturedAt: 1700000000000,
+    analyzedAt: 1700000000500,
     availability: "ok",
+    provider: "fixture",
+    sceneType: "sidewalk",
+    pathStatus: "clear",
+    terrain: "even",
     overallConfidence: 0.7,
+    uncertainty: "low",
     obstacles: [],
-    traversability: "unknown",
+    hazards: [],
+    recommendedImmediateAction: "continue",
+    description: "Open sidewalk ahead.",
   };
 
   it("accepts a well-formed scene", () => {
     expect(SceneAnalysisSchema.safeParse(valid).success).toBe(true);
   });
 
-  it("rejects a missing analysisId", () => {
-    const { analysisId: _omit, ...rest } = valid;
-    void _omit;
-    expect(SceneAnalysisSchema.safeParse(rest).success).toBe(false);
+  it("rejects a non-UUID analysisId", () => {
+    expect(
+      SceneAnalysisSchema.safeParse({ ...valid, analysisId: "a1" }).success,
+    ).toBe(false);
   });
 
   it("rejects an invalid availability state", () => {
     expect(
       SceneAnalysisSchema.safeParse({ ...valid, availability: "fine" }).success,
+    ).toBe(false);
+  });
+
+  it("rejects an invalid path status", () => {
+    expect(
+      SceneAnalysisSchema.safeParse({ ...valid, pathStatus: "mostly" }).success,
     ).toBe(false);
   });
 });

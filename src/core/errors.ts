@@ -7,6 +7,8 @@ export const AppErrorCodeSchema = z.enum([
   "timeout",
   "network",
   "ai_error",
+  "rate_limited",
+  "invalid_image",
   "invalid_model_response",
   "unsupported_feature",
 ]);
@@ -83,6 +85,29 @@ export class AiProviderError extends AppError {
   ) {
     super("ai_error", message, { retryable: true, ...options });
     this.name = "AiProviderError";
+  }
+}
+
+export class RateLimitedError extends AppError {
+  /** Seconds the provider suggested waiting before retrying, if known. */
+  readonly retryAfterSeconds: number | undefined;
+  constructor(
+    message = "The AI provider rate-limited the request.",
+    options?: AppErrorOptions & { retryAfterSeconds?: number },
+  ) {
+    super("rate_limited", message, { retryable: true, ...options });
+    this.name = "RateLimitedError";
+    this.retryAfterSeconds = options?.retryAfterSeconds;
+  }
+}
+
+export class InvalidImageError extends AppError {
+  constructor(
+    message = "The supplied image was missing, malformed, or unsupported.",
+    options?: AppErrorOptions,
+  ) {
+    super("invalid_image", message, { retryable: false, ...options });
+    this.name = "InvalidImageError";
   }
 }
 

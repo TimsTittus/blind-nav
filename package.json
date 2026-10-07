@@ -26,6 +26,7 @@
     "check": "bun run format:check && bun run lint && bun run typecheck && bun run test"
   },
   "dependencies": {
+    "@google/genai": "^2.27.0",
     "next": "16.4.0",
     "react": "19.3.0",
     "react-dom": "19.3.0",

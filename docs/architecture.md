@@ -1,12 +1,17 @@
 # Architecture
 
-Status: **Phase 3 (browser camera subsystem)**; Phase 2 added the mocked Navigation Mode UI. Phase 1 added the core domain model. This document describes the target
-software architecture the prototype is being built toward. The `core` domain
-model + Zod schemas now exist, along with the `VisionProvider` interface
-(contract only), typed env config, the typed error taxonomy, and a minimal
-accessible UI shell with a client-held session. The remaining feature layers
-(`perception`, `safety`, `navigation`, `decision`, `speech` logic) still exist
-as documented seams and gain real logic in later phases.
+Status: **Phase 4 (server-side Gemini vision pipeline)**; Phase 3 added the
+browser camera subsystem, Phase 2 the mocked Navigation Mode UI, and Phase 1 the
+core domain model. This document describes the target software architecture the
+prototype is being built toward. The `core` domain model + Zod schemas exist
+(the Scene Representation is now the conservative Phase-4 shape), along with a
+concrete **Gemini `VisionProvider`** + dev fixtures, the server **analyze route**,
+and a client **perception pipeline** (analysis client, single-in-flight
+controller with no stale overwrites, camera→perception bridge), plus typed env
+config, the typed error taxonomy, and a minimal accessible UI shell with a
+client-held session. The remaining feature layers (`safety`, `navigation`,
+`decision`, `speech` logic) still exist as documented seams and gain real logic
+in later phases.
 
 ## 1. Goals and non-goals
 
@@ -102,8 +107,11 @@ Dependencies point **toward `core`**; lower layers never import UI.
 - One narrow `VisionProvider` interface in [`providers`](../src/providers):
   input a frame (+ context) → output a **validated** partial Scene
   Representation or a typed failure.
-- First implementation: **Google Gemini** via the official `@google/genai` SDK,
-  using **structured JSON output**, parsed with Zod.
+- First implementation (Phase 4, done): **Google Gemini** via the official
+  `@google/genai` SDK (`ai.models.generateContent`), using **structured JSON
+  output** (`responseSchema`) and inline base64 image input, re-parsed with Zod.
+  A dev-only **fixture provider** implements the same interface for keyless runs.
+  See [`docs/gemini.md`](gemini.md).
 - Future implementations behind the same interface: OpenRouter models, local
   object detection, semantic segmentation, depth estimation, dedicated CV
   models — swappable without changing callers.
@@ -214,10 +222,14 @@ next phase is not started automatically.
    `src/app/_navigation` (see §15). No camera, GPS, AI, routing, or speech.
 3. **Browser camera subsystem (done):** `src/camera` — controller, frame
    capture, scheduler, mock consumer (see §16). No AI/GPS/routing.
-4. A mock `VisionProvider` implementation + server route handler + the
-   validation/concurrency harness, then the multi-rate pipeline wiring camera
-   frames to it.
-5. Real Gemini provider (`@google/genai`, structured output).
+4. **Server-side Gemini vision pipeline (done):** evolved Scene Representation,
+   the real Gemini `VisionProvider` (`@google/genai`, structured output) + dev
+   fixtures, `POST /api/vision/analyze` with full validation and typed errors,
+   and a client perception harness (single in-flight, no stale overwrites) wired
+   to the camera at the `FrameConsumer` seam (see §17). Phase 5's "real Gemini"
+   work was folded in here; mounting the pipeline in the live UI is deferred to
+   the Safety Engine phase.
+5. ~~Real Gemini provider~~ — folded into Phase 4.
 6. Deterministic Safety Engine.
 7. Navigation Engine (destination, route, position, heading).
 8. Decision Engine (reconciliation + cadence).
@@ -280,3 +292,38 @@ will consume `FrameConsumer`.
 - **Privacy** — frames live only in memory for one consumer call; nothing is
   written to web storage/IndexedDB or sent over the network (E2E asserts this).
 
+
+## 17. Perception pipeline (added in Phase 4)
+
+Wires camera frames to AI vision and back to a validated Scene Representation.
+Flow: `camera frame → POST /api/vision/analyze → provider (Gemini|fixture) →
+Zod-validated SceneAnalysis`. Code: [`src/providers`](../src/providers),
+[`src/perception`](../src/perception/README.md), and the route under
+[`src/app/api/vision/analyze`](../src/app/api/vision). Config:
+[`docs/gemini.md`](gemini.md).
+
+- **Scene Representation (evolved).** `core` now carries the conservative
+  Phase-4 schema: categorical enums everywhere, a `Hazard` type, explicit
+  `uncertainty`, and **no meters field** (no depth sensor → relative-distance
+  categories only). `SceneObservation` is the model-output subset;
+  `SceneAnalysis` adds server identity/freshness (`analysisId`, `capturedAt`,
+  `analyzedAt`, derived `availability`, `provider`).
+- **Providers.** `GeminiVisionProvider` (server-only; `@google/genai`,
+  structured output, Zod re-validation, typed error mapping) and a dev-only
+  `FixtureVisionProvider` (clear / puddle / obstacle / stairs / blocked /
+  uncertain) behind the one `VisionProvider` interface. `recommendedImmediateAction`
+  is a model *hint*, never a command — the Safety Engine will decide.
+- **Route.** `POST /api/vision/analyze` validates request → MIME → size → calls
+  the provider → returns a typed `SceneAnalysis` or a typed error. Keys are
+  server-only; the browser never calls Gemini directly. On any failure the
+  response is `perceptionStatus: "unavailable"` — never a silent "path clear".
+- **Client harness.** `PerceptionController` runs **one analysis at a time**,
+  coalescing newer frames into a single pending slot, tagging each with a
+  monotonic sequence, and applying results through a pure reducer that **drops
+  any result older than the one already applied**. `dispose()` aborts in-flight
+  work (unmount / session cancellation). A `FrameConsumer` bridge encodes each
+  frame transiently (never stored) and submits it.
+- **Not yet in the live UI.** The pipeline is wired and unit-tested at the
+  `FrameConsumer` seam but is not mounted into `/navigate` yet: that couples
+  perception to the still-mocked navigation/safety and changes a run's privacy
+  posture (frames leaving the device), which belongs with the Safety Engine.

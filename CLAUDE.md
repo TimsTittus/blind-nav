@@ -103,18 +103,25 @@ required and documented. Secrets stay on the server.
 
 ## Current status
 
-**Phase 3 — Browser camera subsystem complete**, on top of Phase 2 (mocked
-Navigation Mode UI) and Phase 1 (core domain model, `VisionProvider` interface,
-typed env). `src/camera` provides `CameraController` (explicit states, cleanup,
-switching, visibility pause), `FrameCapture` (JPEG `Blob`), `FrameScheduler`,
-a dev-only metadata-logging `FrameConsumer`, and `useCamera`/`useFrameLoop`.
-`/navigate` starts the camera on entry and releases it on stop/unmount;
-`CameraViewport` renders every camera state. Frames are never persisted or
-uploaded; there is still no Gemini, GPS, routing, or speech, so safety stays
-honestly UNKNOWN. Vitest + Playwright (mocked camera) cover it. Browser
-limitations: [`src/camera/README.md`](src/camera/README.md).
+**Phase 4 — Server-side Gemini vision pipeline complete**, on top of Phase 3
+(browser camera), Phase 2 (mocked Navigation Mode UI), and Phase 1 (core model,
+typed env). The Scene Representation in `core` is now the conservative Phase-4
+schema (categorical enums, `Hazard`, explicit `uncertainty`, **no meters** — no
+depth sensor). `src/providers` has a server-only `GeminiVisionProvider`
+(`@google/genai`, structured output, Zod-revalidated, typed error mapping) and a
+dev `FixtureVisionProvider` (clear/puddle/obstacle/stairs/blocked/uncertain)
+behind one `VisionProvider`. `POST /api/vision/analyze` validates request → MIME
+→ size → provider → returns a typed `SceneAnalysis` or a typed error with
+`perceptionStatus: "unavailable"` (never a silent "path clear"). `src/perception`
+adds the wire contract, image boundary, browser analysis client, and a
+`PerceptionController` (one in-flight, monotonic sequence, no stale overwrites,
+abortable) plus a camera→perception `FrameConsumer` bridge. Keys are server-only
+and the Gemini module is not in the client-safe barrel. Gemini mocked in unit
+tests. Config: [`docs/gemini.md`](docs/gemini.md). The pipeline is **not** yet
+mounted in `/navigate` (deferred to the Safety Engine phase), so safety stays
+honestly UNKNOWN. There is still no GPS, routing, speech, or local CV.
 
-Next up is **Phase 4** (mock `VisionProvider` + server route handler +
-validation/concurrency harness, then pipeline wiring; see the roadmap in
-[`docs/architecture.md`](docs/architecture.md)). Do not start it without being
-asked.
+Next up is **Phase 6 — the deterministic Safety Engine** (`src/safety`), which
+also mounts perception into the UI and revisits the `StatusCategory`/`SafetyLevel`
+mapping (see the roadmap in [`docs/architecture.md`](docs/architecture.md)). Do
+not start it without being asked.

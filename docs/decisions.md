@@ -393,3 +393,68 @@ subsystem alone (no Gemini, GPS, or routing).
 `src/camera/README.md`); E2E uses a canvas-backed mock stream and injected
 failures instead of hardware.
 
+---
+
+## ADR 0017 — Phase 4: server-side Gemini vision pipeline (provider + route + harness)
+
+**Status:** Accepted (2026-10-07)
+
+**Context.** Phase 4 connects the camera frame pipeline to AI vision:
+`camera frame → server → Gemini → validated SceneAnalysis`. The roadmap split
+this across Phases 4–5 (mock provider/route, then the real Gemini provider); the
+requested Phase 4 merges them. It must keep API keys server-side, validate
+everything external, represent uncertainty and failure explicitly, prevent stale
+overwrites, and remain perception-only (no safety, navigation, GPS, routing,
+speech, or local CV).
+
+**Decision.**
+
+- **Evolve the Scene Representation.** The Phase-1 placeholder `SceneAnalysis` /
+  `Obstacle` in `core` are replaced with the conservative Phase-4 design:
+  categorical enums throughout (`sceneType`, `pathStatus`, `terrain`,
+  obstacle `position` / `relativeDistance` / `severity` / `movement`, `hazards`,
+  `recommendedImmediateAction`, `uncertainty`), a `Hazard` type, and a
+  model-output subset `SceneObservation` that normalizes into a server-stamped
+  `SceneAnalysis` (`analysisId`, `capturedAt`, `analyzedAt`, derived
+  `availability`, `provider`). `core` stays the single source of truth
+  ([ADR 0010](decisions.md)).
+- **No precise distance.** There is no depth sensor, so the schema has **no**
+  meters field; obstacles carry only a relative-distance *category*. The system
+  must never fabricate a numeric distance.
+- **`recommendedImmediateAction` is a hint, not a command.** The LLM remains an
+  observation component ([ADR 0005](decisions.md)); the future deterministic
+  Safety Engine owns risk and user-facing action.
+- **Official SDK.** The Gemini provider uses `@google/genai`
+  (`ai.models.generateContent`) with structured JSON output
+  (`responseMimeType` + `responseSchema` via the `Type` enum), inline base64
+  image input, `temperature: 0`, disabled thinking, and a combined
+  timeout/abort signal. Output is re-validated with Zod regardless.
+- **Secrets stay server-only.** The Gemini provider (and the key) are reachable
+  only from the route handler via a server module; the `@/providers` barrel does
+  not export it, so no client bundle can import the SDK or key.
+- **One request in flight.** A client `PerceptionController` issues at most one
+  analysis at a time, coalescing newer frames into a single pending slot, with a
+  monotonic sequence and a pure reducer that drops any result older than the one
+  already applied — an old response can never overwrite newer state.
+- **Honest failure.** Every failure maps to the typed error taxonomy (extended
+  with `rate_limited` and `invalid_image`), returns
+  `perceptionStatus: "unavailable"`, and clears the last analysis. Failure is
+  never a silent "path clear".
+- **Fixtures, not live UI wiring.** A dev-only fixture provider (clear / puddle /
+  obstacle / stairs / blocked / uncertain) lets the whole pipeline run with no
+  key. The pipeline is wired to the camera at the `FrameConsumer` seam and fully
+  unit-tested, but it is **not** mounted into the live `/navigate` UI this phase:
+  that couples perception to the still-mocked navigation/safety and changes a
+  run's privacy posture (frames would leave the device), which belongs with the
+  Safety Engine and an explicit consent decision.
+
+**Consequences.**
+
+- The architecture's perception seam is real and testable end-to-end without an
+  API key, a camera, or the network (Gemini is mocked in unit tests).
+- The `core` scene schema changed shape; the only consumers were the schema
+  tests and the provider return type, both updated.
+- Mounting perception in the UI, and the `StatusCategory`/`SafetyLevel` mapping,
+  remain for the Safety Engine phase. See [`docs/gemini.md`](gemini.md) for
+  configuration.
+

@@ -17,6 +17,11 @@ export const AnalyzeFrameContextSchema = z.object({
   mode: SessionModeSchema,
   heading: HeadingStateSchema.optional(),
   location: LocationStateSchema.optional(),
+  /**
+   * Development-only hint naming a fixture scene to return. Ignored by the real
+   * Gemini provider; honoured only by the fixture provider in non-production.
+   */
+  scenario: z.string().min(1).optional(),
 });
 
 export const AnalyzeFrameInputSchema = z.object({

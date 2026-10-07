@@ -7,6 +7,11 @@ const ServerEnvSchema = z.object({
   GEMINI_API_KEY: z.string().min(1).optional(),
   GEMINI_MODEL: z.string().min(1).default("gemini-2.5-flash"),
   OPENROUTER_API_KEY: z.string().min(1).optional(),
+  /**
+   * Dev-only switch to force the canned fixture vision provider even when a
+   * Gemini key is present. Ignored in production. "1" or "true" to enable.
+   */
+  VISION_FIXTURES: z.string().min(1).optional(),
 });
 
 export type ServerEnv = z.infer<typeof ServerEnvSchema>;

@@ -305,16 +305,6 @@ legend {
   overflow: hidden;
 }
 
-.camera-viewport__placeholder {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-content: center;
-  margin: 0;
-  text-align: center;
-  font-size: 1rem;
-}
-
 .status-overlay {
   position: absolute;
   inset: 0 0 auto 0;
@@ -616,4 +606,50 @@ legend {
     width: min(100%, calc(70dvh * 16 / 9));
     aspect-ratio: 16 / 9;
   }
+}
+
+/* Camera states + preview (Phase 3). */
+.camera-viewport__video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.camera-viewport__video[hidden] {
+  display: none;
+}
+
+.camera-viewport__message {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem;
+  overflow: auto;
+  text-align: center;
+}
+
+.camera-viewport__text,
+.camera-viewport__hint {
+  margin: 0;
+}
+
+.camera-viewport__text {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.camera-viewport__hint {
+  font-size: 0.875rem;
+}
+
+.camera-viewport__switch {
+  position: absolute;
+  right: 0.5rem;
+  bottom: 0.5rem;
+  z-index: 1;
 }

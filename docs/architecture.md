@@ -1,6 +1,6 @@
 # Architecture
 
-Status: **Phase 2 (Navigation Mode UI, mocked)**. Phase 1 added the core domain model. This document describes the target
+Status: **Phase 3 (browser camera subsystem)**; Phase 2 added the mocked Navigation Mode UI. Phase 1 added the core domain model. This document describes the target
 software architecture the prototype is being built toward. The `core` domain
 model + Zod schemas now exist, along with the `VisionProvider` interface
 (contract only), typed env config, the typed error taxonomy, and a minimal
@@ -212,9 +212,11 @@ next phase is not started automatically.
    `VisionProvider` interface (contract only) was pulled forward into this phase.
 2. **Navigation Mode UI (done, mocked):** audio-first `/navigate` screen —
    `src/app/_navigation` (see §15). No camera, GPS, AI, routing, or speech.
-3. A mock `VisionProvider` implementation + server route handler + the
-   validation/concurrency harness (no real camera yet).
-4. Client camera capture + the multi-rate pipeline wired to the mock provider.
+3. **Browser camera subsystem (done):** `src/camera` — controller, frame
+   capture, scheduler, mock consumer (see §16). No AI/GPS/routing.
+4. A mock `VisionProvider` implementation + server route handler + the
+   validation/concurrency harness, then the multi-rate pipeline wiring camera
+   frames to it.
 5. Real Gemini provider (`@google/genai`, structured output).
 6. Deterministic Safety Engine.
 7. Navigation Engine (destination, route, position, heading).
@@ -248,3 +250,33 @@ fallback interaction, and debugging. Code: `src/app/_navigation`.
 - **Responsive:** camera keeps 16:9 (landscape) / 4:3 (portrait) via
   `aspect-ratio`, capped by viewport height; short landscape screens place the
   camera beside the panel; controls are sticky at the bottom.
+
+## 16. Browser camera subsystem (added in Phase 3)
+
+Client-only input layer in [`src/camera`](../src/camera/README.md). It depends
+on nothing but the browser (and Zod); `app` consumes it, and later `perception`
+will consume `FrameConsumer`.
+
+- **`CameraController`** — framework-agnostic owner of one stream. Explicit
+  states `idle | requesting_permission | active | paused | error | unsupported`
+  from a pure, tested transition table (`state.ts`). Releases all tracks on
+  stop, failure, switch, device loss, and when a late `getUserMedia` result
+  arrives after `stop()` (token invalidation). Pause reasons (user PAUSE, tab
+  hidden) are tracked separately so one cannot undo the other.
+- **`FrameCapture`** — on-demand `captureFrame({ maxWidth, maxHeight, quality })`
+  → `Blob` (JPEG by default; no base64). Never runs by itself.
+- **`FrameScheduler`** — fixed-delay loop (start/stop/pause/resume), never
+  overlaps jobs, aborts and discards in-flight work on pause/stop/hidden tab,
+  stops itself after repeated failures, supports an external `AbortSignal`.
+- **`FrameConsumer`** — sink interface. Only the dev logging consumer exists
+  (metadata only, no pixels, disabled in production builds). The frame loop is
+  enabled in development only until a real consumer exists.
+- **Hooks** — `useCamera()` (store binding + unmount cleanup) and
+  `useFrameLoop()`. Defaults live in `config.ts` (1000 ms, 1024 px box, 0.7).
+- **UI** — `CameraViewport` (`_navigation`) renders the preview and every
+  non-active state with a persistent polite live region. Camera health appears
+  in System status; an active camera does **not** change safety (still UNKNOWN
+  until perception exists).
+- **Privacy** — frames live only in memory for one consumer call; nothing is
+  written to web storage/IndexedDB or sent over the network (E2E asserts this).
+

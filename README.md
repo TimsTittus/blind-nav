@@ -18,7 +18,19 @@ software architecture.
 
 ## Status
 
-**Phase 2 — Navigation Mode UI (mocked).** `/navigate` is now an audio-first,
+**Phase 3 — Browser camera subsystem.** `/navigate` now opens the real camera
+(`getUserMedia`, environment-facing when available) through a reusable
+`CameraController` (`src/camera`): explicit states (idle / requesting_permission
+/ active / paused / error / unsupported), permission-denied and unavailable
+handling, camera switching, pause on tab-hidden, and guaranteed track release on
+stop/unmount. A controlled `FrameCapture` (JPEG `Blob`, ~1 fps default, ≤1024 px)
+and a `FrameScheduler` feed a **mock consumer that logs metadata only, in
+development**. Frames are never persisted or uploaded; there is still no Gemini,
+GPS, routing, or speech, so the safety status stays honestly UNKNOWN. See
+[`src/camera/README.md`](src/camera/README.md) for design and browser
+limitations.
+
+**Phase 2 — Navigation Mode UI (mocked).** `/navigate` is an an audio-first,
 high-contrast screen: camera placeholder, safety category (SAFE / CAUTION /
 DANGER / CRITICAL / UNKNOWN — text + glyph + border style, never colour alone),
 a speech-priority-aware instruction with careful ARIA live regions, destination

@@ -103,17 +103,18 @@ required and documented. Secrets stay on the server.
 
 ## Current status
 
-**Phase 2 — Navigation Mode UI (mocked) complete**, on top of Phase 1 (core
-domain model, `VisionProvider` interface, typed env, minimal shell). `/navigate`
-renders `src/app/_navigation`: pure model files (`status.ts`, `announcement.ts`,
-`mock-scenarios.ts`, `view-model.ts`) plus the components `CameraViewport`,
-`NavigationStatusOverlay`, `NavigationInstruction` (speech-priority-aware, two
-persistent live regions), `DestinationStatus`, `SystemStatus`,
-`SafetyIndicator`, `SessionControls`, `EmergencyStop`, and a dev-only
-`DebugOverlay`. All data is mocked; the default state is honestly UNKNOWN. No
-camera, GPS, Gemini, routing, or speech yet. Vitest + Playwright cover it.
+**Phase 3 — Browser camera subsystem complete**, on top of Phase 2 (mocked
+Navigation Mode UI) and Phase 1 (core domain model, `VisionProvider` interface,
+typed env). `src/camera` provides `CameraController` (explicit states, cleanup,
+switching, visibility pause), `FrameCapture` (JPEG `Blob`), `FrameScheduler`,
+a dev-only metadata-logging `FrameConsumer`, and `useCamera`/`useFrameLoop`.
+`/navigate` starts the camera on entry and releases it on stop/unmount;
+`CameraViewport` renders every camera state. Frames are never persisted or
+uploaded; there is still no Gemini, GPS, routing, or speech, so safety stays
+honestly UNKNOWN. Vitest + Playwright (mocked camera) cover it. Browser
+limitations: [`src/camera/README.md`](src/camera/README.md).
 
-Next up is **Phase 3** (mock `VisionProvider` + server route handler +
-validation/concurrency harness; see the roadmap in
+Next up is **Phase 4** (mock `VisionProvider` + server route handler +
+validation/concurrency harness, then pipeline wiring; see the roadmap in
 [`docs/architecture.md`](docs/architecture.md)). Do not start it without being
 asked.

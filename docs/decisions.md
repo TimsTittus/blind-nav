@@ -360,3 +360,36 @@ bundles exclude it. The mock-provider/route-handler work shifts to Phase 3.
 exist. The `StatusCategory` ↔ `SafetyLevel` mapping must be revisited in the
 Safety Engine phase.
 
+---
+
+## ADR 0016 — Phase 3 is the browser camera subsystem; provider harness moves to Phase 4
+
+**Status:** Accepted (2026-10-07)
+
+**Context.** The roadmap planned the mock `VisionProvider` + route handler for
+Phase 3 and camera capture for Phase 4. The requested Phase 3 is the camera
+subsystem alone (no Gemini, GPS, or routing).
+
+**Decision.**
+
+- Add `src/camera` as a client-only input layer (controller, capture,
+  scheduler, consumer, hooks). It is framework-agnostic at its core so lifecycle
+  logic is unit-testable without React or a real camera (dependencies such as
+  `mediaDevices` and visibility are injectable).
+- **Pause keeps the stream but disables tracks** (`track.enabled = false`)
+  rather than releasing it, for instant resume. Tab-hidden and user-PAUSE are
+  independent pause reasons. `stop()` always releases tracks.
+- **Frames are binary `Blob`s** encoded via canvas; no base64 on the client.
+  The scheduler does not await the consumer, so a slow consumer cannot delay
+  capture; backpressure is the consumer's job (perception will drop stale work
+  with sequence tokens).
+- The frame loop runs **only in development** with the logging consumer; there
+  is no point capturing in production until a real consumer exists.
+- Camera state is not folded into `core` `PerceptionStatus`/safety: a live
+  camera says nothing about obstacles, so safety stays UNKNOWN.
+- Provider harness moves to Phase 4 and is combined with wiring the pipeline.
+
+**Consequences.** Real-camera behaviour varies by browser (see
+`src/camera/README.md`); E2E uses a canvas-backed mock stream and injected
+failures instead of hardware.
+

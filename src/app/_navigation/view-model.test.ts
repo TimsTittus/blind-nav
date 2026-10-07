@@ -83,4 +83,27 @@ describe("buildViewModel", () => {
     expect(view.debug.lastAnalysisAt).toBe(6_000);
     expect(view.debug.latencyMs).toBe(640);
   });
+
+  it("reports the real camera state, defaulting to off", () => {
+    const camera = (state?: Parameters<typeof buildViewModel>[0]["camera"]) =>
+      buildViewModel({
+        session,
+        scenarioId: "awaiting",
+        paused: false,
+        ...(state ? { camera: state } : {}),
+      }).systems.find((s) => s.id === "camera");
+    expect(camera()).toMatchObject({ value: "Off", ok: false });
+    expect(camera("active")).toMatchObject({ value: "Active", ok: true });
+    expect(camera("error")).toMatchObject({ value: "Unavailable", ok: false });
+  });
+
+  it("stays UNKNOWN with an active camera (perception is not wired yet)", () => {
+    const view = buildViewModel({
+      session,
+      scenarioId: "awaiting",
+      paused: false,
+      camera: "active",
+    });
+    expect(view.category).toBe("UNKNOWN");
+  });
 });

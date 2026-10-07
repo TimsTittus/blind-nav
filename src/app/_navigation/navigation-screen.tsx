@@ -2,7 +2,9 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { createDevLoggingConsumer, useCamera, useFrameLoop } from "@/camera";
+import type { NavigationSession } from "@/core";
 import { useSession } from "../_session/use-session";
 import { CameraViewport } from "./camera-viewport";
 import { DebugOverlay } from "./debug-overlay";
@@ -21,10 +23,6 @@ const DEBUG_AVAILABLE = process.env.NODE_ENV !== "production";
 export function NavigationScreen() {
   const { session, hydrated, stop, clear } = useSession();
   const router = useRouter();
-  const [voiceEnabled, setVoiceEnabled] = useState(true);
-  const [paused, setPaused] = useState(false);
-  const [scenarioId, setScenarioId] = useState(AWAITING_SCENARIO_ID);
-  const [debugOpen, setDebugOpen] = useState(false);
 
   if (!hydrated) {
     return <p aria-live="polite">Preparing session…</p>;
@@ -47,19 +45,86 @@ export function NavigationScreen() {
     );
   }
 
-  const view = buildViewModel({ session, scenarioId, paused });
+  return (
+    <ActiveNavigation
+      session={session}
+      onStop={() => {
+        stop();
+        clear();
+        router.push("/");
+      }}
+    />
+  );
+}
+
+// Mock consumer: logs frame metadata in development only (no pixels, no
+// network, no storage). Replaced by the perception pipeline in a later phase.
+const devConsumer = createDevLoggingConsumer();
+
+/**
+ * Mounted only for an active navigate session, so the camera starts on entry
+ * and is released (tracks stopped) on unmount, stop, or navigation away.
+ */
+function ActiveNavigation({
+  session,
+  onStop,
+}: {
+  session: NavigationSession;
+  onStop: () => void;
+}) {
+  const camera = useCamera();
+  const {
+    start: startCamera,
+    pause: pauseCamera,
+    resume: resumeCamera,
+  } = camera;
+  const [voiceEnabled, setVoiceEnabled] = useState(true);
+  const [paused, setPaused] = useState(false);
+  const [scenarioId, setScenarioId] = useState(AWAITING_SCENARIO_ID);
+  const [debugOpen, setDebugOpen] = useState(false);
+
+  useEffect(() => {
+    void startCamera();
+  }, [startCamera]);
+
+  // PAUSE guidance also pauses the camera; resume is idempotent and the
+  // controller keeps tab-hidden pauses separate from this one.
+  useEffect(() => {
+    if (paused) pauseCamera();
+    else resumeCamera();
+  }, [paused, camera.state, pauseCamera, resumeCamera]);
+
+  useFrameLoop({
+    enabled: DEBUG_AVAILABLE && camera.state === "active",
+    captureFrame: camera.captureFrame,
+    consumer: devConsumer,
+  });
+
+  const view = buildViewModel({
+    session,
+    scenarioId,
+    paused,
+    camera: camera.state,
+  });
 
   function handleStop() {
-    stop();
-    clear();
-    router.push("/");
+    camera.stop();
+    onStop();
   }
 
   return (
     <div className="nav-screen">
       <h1 className="nav-screen__title">Navigation mode</h1>
       <div className="nav-screen__camera">
-        <CameraViewport>
+        <CameraViewport
+          state={camera.state}
+          error={camera.error}
+          videoRef={camera.videoRef}
+          canSwitch={camera.canSwitch}
+          switching={camera.switching}
+          onStart={() => void camera.start()}
+          onSwitch={() => void camera.switchCamera()}
+        >
           <NavigationStatusOverlay category={view.category} />
         </CameraViewport>
       </div>

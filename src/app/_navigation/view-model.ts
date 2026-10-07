@@ -1,10 +1,12 @@
+import type { CameraState } from "@/camera";
 import type { NavigationSession } from "@/core";
 import type { Announcement } from "./announcement";
 import { findScenario, AWAITING_SCENARIO_ID } from "./mock-scenarios";
+import { cameraStatusLabel } from "./camera-status";
 import { categoryFromSafety, type StatusCategory } from "./status";
 
 export interface SystemStatusItem {
-  id: "perception" | "gps" | "ai";
+  id: "camera" | "perception" | "gps" | "ai";
   label: string;
   value: string;
   ok: boolean;
@@ -34,6 +36,8 @@ export interface ViewModelInput {
   session: NavigationSession;
   scenarioId: string;
   paused: boolean;
+  /** Real camera state; defaults to "idle" (camera off). */
+  camera?: CameraState;
 }
 
 const PAUSED_ANNOUNCEMENT: Announcement = {
@@ -53,6 +57,7 @@ export function buildViewModel({
   session,
   scenarioId,
   paused,
+  camera = "idle",
 }: ViewModelInput): NavigationViewModel {
   const scenario = findScenario(scenarioId);
   const fromSession = scenario.id === AWAITING_SCENARIO_ID;
@@ -75,6 +80,12 @@ export function buildViewModel({
     destinationLabel: session.destination?.label ?? null,
     nextStep: paused ? null : scenario.nextStep,
     systems: [
+      {
+        id: "camera",
+        label: "Camera",
+        value: cameraStatusLabel(camera),
+        ok: camera === "active",
+      },
       {
         id: "perception",
         label: "Perception",

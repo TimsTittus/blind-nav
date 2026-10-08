@@ -34,11 +34,13 @@ export const STATUS_META: Record<StatusCategory, StatusMeta> = {
 /** A degraded or unknown assessment is never presented as SAFE. */
 export function categoryFromSafety(safety: SafetyAssessment): StatusCategory {
   switch (safety.level) {
-    case "clear":
+    case "safe":
       return safety.degraded ? "UNKNOWN" : "SAFE";
     case "caution":
       return "CAUTION";
-    case "stop":
+    case "danger":
+      return "DANGER";
+    case "critical":
       return "CRITICAL";
     case "unknown":
       return "UNKNOWN";

@@ -572,3 +572,60 @@ depend on live GPS.
 - The navigation state feeds into the Decision Engine (future phase), which
   reconciles it with safety and perception to produce spoken instructions.
 
+---
+
+## ADR 0020 — Phase 7: deterministic safety engine with five levels, actions, fusion, and expiry
+
+**Status:** Accepted (2026-10-08)
+
+**Context.** The architecture mandates a separate, deterministic Safety Engine
+that evaluates structured perception data with auditable rules and never asks a
+model "is this safe?" ([ADR 0005](decisions.md)). The Phase-1 `SafetyLevel` set
+(`clear`/`caution`/`stop`/`unknown`) was a placeholder; the UI already added a
+`DANGER` category between `CAUTION` and `CRITICAL` (ADR 0015 noted the mapping
+would be revisited). The engine must combine perception, location, heading,
+route, and the current route step into a conservative assessment with an
+expiration time.
+
+**Decision.**
+
+- **Evolve `core/safety.ts`.** Replace the four-level `SafetyLevelSchema` with
+  five levels: `unknown` < `safe` < `caution` < `danger` < `critical` (`clear`
+  → `safe`, `stop` → `critical`, `danger` added). Add `SafetyActionSchema`
+  (`none`, `continue`, `continue_cautiously`, `slow_down`, `move_left`,
+  `move_right`, `stop`). Extend `SafetyAssessmentSchema` with `action`,
+  `confidence` (0–1), and `expiresAt`.
+- **Deterministic rules (`src/safety/rules.ts`).** Obstacle evaluation uses
+  position × distance × severity. Hazard evaluation uses position × severity.
+  Path status maps directly. Unknown distance is conservatively treated as
+  `near`; unknown severity as `medium`. Multiple signals are aggregated by
+  worst-signal. Conflicting obstacles (near on both left and right) → DANGER +
+  STOP. Uncertainty and low confidence promote safe → caution.
+- **Navigation fusion (`src/safety/fusion.ts`).** If the current route step is
+  a turn toward a blocked direction (near + high severity obstacle), the engine
+  suppresses the route instruction and returns a `FusionOverride`. The engine
+  never invents an alternative route.
+- **Assessment expiry.** Every assessment carries `expiresAt` (default 3 s
+  TTL). `SafetyEngine.isExpired()` checks; after expiry the assessment must be
+  treated as `unknown`.
+- **Staleness.** Perception older than 10 s → `unknown`. Location older than
+  15 s → assessment marked `degraded` (informational). Thresholds are
+  configurable via `SafetyConfig`.
+- **No AI, no network.** The engine is pure: same input → same output, no model
+  calls, no side effects.
+- **Tests.** 73 table-driven test cases covering all severity combinations,
+  positions, distances, stale perception, conflicting obstacles, navigation
+  fusion, assessment expiry, low confidence, ambiguous availability, and edge
+  cases.
+
+**Consequences.**
+
+- The `core` safety schema changed (five levels, new fields). All consumers
+  (session factory, UI status mapping, mock scenarios, existing tests) were
+  updated. The UI `StatusCategory` ↔ `SafetyLevel` mapping is now nearly 1:1
+  (`safe` + `degraded` → `UNKNOWN`; `danger` → `DANGER`).
+- The engine is ready for the Decision Engine to consume. It is not yet mounted
+  in the UI; the Decision Engine phase will wire it.
+- This remains an assistive prototype and carries no guarantee of collision
+  avoidance — the engine reduces, not eliminates, risk.
+

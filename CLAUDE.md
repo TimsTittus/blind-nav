@@ -103,22 +103,22 @@ required and documented. Secrets stay on the server.
 
 ## Current status
 
-**Phase 6 — Navigation Engine complete**, on top of Phase 5 (speech engine),
-Phase 4 (server-side Gemini vision pipeline), Phase 3 (browser camera), Phase 2
-(mocked Navigation Mode UI), and Phase 1 (core model, typed env). `src/navigation`
-adds a `LocationController` wrapping browser Geolocation with an explicit state
-machine (unsupported/permission_required/permission_denied/acquiring/active/error/
-stale), heading resolution (GPS course vs. device orientation), haversine
-geo-math, a `RoutingProvider` abstraction with a dev-only `FixtureRoutingProvider`
-(three NYC fixture destinations), and a turn-by-turn `RouteTracker` (step
-progression, off-route detection with configurable debounce, arrival detection).
-`core/navigation.ts` gained `HeadingSource`, route `origin`/`totalDurationSeconds`,
-step `bearing`, and destination `address`. A `useLocation()` React hook exposes
-the controller. The navigation engine is **not** yet mounted in `/navigate`
-(deferred to the Safety Engine or Decision Engine phase). There is still no local
-CV or speech recognition.
+**Phase 7 — Safety Engine complete**, on top of Phase 6 (navigation engine),
+Phase 5 (speech engine), Phase 4 (server-side Gemini vision pipeline), Phase 3
+(browser camera), Phase 2 (mocked Navigation Mode UI), and Phase 1 (core model,
+typed env). `src/safety` adds a deterministic `SafetyEngine` that evaluates
+perception + navigation context with auditable rules — no AI model, no network,
+same input → same output. `core/safety.ts` now has five safety levels
+(unknown/safe/caution/danger/critical), seven actions, `confidence`, and
+`expiresAt`. The engine handles obstacle evaluation (position × distance ×
+severity), hazard evaluation, path-status assessment, navigation fusion
+(suppresses route instructions when a hazard blocks the turn direction),
+conflicting-obstacle detection, uncertainty penalties, staleness thresholds,
+and assessment expiry. The `StatusCategory` ↔ `SafetyLevel` mapping was
+revisited and is now nearly 1:1. 73 table-driven tests. The safety engine is
+**not** yet mounted in the live UI (deferred to the Decision Engine phase).
+There is still no local CV or speech recognition.
 
-Next up is **Phase 7 — the deterministic Safety Engine** (`src/safety`), which
-also mounts perception into the UI and revisits the `StatusCategory`/`SafetyLevel`
-mapping (see the roadmap in [`docs/architecture.md`](docs/architecture.md)). Do
-not start it without being asked.
+Next up is **Phase 8 — the Decision Engine** (`src/decision`), which reconciles
+safety + navigation + perception into a final decision and drives the speech
+engine. Do not start it without being asked.

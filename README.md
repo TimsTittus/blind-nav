@@ -18,49 +18,20 @@ software architecture.
 
 ## Status
 
-**Phase 4 — Server-side Gemini vision pipeline.** Camera frames can now be
-analysed by AI: `camera frame → POST /api/vision/analyze → provider → validated
-SceneAnalysis`. A server-only **`GeminiVisionProvider`** (official `@google/genai`
-SDK, structured JSON output, re-validated with Zod) and a dev **fixture provider**
-(clear / puddle / obstacle / stairs / blocked / uncertain) sit behind one
-`VisionProvider` interface. The route validates request → MIME → size, returns a
-typed `SceneAnalysis`, and on any failure returns `perceptionStatus: "unavailable"`
-— never a silent "path clear". API keys are **server-only** and never reach the
-browser bundle. A client perception harness runs **one analysis at a time** with
-monotonic sequencing so a stale response can't overwrite newer state. The Scene
-Representation uses relative-distance *categories* (no depth sensor → **no
-meters**). The pipeline is wired to the camera at the `FrameConsumer` seam and
-unit-tested (Gemini mocked), but **not yet mounted in `/navigate`**, so safety
-stays honestly UNKNOWN. Configuration: [`docs/gemini.md`](docs/gemini.md).
+**Phase 7 — Deterministic Safety Engine.** `src/safety` adds a pure, auditable
+`SafetyEngine` that evaluates perception + navigation context with deterministic
+rules — no AI model, no network. Five safety levels (unknown / safe / caution /
+danger / critical), seven actions, obstacle/hazard evaluation (position ×
+distance × severity), navigation fusion (suppresses route instructions when a
+hazard blocks the turn direction), assessment expiry, uncertainty penalties, and
+configurable staleness thresholds. 73 table-driven tests. Not yet mounted in the
+live UI. See [`docs/safety-engine.md`](docs/safety-engine.md) for the full rules
+reference.
 
-**Phase 3 — Browser camera subsystem.** `/navigate` now opens the real camera
-(`getUserMedia`, environment-facing when available) through a reusable
-`CameraController` (`src/camera`): explicit states (idle / requesting_permission
-/ active / paused / error / unsupported), permission-denied and unavailable
-handling, camera switching, pause on tab-hidden, and guaranteed track release on
-stop/unmount. A controlled `FrameCapture` (JPEG `Blob`, ~1 fps default, ≤1024 px)
-and a `FrameScheduler` feed a **mock consumer that logs metadata only, in
-development**. Frames are never persisted or uploaded; there is still no Gemini,
-GPS, routing, or speech, so the safety status stays honestly UNKNOWN. See
-[`src/camera/README.md`](src/camera/README.md) for design and browser
-limitations.
-
-**Phase 2 — Navigation Mode UI (mocked).** `/navigate` is an an audio-first,
-high-contrast screen: camera placeholder, safety category (SAFE / CAUTION /
-DANGER / CRITICAL / UNKNOWN — text + glyph + border style, never colour alone),
-a speech-priority-aware instruction with careful ARIA live regions, destination
-and system status, VOICE / PAUSE / STOP controls, and a development-only debug
-overlay (with a simulated-scenario switcher). All state is **mocked**; there is
-no camera, GPS, Gemini, routing, or speech.
-
-**Phase 1 — Core domain model.** The `core` domain types + Zod schemas (Scene
-Representation, session, safety, navigation, decision, speech), the typed error
-taxonomy, the `VisionProvider` interface (contract only), typed env config, and
-a minimal accessible UI shell (home + session creation, `/navigate` and
-`/explore` placeholders) are in place, with unit (Vitest) and e2e (Playwright)
-tests. **No live features yet** (no camera, AI, GPS, routing, or speech). See
-[`docs/architecture.md`](docs/architecture.md) for the design and the planned
-phases.
+Earlier phases: navigation engine (Phase 6), speech engine (Phase 5), server-side
+Gemini vision pipeline (Phase 4), browser camera (Phase 3), mocked Navigation
+Mode UI (Phase 2), core domain model (Phase 1). See
+[`docs/architecture.md`](docs/architecture.md) for the full design and roadmap.
 
 ## Tech stack
 

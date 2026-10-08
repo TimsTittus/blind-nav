@@ -89,8 +89,11 @@ describe("SafetyAssessmentSchema", () => {
     expect(
       SafetyAssessmentSchema.safeParse({
         level: "caution",
+        action: "slow_down",
         reasons: ["Obstacle ahead"],
+        confidence: 0.8,
         assessedAt: 1,
+        expiresAt: 5000,
         degraded: false,
       }).success,
     ).toBe(true);
@@ -99,9 +102,12 @@ describe("SafetyAssessmentSchema", () => {
   it("rejects an invalid safety level", () => {
     expect(
       SafetyAssessmentSchema.safeParse({
-        level: "danger",
+        level: "panic",
+        action: "none",
         reasons: [],
+        confidence: 0,
         assessedAt: 1,
+        expiresAt: 1,
         degraded: false,
       }).success,
     ).toBe(false);
@@ -167,8 +173,11 @@ describe("speech & decision schemas", () => {
         kind: "caution",
         safety: {
           level: "caution",
+          action: "slow_down",
           reasons: ["pole"],
+          confidence: 0.7,
           assessedAt: 1,
+          expiresAt: 5000,
           degraded: false,
         },
         message: "Caution, obstacle ahead.",

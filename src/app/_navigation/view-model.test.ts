@@ -14,19 +14,28 @@ function safety(
   level: SafetyAssessment["level"],
   degraded = false,
 ): SafetyAssessment {
-  return { level, reasons: [], assessedAt: 0, degraded };
+  return {
+    level,
+    action: "none",
+    reasons: [],
+    confidence: 0,
+    assessedAt: 0,
+    expiresAt: 0,
+    degraded,
+  };
 }
 
 describe("categoryFromSafety", () => {
   it("maps core levels to UI categories", () => {
-    expect(categoryFromSafety(safety("clear"))).toBe("SAFE");
+    expect(categoryFromSafety(safety("safe"))).toBe("SAFE");
     expect(categoryFromSafety(safety("caution"))).toBe("CAUTION");
-    expect(categoryFromSafety(safety("stop"))).toBe("CRITICAL");
+    expect(categoryFromSafety(safety("danger"))).toBe("DANGER");
+    expect(categoryFromSafety(safety("critical"))).toBe("CRITICAL");
     expect(categoryFromSafety(safety("unknown"))).toBe("UNKNOWN");
   });
 
   it("never reports SAFE for a degraded assessment", () => {
-    expect(categoryFromSafety(safety("clear", true))).toBe("UNKNOWN");
+    expect(categoryFromSafety(safety("safe", true))).toBe("UNKNOWN");
   });
 });
 

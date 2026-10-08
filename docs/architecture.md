@@ -1,21 +1,26 @@
 # Architecture
 
-Status: **Phase 6 (navigation engine)**; Phase 5 added the speech engine, Phase 4
-the server-side Gemini vision pipeline, Phase 3 the browser camera subsystem,
-Phase 2 the mocked Navigation Mode UI, and Phase 1 the core domain model. This
-document describes the target software architecture the prototype is being built
-toward. The `core` domain model + Zod schemas exist (the Scene Representation is
-now the conservative Phase-4 shape), along with a concrete **Gemini
-`VisionProvider`** + dev fixtures, the server **analyze route**, and a client
-**perception pipeline** (analysis client, single-in-flight controller with no
-stale overwrites, camera→perception bridge), a **speech engine** (`src/speech`)
-with a priority queue, interruption rules, duplicate suppression, and
-voice-settings persistence behind a swappable `TtsProvider` interface (browser
-`SpeechSynthesis` first), and a **navigation engine** (`src/navigation`) with
-location tracking, heading resolution, geo-math, a `RoutingProvider` abstraction,
-turn-by-turn `RouteTracker` with off-route detection and arrival, and a dev-only
-fixture routing provider. The remaining feature layers (`safety`, `decision`)
-still exist as documented seams and gain real logic in later phases.
+Status: **Phase 7 (safety engine)**; Phase 6 added the navigation engine,
+Phase 5 the speech engine, Phase 4 the server-side Gemini vision pipeline,
+Phase 3 the browser camera subsystem, Phase 2 the mocked Navigation Mode UI,
+and Phase 1 the core domain model. This document describes the target software
+architecture the prototype is being built toward. The `core` domain model + Zod
+schemas exist (the Scene Representation is now the conservative Phase-4 shape),
+along with a concrete **Gemini `VisionProvider`** + dev fixtures, the server
+**analyze route**, and a client **perception pipeline** (analysis client,
+single-in-flight controller with no stale overwrites, camera→perception bridge),
+a **speech engine** (`src/speech`) with a priority queue, interruption rules,
+duplicate suppression, and voice-settings persistence behind a swappable
+`TtsProvider` interface (browser `SpeechSynthesis` first), a **navigation
+engine** (`src/navigation`) with location tracking, heading resolution, geo-math,
+a `RoutingProvider` abstraction, turn-by-turn `RouteTracker` with off-route
+detection and arrival, and a dev-only fixture routing provider, and a
+**deterministic safety engine** (`src/safety`) with five safety levels
+(unknown/safe/caution/danger/critical), obstacle and hazard evaluation rules,
+navigation fusion (suppresses route instructions when a hazard conflicts),
+assessment expiry, and configurable staleness thresholds. The remaining feature
+layer (`decision`) still exists as a documented seam and gains real logic in a
+later phase.
 
 ## 1. Goals and non-goals
 
@@ -87,7 +92,7 @@ Each layer has a README with detail. Summary:
 | [`core`](../src/core)          | Domain types + Zod schemas (Scene Representation); pure helpers   | —                   |
 | [`providers`](../src/providers)| `VisionProvider` interface + concrete providers (server-only)     | core                |
 | [`perception`](../src/perception)| Frames → validated scene; multi-rate pipeline; concurrency       | core, providers     |
-| [`safety`](../src/safety)      | Deterministic safety assessment from the scene                    | core                |
+| [`safety`](../src/safety)      | Deterministic safety assessment from scene + navigation context   | core                |
 | [`navigation`](../src/navigation)| Route/GPS/position/heading reasoning                             | core                |
 | [`decision`](../src/decision)  | Reconcile safety + navigation + scene → decision & cadence        | core, safety, navigation |
 | [`speech`](../src/speech)      | Speak decisions; prioritize safety; duplicate suppression; swappable TTS | core          |
@@ -246,7 +251,13 @@ next phase is not started automatically.
    turn-by-turn `RouteTracker` (step progression, off-route detection with
    configurable debounce, arrival detection), and a `Route`/`RouteStep`/
    `Destination` model in `core` (see §19).
-7. Deterministic Safety Engine.
+7. **Deterministic Safety Engine (done):** `src/safety` — five safety levels
+   (unknown/safe/caution/danger/critical), seven actions, deterministic
+   obstacle/hazard/path evaluation rules, navigation fusion (suppresses route
+   instructions when a hazard conflicts with the turn direction), assessment
+   expiry, uncertainty penalties, conflicting-obstacle detection, configurable
+   staleness thresholds, and the evolved `core` safety schema with `action`,
+   `confidence`, and `expiresAt` (see §20).
 8. Decision Engine (reconciliation + cadence).
 9. Full accessibility pass.
 10. Hardening: failure/lifecycle edge cases end-to-end.
@@ -415,3 +426,49 @@ route state. Code: [`src/navigation`](../src/navigation/README.md).
   not mounted into `/navigate` yet — the UI integration belongs with the Safety
   Engine or Decision Engine phase, which needs location and route context to
   produce meaningful decisions.
+
+## 20. Deterministic safety engine (added in Phase 7)
+
+Pure, deterministic assessment of scene + navigation context. No AI model, no
+network, no side effects — same input always produces the same output. Code:
+[`src/safety`](../src/safety/README.md). Rules reference:
+[`docs/safety-engine.md`](safety-engine.md).
+
+- **Five safety levels.** `unknown` (default/degraded) < `safe` < `caution` <
+  `danger` < `critical`. The previous `core` level set (`clear`/`caution`/`stop`/
+  `unknown`) was replaced; `clear` became `safe`, `stop` became `critical`, and
+  `danger` was added between `caution` and `critical`. The UI's `StatusCategory`
+  now maps 1:1 with the core levels (except `safe` + `degraded` → `UNKNOWN`).
+- **Seven safety actions.** `none`, `continue`, `continue_cautiously`,
+  `slow_down`, `move_left`, `move_right`, `stop`. These are deterministic
+  outputs, not model hints. `SafetyAssessment` now carries `action`,
+  `confidence` (0–1), and `expiresAt`.
+- **Obstacle rules.** Each `Obstacle` is scored by position × distance ×
+  severity. Center + very_near + high/critical → CRITICAL/STOP; center + near +
+  high → DANGER/STOP; lateral + near + high → CAUTION/MOVE_LEFT or MOVE_RIGHT.
+  Unknown distance is conservatively treated as `near`; unknown severity as
+  `medium`. Approaching obstacles boost the threat level.
+- **Hazard rules.** Center + high/critical → CRITICAL/STOP; lateral + high →
+  DANGER + lateral move.
+- **Path status.** `blocked` → CRITICAL/STOP; `partially_blocked` →
+  CAUTION/SLOW_DOWN; `unknown` → CAUTION/CONTINUE_CAUTIOUSLY.
+- **Worst-signal aggregation.** Multiple obstacles/hazards: the worst threat
+  wins. If near obstacles exist on both left and right (conflicting), the engine
+  returns DANGER/STOP (cannot safely move in either direction).
+- **Uncertainty penalty.** When overall confidence < 0.3 or uncertainty is
+  `high`, a `safe` result is promoted to `caution` and confidence is capped.
+  Ambiguous availability also promotes `safe` → `caution`.
+- **Assessment expiry.** Every assessment has an `expiresAt` (configurable, default
+  3 s). After expiry it must be treated as `unknown`.
+- **Navigation fusion.** If the current route step is a turn (left/right) and
+  perception shows the turn direction is blocked (near + high severity), the
+  engine produces a `FusionOverride` that suppresses the route instruction and
+  replaces it with a safety message ("Right side appears blocked. Continue
+  carefully."). The engine never invents an alternative route — it can only
+  say stop, slow down, continue cautiously, or move laterally.
+- **Stale data handling.** Perception older than 10 s → `unknown`. Location
+  older than 15 s → assessment marked `degraded` with a reason (does not change
+  the level). Thresholds are configurable via `SafetyConfig`.
+- **Not yet in the UI.** The safety engine is pure and fully unit-tested (73
+  table-driven test cases) but is not mounted into the live UI — the Decision
+  Engine will consume its output and drive the Speech Engine.

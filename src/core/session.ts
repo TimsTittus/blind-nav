@@ -58,8 +58,11 @@ export function createSession(input: CreateSessionInput): NavigationSession {
     },
     safety: {
       level: "unknown",
+      action: "none",
       reasons: ["No perception yet; safety is unknown."],
+      confidence: 0,
       assessedAt: createdAt,
+      expiresAt: createdAt,
       degraded: true,
     },
   });

@@ -9,16 +9,24 @@ import {
   UuidSchema,
 } from "./primitives";
 
+export const HeadingSourceSchema = z.enum([
+  "gps",
+  "device_orientation",
+  "unknown",
+]);
+
 export const LocationStateSchema = z.object({
   coords: LatLngSchema,
   accuracyMeters: MetersSchema.optional(),
   altitudeMeters: z.number().optional(),
   speedMps: SpeedMpsSchema.optional(),
+  heading: HeadingDegreesSchema.optional(),
   timestamp: EpochMillisSchema,
 });
 
 export const HeadingStateSchema = z.object({
   degrees: HeadingDegreesSchema,
+  source: HeadingSourceSchema,
   accuracyDegrees: z.number().min(0).optional(),
   timestamp: EpochMillisSchema,
 });
@@ -27,6 +35,7 @@ export const DestinationSchema = z.object({
   id: NonEmptyStringSchema,
   label: NonEmptyStringSchema,
   coords: LatLngSchema.optional(),
+  address: NonEmptyStringSchema.optional(),
 });
 
 export const ManeuverSchema = z.enum([
@@ -49,16 +58,20 @@ export const RouteStepSchema = z.object({
   maneuver: ManeuverSchema.optional(),
   startsAt: LatLngSchema.optional(),
   endsAt: LatLngSchema.optional(),
+  bearing: HeadingDegreesSchema.optional(),
 });
 
 export const RouteSchema = z.object({
   id: UuidSchema,
   destination: DestinationSchema,
+  origin: LatLngSchema.optional(),
   steps: z.array(RouteStepSchema),
   totalDistanceMeters: MetersSchema.optional(),
+  totalDurationSeconds: z.number().min(0).optional(),
   createdAt: EpochMillisSchema,
 });
 
+export type HeadingSource = z.infer<typeof HeadingSourceSchema>;
 export type LocationState = z.infer<typeof LocationStateSchema>;
 export type HeadingState = z.infer<typeof HeadingStateSchema>;
 export type Destination = z.infer<typeof DestinationSchema>;

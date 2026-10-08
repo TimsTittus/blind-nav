@@ -103,21 +103,22 @@ required and documented. Secrets stay on the server.
 
 ## Current status
 
-**Phase 5 — Speech engine complete**, on top of Phase 4 (server-side Gemini
-vision pipeline), Phase 3 (browser camera), Phase 2 (mocked Navigation Mode UI),
-and Phase 1 (core model, typed env). `src/speech` adds a priority-ordered speech
-queue with interruption rules, duplicate suppression with per-priority cooldowns,
-browser `SpeechSynthesis` behind a swappable `TtsProvider` interface,
-voice-settings persistence (`localStorage`), a `SpeechEngine` orchestrator, and a
-`useSpeech()` React hook. Five speech priorities: `critical` > `high` >
-`navigation` > `information` > `low`. The voice toggle in the navigation UI now
-controls the real engine. A dev-only **Speech test** panel fires five test phrases
-at their priorities. The engine is event-driven and does not speak continuously.
-No speech recognition (deferred). The perception pipeline is **not** yet mounted
-in `/navigate` (deferred to the Safety Engine phase). There is still no GPS,
-routing, or local CV.
+**Phase 6 — Navigation Engine complete**, on top of Phase 5 (speech engine),
+Phase 4 (server-side Gemini vision pipeline), Phase 3 (browser camera), Phase 2
+(mocked Navigation Mode UI), and Phase 1 (core model, typed env). `src/navigation`
+adds a `LocationController` wrapping browser Geolocation with an explicit state
+machine (unsupported/permission_required/permission_denied/acquiring/active/error/
+stale), heading resolution (GPS course vs. device orientation), haversine
+geo-math, a `RoutingProvider` abstraction with a dev-only `FixtureRoutingProvider`
+(three NYC fixture destinations), and a turn-by-turn `RouteTracker` (step
+progression, off-route detection with configurable debounce, arrival detection).
+`core/navigation.ts` gained `HeadingSource`, route `origin`/`totalDurationSeconds`,
+step `bearing`, and destination `address`. A `useLocation()` React hook exposes
+the controller. The navigation engine is **not** yet mounted in `/navigate`
+(deferred to the Safety Engine or Decision Engine phase). There is still no local
+CV or speech recognition.
 
-Next up is **Phase 6 — the deterministic Safety Engine** (`src/safety`), which
+Next up is **Phase 7 — the deterministic Safety Engine** (`src/safety`), which
 also mounts perception into the UI and revisits the `StatusCategory`/`SafetyLevel`
 mapping (see the roadmap in [`docs/architecture.md`](docs/architecture.md)). Do
 not start it without being asked.

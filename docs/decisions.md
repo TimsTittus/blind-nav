@@ -510,3 +510,65 @@ must not repeat excessively), and a swappable TTS backend (browser
 - Screen-reader announcements (ARIA live regions) remain independent of TTS —
   they work even when speech is disabled or unsupported.
 
+---
+
+## ADR 0019 — Phase 6: navigation engine (location, heading, routing, route tracking)
+
+**Status:** Accepted (2026-10-08)
+
+**Context.** The system needs GPS-based location tracking, heading awareness,
+destination selection, walking route acquisition, and turn-by-turn route state
+to feed the Decision Engine. These are separate from visual perception and must
+not depend on a specific routing provider. The browser Geolocation API provides
+location; device orientation and GPS course provide heading. Tests must not
+depend on live GPS.
+
+**Decision.**
+
+- **Location state machine.** Seven explicit states (`unsupported`,
+  `permission_required`, `permission_denied`, `acquiring`, `active`, `error`,
+  `stale`) modeled as a pure transition table, driven by `LocationController`
+  wrapping browser `watchPosition`/`clearWatch`. A stale timer transitions to
+  `stale` after 15 s without a new position. The Geolocation dependency is
+  injectable for testability — tests use a `fakeGeolocation()` helper.
+- **Heading resolution.** GPS course heading and device orientation heading are
+  modeled as separate inputs. `resolveHeading()` picks the freshest source and
+  tags the result with `HeadingSource` (`gps` | `device_orientation` |
+  `unknown`). The core `HeadingStateSchema` gained a required `source` field.
+- **Geo-math.** Haversine distance, bearing, and perpendicular distance to a
+  segment are pure functions in `geo-math.ts`, used by the route tracker and
+  off-route detection.
+- **`RoutingProvider` abstraction.** `geocode(query)` → `GeocodingResult[]` and
+  `getWalkingRoute(origin, destination)` → `Route`. Provider-agnostic; the first
+  implementation is a dev-only `FixtureRoutingProvider` with three NYC fixture
+  destinations and interpolated walking routes. A live backend (Google
+  Directions, Mapbox, etc.) can be added behind the same interface later.
+  OpenStreetMap's public tile/API infrastructure is not used as an unrestricted
+  production routing backend.
+- **`RouteTracker`.** Tracks navigation progress against a `Route`: step
+  progression (advances when within a configurable threshold of a step's end
+  coordinate), off-route detection with a configurable distance threshold and
+  a debounce window (prevents false positives from GPS jitter), arrival
+  detection (within threshold of destination), and fractional progress
+  reporting.
+- **Core schema additions.** `core/navigation.ts` gained `HeadingSourceSchema`,
+  `address` on `DestinationSchema`, `bearing` on `RouteStepSchema`, and
+  `origin`/`totalDurationSeconds` on `RouteSchema`.
+- **React hook.** `useLocation()` creates a `LocationController` on mount,
+  disposes on unmount, and exposes the snapshot via `useSyncExternalStore`.
+- **Not yet in the UI.** The navigation engine is wired and unit-tested but
+  not mounted in `/navigate` — UI integration belongs with the Safety Engine
+  or Decision Engine phase, which needs location and route context.
+
+**Consequences.**
+
+- Location, heading, routing, and route tracking are testable independently with
+  deterministic fake inputs (no live GPS, no network).
+- The `RoutingProvider` abstraction makes the routing backend replaceable;
+  switching providers requires no changes to the route tracker, decision engine,
+  or UI.
+- Off-route detection debouncing prevents noisy GPS from generating false
+  re-route prompts.
+- The navigation state feeds into the Decision Engine (future phase), which
+  reconciles it with safety and perception to produce spoken instructions.
+

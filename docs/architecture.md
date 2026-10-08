@@ -1,19 +1,21 @@
 # Architecture
 
-Status: **Phase 5 (speech engine)**; Phase 4 added the server-side Gemini vision
-pipeline, Phase 3 the browser camera subsystem, Phase 2 the mocked Navigation
-Mode UI, and Phase 1 the core domain model. This document describes the target
-software architecture the prototype is being built toward. The `core` domain
-model + Zod schemas exist (the Scene Representation is now the conservative
-Phase-4 shape), along with a concrete **Gemini `VisionProvider`** + dev fixtures,
-the server **analyze route**, and a client **perception pipeline** (analysis
-client, single-in-flight controller with no stale overwrites, camera→perception
-bridge), plus typed env config, the typed error taxonomy, a minimal accessible
-UI shell with a client-held session, and a **speech engine** (`src/speech`) with
-a priority queue, interruption rules, duplicate suppression, and voice-settings
-persistence behind a swappable `TtsProvider` interface (browser `SpeechSynthesis`
-first). The remaining feature layers (`safety`, `navigation`, `decision`) still
-exist as documented seams and gain real logic in later phases.
+Status: **Phase 6 (navigation engine)**; Phase 5 added the speech engine, Phase 4
+the server-side Gemini vision pipeline, Phase 3 the browser camera subsystem,
+Phase 2 the mocked Navigation Mode UI, and Phase 1 the core domain model. This
+document describes the target software architecture the prototype is being built
+toward. The `core` domain model + Zod schemas exist (the Scene Representation is
+now the conservative Phase-4 shape), along with a concrete **Gemini
+`VisionProvider`** + dev fixtures, the server **analyze route**, and a client
+**perception pipeline** (analysis client, single-in-flight controller with no
+stale overwrites, camera→perception bridge), a **speech engine** (`src/speech`)
+with a priority queue, interruption rules, duplicate suppression, and
+voice-settings persistence behind a swappable `TtsProvider` interface (browser
+`SpeechSynthesis` first), and a **navigation engine** (`src/navigation`) with
+location tracking, heading resolution, geo-math, a `RoutingProvider` abstraction,
+turn-by-turn `RouteTracker` with off-route detection and arrival, and a dev-only
+fixture routing provider. The remaining feature layers (`safety`, `decision`)
+still exist as documented seams and gain real logic in later phases.
 
 ## 1. Goals and non-goals
 
@@ -236,8 +238,15 @@ next phase is not started automatically.
    `SpeechSynthesis` behind a swappable `TtsProvider` interface, voice-settings
    persistence, React hook, and a dev-only speech test panel in the navigation
    UI (see §18). ~~Real Gemini provider~~ was folded into Phase 4.
-6. Deterministic Safety Engine.
-7. Navigation Engine (destination, route, position, heading).
+6. **Navigation Engine (done):** `src/navigation` — `LocationController` +
+   `useLocation()` wrapping browser Geolocation with explicit state machine
+   (unsupported/permission_required/permission_denied/acquiring/active/error/stale),
+   heading resolution (GPS course vs. device orientation), haversine geo-math,
+   `RoutingProvider` abstraction + `FixtureRoutingProvider` (NYC fixtures),
+   turn-by-turn `RouteTracker` (step progression, off-route detection with
+   configurable debounce, arrival detection), and a `Route`/`RouteStep`/
+   `Destination` model in `core` (see §19).
+7. Deterministic Safety Engine.
 8. Decision Engine (reconciliation + cadence).
 9. Full accessibility pass.
 10. Hardening: failure/lifecycle edge cases end-to-end.
@@ -371,3 +380,38 @@ instruction arrives. Code: [`src/speech`](../src/speech/README.md).
   but is not yet connected to a Decision Engine — it is invoked manually via the
   dev panel or programmatically via `useSpeech().speak()`. The Decision Engine
   phase will produce `SpeechInstruction`s that the engine consumes.
+
+## 19. Navigation engine (added in Phase 6)
+
+Location tracking, heading resolution, routing abstraction, and turn-by-turn
+route state. Code: [`src/navigation`](../src/navigation/README.md).
+
+- **Location state machine.** Seven states: `unsupported`, `permission_required`,
+  `permission_denied`, `acquiring`, `active`, `error`, `stale`. Pure transition
+  table in `state.ts`; `LocationController` wraps the browser Geolocation API
+  (`watchPosition`/`clearWatch`) and drives the machine. A stale timer fires
+  after 15 s without a position update. Subscribable via
+  `subscribe`/`getSnapshot` (compatible with `useSyncExternalStore`).
+- **Heading resolution.** GPS course heading and device orientation heading are
+  separate inputs. `resolveHeading()` picks the freshest source and tags it with
+  `HeadingSource` (`gps` | `device_orientation` | `unknown`).
+- **Geo-math.** `haversineDistance`, `bearingBetween`, and `distanceToSegment` in
+  a small pure module, used by both the route tracker and off-route detection.
+- **`RoutingProvider` abstraction.** `geocode(query)` → `GeocodingResult[]` and
+  `getWalkingRoute(origin, destination)` → `Route`. The interface is provider-
+  agnostic; `FixtureRoutingProvider` is the first implementation (three NYC
+  fixture destinations, interpolated walking routes). A live routing backend
+  (e.g. Google Directions) can be added behind the same interface later.
+- **`RouteTracker`.** Tracks navigation state against a `Route`: current step,
+  step progression (advances when within `stepAdvanceMeters` of a step's end
+  coordinate), off-route detection with configurable threshold and debounce
+  (transitions to `off_route` only after `offRouteDebounceMs` of continuous
+  deviation beyond `offRouteThresholdMeters`), arrival detection (within
+  `arrivalThresholdMeters` of the destination), and fractional progress.
+- **React hook.** `useLocation()` creates a `LocationController` on mount,
+  cleans up on unmount, and exposes the latest `LocationSnapshot` via
+  `useSyncExternalStore`.
+- **Not yet in the UI.** The navigation engine is wired and unit-tested but is
+  not mounted into `/navigate` yet — the UI integration belongs with the Safety
+  Engine or Decision Engine phase, which needs location and route context to
+  produce meaningful decisions.

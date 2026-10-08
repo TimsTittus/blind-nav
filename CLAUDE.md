@@ -103,23 +103,22 @@ required and documented. Secrets stay on the server.
 
 ## Current status
 
-**Phase 8 — Decision Engine / real-time pipeline complete**, on top of Phase 7
-(safety engine), Phase 6 (navigation engine), Phase 5 (speech engine), Phase 4
-(server-side Gemini vision pipeline), Phase 3 (browser camera), Phase 2 (mocked
-Navigation Mode UI), and Phase 1 (core model, typed env). `src/decision` adds a
-`NavigationSessionController` that orchestrates the full real-time pipeline:
-camera capture → blob encoding → AI analysis (via `PerceptionController`) →
-`SafetyEngine` assessment → `SpeechDispatch` → `SpeechEngine` output. The
-controller owns every subsystem lifecycle (camera, location, perception, safety,
-speech). React observes state via `useSyncExternalStore`; it never creates or
-disposes subsystems. `SpeechDispatch` maps safety levels and route state changes
-to spoken output with configurable cooldowns. Perception freshness is tracked as
-four states (fresh/aging/stale/none). Safety is re-evaluated on new perception
-data and on a periodic expiry check. The Navigation Mode UI is wired to real
-controller state with an enhanced debug overlay (FPS, AI stats, perception
-freshness, GPS accuracy, speech status). Mock scenarios remain available via the
-debug overlay. 30 new tests (456 total). There is still no local CV or speech
-recognition.
+**Phase 9 — Navigation Mode + Explore Mode complete**, on top of Phase 8
+(decision engine / real-time pipeline), Phase 7 (safety engine), Phase 6
+(navigation engine), Phase 5 (speech engine), Phase 4 (server-side Gemini
+vision pipeline), Phase 3 (browser camera), Phase 2 (mocked Navigation Mode
+UI), and Phase 1 (core model, typed env). `src/voice` adds a `VoiceInput`
+abstraction (browser SpeechRecognition with vendor prefix, push-to-talk
+semantics, text fallback). `VisionProvider` gains an optional `queryScene`
+method for free-form questions answered from a camera frame (implemented in
+Gemini and fixture providers). A new `POST /api/vision/query` endpoint and
+`SceneQueryClient` complete the query pipeline. `SceneQueryHandler` in
+`src/decision` coordinates frame capture → API → speech, integrated into
+`NavigationSessionController` via `submitQuery`. The `SessionCreator` now
+supports recent destinations (localStorage, max 5). `src/app/_explore` adds
+`ExploreScreen` with camera, safety overlay, push-to-talk + text query input,
+and query status display. Both Navigation Mode and Explore Mode are fully
+wired to real state. 37 new tests (493 total). There is still no local CV.
 
-Next up is **Phase 9 — Full accessibility pass**. Do not start it without being
-asked.
+Next up is **Phase 10 — Full accessibility pass**. Do not start it without
+being asked.

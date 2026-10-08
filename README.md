@@ -18,20 +18,21 @@ software architecture.
 
 ## Status
 
-**Phase 8 — Decision Engine / Real-Time Pipeline.** `src/decision` adds a
-`NavigationSessionController` that orchestrates the full real-time pipeline:
-camera capture → AI analysis → safety assessment → speech output. The controller
-owns every subsystem lifecycle; React observes state via `useSyncExternalStore`.
-`SpeechDispatch` maps safety assessments and route state changes to spoken
-output with cooldown and duplicate suppression. Perception freshness tracking
-(fresh / aging / stale / none). The Navigation Mode UI is wired to real
-controller state with an enhanced debug overlay (FPS, AI stats, perception
-freshness, GPS accuracy). 456 tests total.
+**Phase 9 — Navigation Mode + Explore Mode.** Both product modes are complete.
+**Navigation Mode**: destination input with recent-destination history
+(localStorage), full real-time pipeline (camera + GPS + AI analysis + safety +
+speech), route tracking with step-by-step instructions. **Explore Mode**: camera
++ safety overlay, push-to-talk voice input and text fallback for asking
+questions about the environment (scene query pipeline: VoiceInput → question →
+SceneQueryHandler → VisionProvider → speech). `src/voice` provides a
+`VoiceInput` abstraction wrapping browser SpeechRecognition (push-to-talk, not
+always-listening). `VisionProvider.queryScene` answers free-form questions from a
+camera frame. 493 tests total.
 
-Earlier phases: deterministic safety engine (Phase 7), navigation engine
-(Phase 6), speech engine (Phase 5), server-side Gemini vision pipeline
-(Phase 4), browser camera (Phase 3), mocked Navigation Mode UI (Phase 2),
-core domain model (Phase 1). See
+Earlier phases: decision engine / real-time pipeline (Phase 8), deterministic
+safety engine (Phase 7), navigation engine (Phase 6), speech engine (Phase 5),
+server-side Gemini vision pipeline (Phase 4), browser camera (Phase 3), mocked
+Navigation Mode UI (Phase 2), core domain model (Phase 1). See
 [`docs/architecture.md`](docs/architecture.md) for the full design and roadmap.
 
 ## Tech stack
@@ -80,17 +81,21 @@ bun run dev                  # http://localhost:3000
 src/
   app/          Next.js App Router (UI + server route handlers under app/api)
     _components/   Shell UI components (session creator, details, stop)
+    _explore/      Explore mode UI (push-to-talk, query input)
+    _navigation/   Navigation mode UI (camera, safety, route, debug)
     _session/      Client-held session: store + sessionStorage persistence
-    navigate/      Navigate-mode placeholder route
-    explore/       Explore-mode placeholder route
+    api/vision/    Server endpoints: analyze (structured) + query (free-form)
+    navigate/      Navigate-mode route
+    explore/       Explore-mode route
   core/         Shared domain types + Zod schemas + errors (single source of truth)
   config/       Typed, Zod-validated env (server-only + client-safe public)
-  perception/   Sensor input → validated Scene Representation
+  perception/   Sensor input → validated Scene Representation + query client
   providers/    Replaceable AI vision provider abstraction (server-only)
   safety/       Deterministic safety engine (independent of the LLM)
   navigation/   Route / GPS / position / heading reasoning
-  decision/     Reconciles safety + navigation + scene into decisions
-  speech/        Audio output (primary user channel)
+  decision/     Reconciles safety + navigation + scene into decisions + scene queries
+  speech/       Audio output (primary user channel)
+  voice/        Voice input (browser SpeechRecognition + text fallback)
 e2e/            Playwright end-to-end specs
 docs/
   architecture.md   System design, data flow, constraints

@@ -69,7 +69,7 @@ describe("WebTtsProvider", () => {
   it("reports unsupported when constructed without synth on a non-browser env", () => {
     const origSynth = globalThis.window?.speechSynthesis;
     const origWindow = globalThis.window;
-    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+
     delete (globalThis as Record<string, unknown>)["window"];
     const provider = new WebTtsProvider();
     expect(provider.isSupported).toBe(false);
@@ -155,7 +155,7 @@ describe("WebTtsProvider", () => {
 
   it("speak is a no-op when synth is null", () => {
     const origWindow = globalThis.window;
-    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+
     delete (globalThis as Record<string, unknown>)["window"];
     const provider = new WebTtsProvider();
     (globalThis as Record<string, unknown>)["window"] = origWindow;

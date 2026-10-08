@@ -1,5 +1,6 @@
 import type { CameraState } from "@/camera";
-import type { NavigationSession } from "@/core";
+import type { NavigationSession, SafetyLevel } from "@/core";
+import type { SessionControllerSnapshot } from "@/decision";
 import type { Announcement } from "./announcement";
 import { findScenario, AWAITING_SCENARIO_ID } from "./mock-scenarios";
 import { cameraStatusLabel } from "./camera-status";
@@ -21,6 +22,11 @@ export interface DebugInfo {
   safetyLevel: string;
   lastAnalysisAt: number | null;
   latencyMs: number | null;
+  fps: number;
+  aiRequestCount: number;
+  perceptionFreshness: string;
+  gpsAccuracy: number | null;
+  speechQueueActive: boolean;
 }
 
 export interface NavigationViewModel {
@@ -117,6 +123,121 @@ export function buildViewModel({
           ? null
           : session.createdAt + scenario.analysisOffsetMs,
       latencyMs: scenario.latencyMs,
+      fps: 0,
+      aiRequestCount: 0,
+      perceptionFreshness: "none",
+      gpsAccuracy: null,
+      speechQueueActive: false,
+    },
+  };
+}
+
+// ── Real-data view model from controller snapshot ────────────────
+
+const SAFETY_ANNOUNCEMENTS: Record<SafetyLevel, Announcement> = {
+  critical: { text: "Stop. Immediate danger detected.", priority: "CRITICAL" },
+  danger: {
+    text: "Warning. Significant obstacle ahead.",
+    priority: "HIGH",
+  },
+  caution: { text: "Caution. Obstacle nearby.", priority: "NAVIGATION" },
+  safe: { text: "Path is clear. Continue.", priority: "NORMAL" },
+  unknown: {
+    text: "Safety cannot be determined. Proceed with caution.",
+    priority: "NAVIGATION",
+  },
+};
+
+const LOCATION_STATE_LABELS: Record<string, string> = {
+  permission_required: "Awaiting permission",
+  acquiring: "Acquiring…",
+  active: "Active",
+  stale: "Stale",
+  error: "Error",
+  permission_denied: "Denied",
+  unsupported: "Unsupported",
+};
+
+export interface RealViewModelInput {
+  session: NavigationSession;
+  snapshot: SessionControllerSnapshot;
+  paused: boolean;
+}
+
+export function buildRealViewModel({
+  session,
+  snapshot,
+  paused,
+}: RealViewModelInput): NavigationViewModel {
+  const category: StatusCategory = paused
+    ? "UNKNOWN"
+    : categoryFromSafety(snapshot.safety);
+
+  const announcement: Announcement = paused
+    ? PAUSED_ANNOUNCEMENT
+    : SAFETY_ANNOUNCEMENTS[snapshot.safety.level];
+
+  const perceptionLabel =
+    snapshot.perception.status === "ok"
+      ? `Active (${snapshot.perceptionFreshness})`
+      : snapshot.perception.status;
+
+  const gpsLabel =
+    LOCATION_STATE_LABELS[snapshot.location.state] ?? snapshot.location.state;
+
+  const aiLabel = snapshot.perception.inFlight
+    ? "Processing…"
+    : snapshot.perception.analysis
+      ? "Connected"
+      : "Not connected";
+
+  const routeStep = snapshot.route.currentStep;
+
+  return {
+    category,
+    announcement,
+    destinationLabel: session.destination?.label ?? null,
+    nextStep: paused ? null : (routeStep?.instruction ?? null),
+    systems: [
+      {
+        id: "camera",
+        label: "Camera",
+        value: cameraStatusLabel(snapshot.camera),
+        ok: snapshot.camera === "active",
+      },
+      {
+        id: "perception",
+        label: "Perception",
+        value: perceptionLabel,
+        ok: snapshot.perception.status === "ok",
+      },
+      {
+        id: "gps",
+        label: "GPS",
+        value: gpsLabel,
+        ok: snapshot.location.state === "active",
+      },
+      {
+        id: "ai",
+        label: "AI",
+        value: aiLabel,
+        ok: snapshot.perception.analysis !== null,
+      },
+    ],
+    debug: {
+      sessionId: session.id,
+      mode: session.mode,
+      perception: perceptionLabel,
+      gps: gpsLabel,
+      ai: aiLabel,
+      safetyLevel: snapshot.safety.level,
+      lastAnalysisAt: snapshot.stats.lastAnalysisAt,
+      latencyMs: snapshot.stats.aiLatencyMs,
+      fps: snapshot.stats.fps,
+      aiRequestCount: snapshot.stats.aiRequestCount,
+      perceptionFreshness: snapshot.perceptionFreshness,
+      gpsAccuracy: snapshot.location.location?.accuracyMeters ?? null,
+      speechQueueActive: snapshot.stats.lastSpeechAt !== null,
     },
   };
 }

@@ -1,26 +1,26 @@
 # Architecture
 
-Status: **Phase 7 (safety engine)**; Phase 6 added the navigation engine,
-Phase 5 the speech engine, Phase 4 the server-side Gemini vision pipeline,
-Phase 3 the browser camera subsystem, Phase 2 the mocked Navigation Mode UI,
-and Phase 1 the core domain model. This document describes the target software
-architecture the prototype is being built toward. The `core` domain model + Zod
-schemas exist (the Scene Representation is now the conservative Phase-4 shape),
-along with a concrete **Gemini `VisionProvider`** + dev fixtures, the server
-**analyze route**, and a client **perception pipeline** (analysis client,
-single-in-flight controller with no stale overwrites, camera→perception bridge),
-a **speech engine** (`src/speech`) with a priority queue, interruption rules,
-duplicate suppression, and voice-settings persistence behind a swappable
-`TtsProvider` interface (browser `SpeechSynthesis` first), a **navigation
-engine** (`src/navigation`) with location tracking, heading resolution, geo-math,
-a `RoutingProvider` abstraction, turn-by-turn `RouteTracker` with off-route
-detection and arrival, and a dev-only fixture routing provider, and a
-**deterministic safety engine** (`src/safety`) with five safety levels
-(unknown/safe/caution/danger/critical), obstacle and hazard evaluation rules,
-navigation fusion (suppresses route instructions when a hazard conflicts),
-assessment expiry, and configurable staleness thresholds. The remaining feature
-layer (`decision`) still exists as a documented seam and gains real logic in a
-later phase.
+Status: **Phase 8 (decision engine / real-time pipeline)**; Phase 7 added the
+deterministic safety engine, Phase 6 the navigation engine, Phase 5 the speech
+engine, Phase 4 the server-side Gemini vision pipeline, Phase 3 the browser
+camera subsystem, Phase 2 the mocked Navigation Mode UI, and Phase 1 the core
+domain model. This document describes the target software architecture the
+prototype is being built toward. The `core` domain model + Zod schemas exist
+(the Scene Representation is now the conservative Phase-4 shape), along with a
+concrete **Gemini `VisionProvider`** + dev fixtures, the server **analyze
+route**, a client **perception pipeline** (analysis client, single-in-flight
+controller with no stale overwrites, camera→perception bridge), a **speech
+engine** (`src/speech`) with a priority queue, interruption rules, duplicate
+suppression, and voice-settings persistence, a **navigation engine**
+(`src/navigation`) with location tracking, heading resolution, geo-math, a
+`RoutingProvider` abstraction, turn-by-turn `RouteTracker` with off-route
+detection and arrival, a **deterministic safety engine** (`src/safety`) with
+five safety levels, obstacle and hazard evaluation rules, navigation fusion,
+assessment expiry, and configurable staleness thresholds, and a **decision
+engine** (`src/decision`) with a `NavigationSessionController` that orchestrates
+the full real-time pipeline — camera → frame capture → AI analysis → safety
+assessment → speech output — with perception freshness tracking, speech
+dispatch, and the Navigation Mode UI wired to real state.
 
 ## 1. Goals and non-goals
 
@@ -258,7 +258,13 @@ next phase is not started automatically.
    expiry, uncertainty penalties, conflicting-obstacle detection, configurable
    staleness thresholds, and the evolved `core` safety schema with `action`,
    `confidence`, and `expiresAt` (see §20).
-8. Decision Engine (reconciliation + cadence).
+8. **Decision Engine / real-time pipeline (done):** `src/decision` —
+   `NavigationSessionController` orchestrates the full pipeline: camera →
+   frame capture → AI analysis → safety → speech. `SpeechDispatch` maps
+   safety assessments and route state changes to speech calls with cooldowns
+   and duplicate suppression. Perception freshness tracking (fresh/aging/
+   stale/none). Navigation Mode UI wired to real controller state with an
+   enhanced debug overlay (see §21).
 9. Full accessibility pass.
 10. Hardening: failure/lifecycle edge cases end-to-end.
 
@@ -469,6 +475,50 @@ network, no side effects — same input always produces the same output. Code:
 - **Stale data handling.** Perception older than 10 s → `unknown`. Location
   older than 15 s → assessment marked `degraded` with a reason (does not change
   the level). Thresholds are configurable via `SafetyConfig`.
-- **Not yet in the UI.** The safety engine is pure and fully unit-tested (73
-  table-driven test cases) but is not mounted into the live UI — the Decision
-  Engine will consume its output and drive the Speech Engine.
+- **Now in the UI.** The safety engine is consumed by the Decision Engine's
+  `NavigationSessionController`, which runs assessments on every new perception
+  result and on expiry, and dispatches results to the Speech Engine via
+  `SpeechDispatch` (see §21). 73 table-driven test cases.
+
+## 21. Decision engine / real-time pipeline (added in Phase 8)
+
+The `NavigationSessionController` in `src/decision` is the session-level
+orchestrator that wires every subsystem into a real-time loop. React observes
+state via `useSyncExternalStore`; it never creates or disposes subsystems
+directly. Code: [`src/decision`](../src/decision/README.md).
+
+- **Pipeline.** Camera capture → blob encoding → `PerceptionController`
+  (one-at-a-time AI analysis, latest-frame-wins) → `SafetyEngine` assessment →
+  `SpeechDispatch` → `SpeechEngine` output. Location updates flow through
+  `RouteTracker` and also feed safety context.
+- **`NavigationSessionController`.** Creates and owns: `CameraController`,
+  `FrameCapture`, `FrameScheduler`, `PerceptionController`, `LocationController`,
+  `RouteTracker`, `SafetyEngine`, `SpeechEngine`, `SpeechDispatch`. Exposes a
+  `SessionControllerSnapshot` via `subscribe`/`getSnapshot`. Lifecycle:
+  `idle → starting → running ⇄ paused → stopping → stopped`. `dispose()` tears
+  down everything. `start()` can be called again after `stop()`.
+- **`SpeechDispatch`.** Maps safety assessments and route state changes to
+  speech calls. Critical/danger bypass cooldown and speak immediately. Lower
+  levels respect a configurable cooldown and only speak on level changes.
+  Navigation speech fires on step changes with its own cooldown. Arrival and
+  off-route are announced once. Perception freshness transitions (→ stale,
+  → none) trigger informational speech.
+- **Perception freshness.** Four states: `fresh` (< 3 s), `aging` (3–7 s),
+  `stale` (7–10 s), `none` (no analysis). Thresholds are configurable.
+- **Safety re-evaluation.** Runs on every new perception result and on a
+  periodic interval matching the assessment TTL (3 s default), so expired
+  assessments degrade to `unknown` promptly.
+- **Stats.** FPS (rolling 1 s window), AI request count, last analysis
+  timestamp, AI latency, last speech timestamp.
+- **Debug overlay.** Enhanced with FPS, AI request count, perception freshness,
+  GPS accuracy, and speech queue status. The mock scenario selector remains
+  available for testing.
+- **Error recovery.** Camera failure puts the camera subsystem into error
+  state; the session continues in degraded mode. The safety engine treats
+  missing perception as `unknown`. Speech dispatch announces perception
+  unavailability.
+- **UI wiring.** `ActiveNavigation` in `navigation-screen.tsx` creates a
+  single `NavigationSessionController` and observes its snapshot. A
+  `buildRealViewModel` function maps the snapshot to the existing
+  `NavigationViewModel` shape. Mock scenarios remain available via the
+  debug overlay's scenario selector.

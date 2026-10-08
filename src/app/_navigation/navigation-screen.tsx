@@ -2,10 +2,15 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { createDevLoggingConsumer, useCamera, useFrameLoop } from "@/camera";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  useSyncExternalStore,
+} from "react";
 import type { NavigationSession } from "@/core";
-import { useSpeech } from "@/speech";
+import { NavigationSessionController } from "@/decision";
 import { useSession } from "../_session/use-session";
 import { CameraViewport } from "./camera-viewport";
 import { DebugOverlay } from "./debug-overlay";
@@ -16,10 +21,8 @@ import { NavigationStatusOverlay } from "./navigation-status-overlay";
 import { SessionControls } from "./session-controls";
 import { SpeechTestPanel } from "./speech-test-panel";
 import { SystemStatus } from "./system-status";
-import { buildViewModel } from "./view-model";
+import { buildRealViewModel, buildViewModel } from "./view-model";
 
-// Inlined at build time so the debug overlay is dead-code-eliminated from
-// production bundles. Must stay in this module for the constant to fold.
 const DEBUG_AVAILABLE = process.env.NODE_ENV !== "production";
 
 export function NavigationScreen() {
@@ -59,14 +62,6 @@ export function NavigationScreen() {
   );
 }
 
-// Mock consumer: logs frame metadata in development only (no pixels, no
-// network, no storage). Replaced by the perception pipeline in a later phase.
-const devConsumer = createDevLoggingConsumer();
-
-/**
- * Mounted only for an active navigate session, so the camera starts on entry
- * and is released (tracks stopped) on unmount, stop, or navigation away.
- */
 function ActiveNavigation({
   session,
   onStop,
@@ -74,67 +69,82 @@ function ActiveNavigation({
   session: NavigationSession;
   onStop: () => void;
 }) {
-  const camera = useCamera();
-  const {
-    start: startCamera,
-    pause: pauseCamera,
-    resume: resumeCamera,
-  } = camera;
-  const speech = useSpeech();
+  const [controller] = useState(() => new NavigationSessionController());
+
+  const snapshot = useSyncExternalStore(
+    controller.subscribe,
+    controller.getSnapshot,
+    controller.getSnapshot,
+  );
+
   const [paused, setPaused] = useState(false);
   const [scenarioId, setScenarioId] = useState(AWAITING_SCENARIO_ID);
   const [debugOpen, setDebugOpen] = useState(false);
   const [speechTestOpen, setSpeechTestOpen] = useState(false);
+  const [voiceEnabled, setVoiceEnabled] = useState(true);
 
   useEffect(() => {
-    void startCamera();
-  }, [startCamera]);
+    void controller.start(session);
+    return () => controller.dispose();
+  }, [controller, session]);
 
-  // PAUSE guidance also pauses the camera; resume is idempotent and the
-  // controller keeps tab-hidden pauses separate from this one.
   useEffect(() => {
-    if (paused) pauseCamera();
-    else resumeCamera();
-  }, [paused, camera.state, pauseCamera, resumeCamera]);
+    if (snapshot.phase === "running" && paused) {
+      controller.pause();
+    } else if (snapshot.phase === "paused" && !paused) {
+      controller.resume();
+    }
+  }, [paused, snapshot.phase, controller]);
 
-  // Sync voice enabled/disabled with speech engine.
-  function handleToggleVoice() {
-    const next = !speech.settings.enabled;
-    speech.updateSettings({ enabled: next });
-    if (!next) speech.stop();
-  }
+  const handleToggleVoice = useCallback(() => {
+    setVoiceEnabled((prev) => {
+      const next = !prev;
+      controller.updateVoiceSettings({
+        enabled: next,
+        rate: 1,
+        pitch: 1,
+        volume: 1,
+      });
+      return next;
+    });
+  }, [controller]);
 
-  useFrameLoop({
-    enabled: DEBUG_AVAILABLE && camera.state === "active",
-    captureFrame: camera.captureFrame,
-    consumer: devConsumer,
-  });
+  const videoRef = useCallback(
+    (element: HTMLVideoElement | null) => controller.attachVideo(element),
+    [controller],
+  );
 
-  const view = buildViewModel({
-    session,
-    scenarioId,
-    paused,
-    camera: camera.state,
-  });
-
-  function handleStop() {
-    camera.stop();
-    speech.stop();
+  const handleStop = useCallback(() => {
+    controller.stop();
     onStop();
-  }
+  }, [controller, onStop]);
+
+  const useMock = scenarioId !== AWAITING_SCENARIO_ID;
+
+  const view = useMemo(() => {
+    if (useMock) {
+      return buildViewModel({
+        session,
+        scenarioId,
+        paused,
+        camera: snapshot.camera,
+      });
+    }
+    return buildRealViewModel({ session, snapshot, paused });
+  }, [useMock, session, scenarioId, paused, snapshot]);
 
   return (
     <div className="nav-screen">
       <h1 className="nav-screen__title">Navigation mode</h1>
       <div className="nav-screen__camera">
         <CameraViewport
-          state={camera.state}
-          error={camera.error}
-          videoRef={camera.videoRef}
-          canSwitch={camera.canSwitch}
-          switching={camera.switching}
-          onStart={() => void camera.start()}
-          onSwitch={() => void camera.switchCamera()}
+          state={snapshot.camera}
+          error={null}
+          videoRef={videoRef}
+          canSwitch={controller.canSwitchCamera}
+          switching={controller.isSwitchingCamera}
+          onStart={() => controller.startCamera()}
+          onSwitch={() => controller.switchCamera()}
         >
           <NavigationStatusOverlay category={view.category} />
         </CameraViewport>
@@ -148,7 +158,7 @@ function ActiveNavigation({
         <SystemStatus items={view.systems} />
         <div className="nav-screen__controls">
           <SessionControls
-            voiceEnabled={speech.settings.enabled}
+            voiceEnabled={voiceEnabled}
             paused={paused}
             onToggleVoice={handleToggleVoice}
             onTogglePause={() => setPaused((value) => !value)}
@@ -185,10 +195,7 @@ function ActiveNavigation({
         />
       ) : null}
       {DEBUG_AVAILABLE && speechTestOpen ? (
-        <SpeechTestPanel
-          speech={speech}
-          onClose={() => setSpeechTestOpen(false)}
-        />
+        <SpeechTestPanel onClose={() => setSpeechTestOpen(false)} />
       ) : null}
     </div>
   );

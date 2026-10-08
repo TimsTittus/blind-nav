@@ -1,12 +1,17 @@
-import type { SpeechPriority } from "@/core";
-import type { UseSpeechReturn } from "@/speech";
+"use client";
+
+import { useSpeech } from "@/speech";
 
 interface SpeechTestPanelProps {
-  speech: UseSpeechReturn;
   onClose: () => void;
 }
 
-const TEST_PHRASES: { text: string; priority: SpeechPriority }[] = [
+interface TestPhrase {
+  readonly text: string;
+  readonly priority: "information" | "navigation" | "high" | "critical";
+}
+
+const TEST_PHRASES: TestPhrase[] = [
   { text: "Path clear. Continue straight.", priority: "information" },
   { text: "Puddle ahead. Stay to the right.", priority: "navigation" },
   { text: "Obstacle ahead. Move left.", priority: "high" },
@@ -14,7 +19,9 @@ const TEST_PHRASES: { text: string; priority: SpeechPriority }[] = [
   { text: "Turn right in 20 meters.", priority: "navigation" },
 ];
 
-export function SpeechTestPanel({ speech, onClose }: SpeechTestPanelProps) {
+export function SpeechTestPanel({ onClose }: SpeechTestPanelProps) {
+  const speech = useSpeech();
+
   return (
     <aside
       className="debug-overlay"

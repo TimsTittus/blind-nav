@@ -103,22 +103,23 @@ required and documented. Secrets stay on the server.
 
 ## Current status
 
-**Phase 7 — Safety Engine complete**, on top of Phase 6 (navigation engine),
-Phase 5 (speech engine), Phase 4 (server-side Gemini vision pipeline), Phase 3
-(browser camera), Phase 2 (mocked Navigation Mode UI), and Phase 1 (core model,
-typed env). `src/safety` adds a deterministic `SafetyEngine` that evaluates
-perception + navigation context with auditable rules — no AI model, no network,
-same input → same output. `core/safety.ts` now has five safety levels
-(unknown/safe/caution/danger/critical), seven actions, `confidence`, and
-`expiresAt`. The engine handles obstacle evaluation (position × distance ×
-severity), hazard evaluation, path-status assessment, navigation fusion
-(suppresses route instructions when a hazard blocks the turn direction),
-conflicting-obstacle detection, uncertainty penalties, staleness thresholds,
-and assessment expiry. The `StatusCategory` ↔ `SafetyLevel` mapping was
-revisited and is now nearly 1:1. 73 table-driven tests. The safety engine is
-**not** yet mounted in the live UI (deferred to the Decision Engine phase).
-There is still no local CV or speech recognition.
+**Phase 8 — Decision Engine / real-time pipeline complete**, on top of Phase 7
+(safety engine), Phase 6 (navigation engine), Phase 5 (speech engine), Phase 4
+(server-side Gemini vision pipeline), Phase 3 (browser camera), Phase 2 (mocked
+Navigation Mode UI), and Phase 1 (core model, typed env). `src/decision` adds a
+`NavigationSessionController` that orchestrates the full real-time pipeline:
+camera capture → blob encoding → AI analysis (via `PerceptionController`) →
+`SafetyEngine` assessment → `SpeechDispatch` → `SpeechEngine` output. The
+controller owns every subsystem lifecycle (camera, location, perception, safety,
+speech). React observes state via `useSyncExternalStore`; it never creates or
+disposes subsystems. `SpeechDispatch` maps safety levels and route state changes
+to spoken output with configurable cooldowns. Perception freshness is tracked as
+four states (fresh/aging/stale/none). Safety is re-evaluated on new perception
+data and on a periodic expiry check. The Navigation Mode UI is wired to real
+controller state with an enhanced debug overlay (FPS, AI stats, perception
+freshness, GPS accuracy, speech status). Mock scenarios remain available via the
+debug overlay. 30 new tests (456 total). There is still no local CV or speech
+recognition.
 
-Next up is **Phase 8 — the Decision Engine** (`src/decision`), which reconciles
-safety + navigation + perception into a final decision and drives the speech
-engine. Do not start it without being asked.
+Next up is **Phase 9 — Full accessibility pass**. Do not start it without being
+asked.

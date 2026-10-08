@@ -18,19 +18,20 @@ software architecture.
 
 ## Status
 
-**Phase 7 — Deterministic Safety Engine.** `src/safety` adds a pure, auditable
-`SafetyEngine` that evaluates perception + navigation context with deterministic
-rules — no AI model, no network. Five safety levels (unknown / safe / caution /
-danger / critical), seven actions, obstacle/hazard evaluation (position ×
-distance × severity), navigation fusion (suppresses route instructions when a
-hazard blocks the turn direction), assessment expiry, uncertainty penalties, and
-configurable staleness thresholds. 73 table-driven tests. Not yet mounted in the
-live UI. See [`docs/safety-engine.md`](docs/safety-engine.md) for the full rules
-reference.
+**Phase 8 — Decision Engine / Real-Time Pipeline.** `src/decision` adds a
+`NavigationSessionController` that orchestrates the full real-time pipeline:
+camera capture → AI analysis → safety assessment → speech output. The controller
+owns every subsystem lifecycle; React observes state via `useSyncExternalStore`.
+`SpeechDispatch` maps safety assessments and route state changes to spoken
+output with cooldown and duplicate suppression. Perception freshness tracking
+(fresh / aging / stale / none). The Navigation Mode UI is wired to real
+controller state with an enhanced debug overlay (FPS, AI stats, perception
+freshness, GPS accuracy). 456 tests total.
 
-Earlier phases: navigation engine (Phase 6), speech engine (Phase 5), server-side
-Gemini vision pipeline (Phase 4), browser camera (Phase 3), mocked Navigation
-Mode UI (Phase 2), core domain model (Phase 1). See
+Earlier phases: deterministic safety engine (Phase 7), navigation engine
+(Phase 6), speech engine (Phase 5), server-side Gemini vision pipeline
+(Phase 4), browser camera (Phase 3), mocked Navigation Mode UI (Phase 2),
+core domain model (Phase 1). See
 [`docs/architecture.md`](docs/architecture.md) for the full design and roadmap.
 
 ## Tech stack

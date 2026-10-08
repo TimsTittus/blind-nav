@@ -629,3 +629,55 @@ expiration time.
 - This remains an assistive prototype and carries no guarantee of collision
   avoidance — the engine reduces, not eliminates, risk.
 
+---
+
+## ADR 0021 — Phase 8: decision engine with NavigationSessionController and real-time pipeline
+
+**Status:** Accepted.
+
+**Context:** Phases 1–7 built every subsystem in isolation: camera, perception,
+safety, navigation, speech. Each has its own controller, state, and tests. The
+Navigation Mode UI used mock scenarios and a dev logging consumer. No subsystem
+was wired to another at runtime. To deliver the end-to-end prototype we need an
+orchestration layer that starts every subsystem, feeds frames through the
+pipeline, runs safety assessment, dispatches speech, and tears everything down
+on stop.
+
+**Decision:** Create a `NavigationSessionController` class in `src/decision`
+that owns the full lifecycle. Key design choices:
+
+1. **Controller, not React.** The orchestration lives in a plain TypeScript
+   class, not inside React components. React observes state via
+   `useSyncExternalStore`; it never creates or disposes subsystems directly.
+2. **One pipeline, one owner.** The controller creates all subsystems on
+   `start()` and tears them all down on `stop()` or `dispose()`. No subsystem
+   outlives the session.
+3. **SpeechDispatch as a separate concern.** Safety-to-speech and route-to-speech
+   mapping is isolated in `SpeechDispatch` with its own cooldown and duplicate
+   suppression logic, independent of the `SpeechEngine`'s own queue.
+4. **Perception freshness.** Four states (fresh/aging/stale/none) with
+   configurable thresholds, tracked by the controller and exposed in the
+   snapshot.
+5. **Safety re-evaluation loop.** Assessments are re-run on new perception
+   data and on a periodic interval matching the TTL, so expired assessments
+   degrade promptly.
+6. **Graceful degradation.** Camera failure doesn't crash the session; the
+   safety engine treats absent perception as `unknown`; speech dispatch
+   announces degradation.
+7. **Mock scenarios preserved.** The debug overlay retains the scenario
+   selector for testing without real hardware.
+
+**Consequences:**
+
+- The full camera → AI → safety → speech pipeline is wired end-to-end. With
+  a Gemini API key and browser permissions, the prototype delivers real-time
+  spoken navigation guidance.
+- The `SpeechTestPanel` now creates its own `useSpeech()` instance for
+  independent testing; it no longer shares the session's speech engine.
+- The view model gained `buildRealViewModel` alongside the existing
+  `buildViewModel` (mock scenarios). The debug overlay shows FPS, AI request
+  count, perception freshness, GPS accuracy, and speech status.
+- `DebugInfo` grew five new fields; existing tests pass because `buildViewModel`
+  provides defaults.
+- 30 new tests (13 speech dispatch, 17 controller integration). Total: 456.
+

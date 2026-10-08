@@ -29,8 +29,18 @@ export function DebugOverlay({
     ["Last analysis", formatTime(info.lastAnalysisAt)],
     [
       "Analysis latency",
-      info.latencyMs === null ? "n/a" : `${info.latencyMs} ms`,
+      info.latencyMs === null ? "n/a" : `${String(info.latencyMs)} ms`,
     ],
+    ["FPS", String(info.fps)],
+    ["AI requests", String(info.aiRequestCount)],
+    ["Perception freshness", info.perceptionFreshness],
+    [
+      "GPS accuracy",
+      info.gpsAccuracy === null
+        ? "n/a"
+        : `${String(Math.round(info.gpsAccuracy))} m`,
+    ],
+    ["Speech active", info.speechQueueActive ? "yes" : "no"],
   ];
   return (
     <aside className="debug-overlay" aria-label="Developer debug information">

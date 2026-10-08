@@ -4,4 +4,9 @@ export {
 } from "./gemini-provider";
 export type { GeminiModels, GeminiProviderOptions } from "./gemini-provider";
 export { GEMINI_SCENE_SCHEMA } from "./schema";
-export { GEMINI_SYSTEM_INSTRUCTION, buildGeminiPrompt } from "./prompt";
+export {
+  GEMINI_QUERY_SYSTEM_INSTRUCTION,
+  GEMINI_SYSTEM_INSTRUCTION,
+  buildGeminiPrompt,
+  buildGeminiQueryPrompt,
+} from "./prompt";

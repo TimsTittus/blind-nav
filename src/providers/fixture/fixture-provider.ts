@@ -1,7 +1,12 @@
 import type { SceneAnalysis } from "@/core";
 import { normalizeSceneObservation } from "../normalize";
 import type { VisionProvider } from "../provider";
-import type { AnalyzeFrameInput, AnalyzeFrameOptions } from "../types";
+import type {
+  AnalyzeFrameInput,
+  AnalyzeFrameOptions,
+  SceneQueryInput,
+  SceneQueryResult,
+} from "../types";
 import {
   DEFAULT_FIXTURE_SCENE,
   FIXTURE_SCENES,
@@ -47,6 +52,19 @@ export class FixtureVisionProvider implements VisionProvider {
       capturedAt: input.frame.capturedAt,
       provider: this.id,
     });
+  }
+
+  async queryScene(
+    input: SceneQueryInput,
+    options?: AnalyzeFrameOptions,
+  ): Promise<SceneQueryResult> {
+    if (this.delayMs > 0) await delay(this.delayMs, options?.signal);
+    throwIfAborted(options?.signal);
+    return {
+      answer: `Fixture answer for: "${input.question}"`,
+      queriedAt: Date.now(),
+      provider: this.id,
+    };
   }
 }
 

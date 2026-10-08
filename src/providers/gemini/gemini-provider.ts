@@ -8,9 +8,19 @@ import {
 import { invalidModelResponse, mapProviderError } from "../errors";
 import { normalizeSceneObservation } from "../normalize";
 import type { VisionProvider } from "../provider";
-import type { AnalyzeFrameInput, AnalyzeFrameOptions } from "../types";
+import type {
+  AnalyzeFrameInput,
+  AnalyzeFrameOptions,
+  SceneQueryInput,
+  SceneQueryResult,
+} from "../types";
 import { GEMINI_SCENE_SCHEMA } from "./schema";
-import { buildGeminiPrompt, GEMINI_SYSTEM_INSTRUCTION } from "./prompt";
+import {
+  buildGeminiPrompt,
+  buildGeminiQueryPrompt,
+  GEMINI_QUERY_SYSTEM_INSTRUCTION,
+  GEMINI_SYSTEM_INSTRUCTION,
+} from "./prompt";
 
 /** Default per-request budget. A navigation frame is worthless if it is late. */
 export const DEFAULT_GEMINI_TIMEOUT_MS = 8000;
@@ -130,6 +140,51 @@ export class GeminiVisionProvider implements VisionProvider {
       capturedAt: input.frame.capturedAt,
       provider: this.id,
     });
+  }
+
+  async queryScene(
+    input: SceneQueryInput,
+    options?: AnalyzeFrameOptions,
+  ): Promise<SceneQueryResult> {
+    const { mimeType, data } = parseDataUrl(input.frame.dataUrl);
+    const timeout = withTimeout(
+      options?.signal,
+      options?.timeoutMs ?? this.timeoutMs,
+    );
+
+    let text: string | undefined;
+    try {
+      const response = await this.models.generateContent({
+        model: this.model,
+        contents: [
+          { text: buildGeminiQueryPrompt(input.question) },
+          { inlineData: { mimeType, data } },
+        ],
+        config: {
+          systemInstruction: GEMINI_QUERY_SYSTEM_INSTRUCTION,
+          temperature: 0,
+          thinkingConfig: { thinkingBudget: 0 },
+          abortSignal: timeout.signal,
+        },
+      });
+      text = response.text;
+    } catch (error) {
+      throw mapProviderError(error);
+    } finally {
+      timeout.clear();
+    }
+
+    if (!text || text.trim() === "") {
+      throw new InvalidModelResponseError(
+        "The model returned an empty response.",
+      );
+    }
+
+    return {
+      answer: text.trim(),
+      queriedAt: Date.now(),
+      provider: this.id,
+    };
   }
 }
 

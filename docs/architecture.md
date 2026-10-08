@@ -1,26 +1,29 @@
 # Architecture
 
-Status: **Phase 8 (decision engine / real-time pipeline)**; Phase 7 added the
-deterministic safety engine, Phase 6 the navigation engine, Phase 5 the speech
-engine, Phase 4 the server-side Gemini vision pipeline, Phase 3 the browser
-camera subsystem, Phase 2 the mocked Navigation Mode UI, and Phase 1 the core
-domain model. This document describes the target software architecture the
-prototype is being built toward. The `core` domain model + Zod schemas exist
-(the Scene Representation is now the conservative Phase-4 shape), along with a
-concrete **Gemini `VisionProvider`** + dev fixtures, the server **analyze
-route**, a client **perception pipeline** (analysis client, single-in-flight
-controller with no stale overwrites, camera→perception bridge), a **speech
-engine** (`src/speech`) with a priority queue, interruption rules, duplicate
-suppression, and voice-settings persistence, a **navigation engine**
-(`src/navigation`) with location tracking, heading resolution, geo-math, a
-`RoutingProvider` abstraction, turn-by-turn `RouteTracker` with off-route
-detection and arrival, a **deterministic safety engine** (`src/safety`) with
-five safety levels, obstacle and hazard evaluation rules, navigation fusion,
-assessment expiry, and configurable staleness thresholds, and a **decision
-engine** (`src/decision`) with a `NavigationSessionController` that orchestrates
-the full real-time pipeline — camera → frame capture → AI analysis → safety
-assessment → speech output — with perception freshness tracking, speech
-dispatch, and the Navigation Mode UI wired to real state.
+Status: **Phase 9 (Navigation Mode + Explore Mode complete)**; Phase 8 added the
+decision engine / real-time pipeline, Phase 7 the deterministic safety engine,
+Phase 6 the navigation engine, Phase 5 the speech engine, Phase 4 the
+server-side Gemini vision pipeline, Phase 3 the browser camera subsystem,
+Phase 2 the mocked Navigation Mode UI, and Phase 1 the core domain model. This
+document describes the target software architecture the prototype is being built
+toward. The `core` domain model + Zod schemas exist (the Scene Representation is
+now the conservative Phase-4 shape), along with a concrete **Gemini
+`VisionProvider`** + dev fixtures (now with `queryScene` for free-form
+questions), the server **analyze and query routes**, a client **perception
+pipeline** (analysis client, scene query client, single-in-flight controller
+with no stale overwrites, camera→perception bridge), a **speech engine**
+(`src/speech`) with a priority queue, interruption rules, duplicate suppression,
+and voice-settings persistence, a **navigation engine** (`src/navigation`) with
+location tracking, heading resolution, geo-math, a `RoutingProvider`
+abstraction, turn-by-turn `RouteTracker` with off-route detection and arrival, a
+**deterministic safety engine** (`src/safety`) with five safety levels, obstacle
+and hazard evaluation rules, navigation fusion, assessment expiry, and
+configurable staleness thresholds, a **decision engine** (`src/decision`) with a
+`NavigationSessionController` that orchestrates the full real-time pipeline, a
+**voice input** abstraction (`src/voice`) with browser SpeechRecognition and text
+fallback, a **scene query pipeline** (VoiceInput → question → SceneQueryHandler
+→ VisionProvider → speech), and both **Navigation Mode** and **Explore Mode** UIs
+fully wired to real state with destination management and push-to-talk queries.
 
 ## 1. Goals and non-goals
 
@@ -522,3 +525,48 @@ directly. Code: [`src/decision`](../src/decision/README.md).
   `buildRealViewModel` function maps the snapshot to the existing
   `NavigationViewModel` shape. Mock scenarios remain available via the
   debug overlay's scenario selector.
+
+## 22. Voice input, scene queries, and Explore Mode (added in Phase 9)
+
+Phase 9 adds two user-facing product modes and the supporting voice/query
+infrastructure. Code: [`src/voice`](../src/voice/), [`src/app/_explore`](../src/app/_explore/).
+
+### Voice input (`src/voice`)
+- **`VoiceInput`** wraps the browser `SpeechRecognition` API (with
+  `webkitSpeechRecognition` vendor prefix). Supports `startListening` (push-to-
+  talk, *not* always-listening), `stopListening`, and `submitText` (text
+  fallback). Exposes `subscribe`/`getSnapshot` for `useSyncExternalStore`.
+- States: `idle → listening → processing`, plus `unsupported`, `denied`,
+  `error`.
+
+### Scene query pipeline
+- **Server endpoint** `POST /api/vision/query`: accepts `{ frame, question }`,
+  calls `VisionProvider.queryScene`, returns concise free-form text.
+- **`VisionProvider.queryScene`**: optional method on the provider interface.
+  Gemini implementation uses a separate system instruction that produces one or
+  two short sentences. Fixture provider returns a canned response.
+- **`SceneQueryHandler`** (`src/decision`): coordinates frame capture → API call
+  → speech. States: `idle → capturing → querying → speaking → idle`.
+  Integrated into `NavigationSessionController` so it shares the same frame
+  capture and speech engine. Exposed via `submitQuery(question)` on the
+  controller and `query` in the snapshot.
+- **`SceneQueryClient`** (`src/perception`): browser-side fetch wrapper for the
+  query endpoint, mirroring `AnalysisClient`.
+
+### Session creator
+- Updated `SessionCreator` with recent-destinations support (localStorage,
+  max 5, no auth/cloud), destination selection from recents, and distinct
+  "Start navigation" / "Start exploring" submit labels.
+
+### Navigation Mode (complete)
+- Destination input with recent-destination history.
+- Full real-time pipeline: camera + GPS + AI analysis + safety + speech.
+- Route tracking, step-by-step instructions, off-route/arrival detection.
+
+### Explore Mode (complete)
+- `ExploreScreen` (`src/app/_explore`): camera + safety + push-to-talk +
+  text fallback. Uses the same `NavigationSessionController` (no destination or
+  route). Displays query status (processing, answer, error) in a live region.
+- `QueryInput` component: push-to-talk button + text form.
+- No destination required, no route tracking — pure obstacle/environment
+  awareness plus user questions.

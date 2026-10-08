@@ -37,3 +37,17 @@ export interface AnalyzeFrameOptions {
   signal?: AbortSignal;
   timeoutMs?: number;
 }
+
+export const SceneQueryInputSchema = z.object({
+  frame: FrameInputSchema,
+  question: z.string().min(1).max(500),
+  context: AnalyzeFrameContextSchema.optional(),
+});
+
+export type SceneQueryInput = z.infer<typeof SceneQueryInputSchema>;
+
+export interface SceneQueryResult {
+  readonly answer: string;
+  readonly queriedAt: number;
+  readonly provider: string;
+}

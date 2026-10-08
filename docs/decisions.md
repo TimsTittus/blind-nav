@@ -681,3 +681,50 @@ that owns the full lifecycle. Key design choices:
   provides defaults.
 - 30 new tests (13 speech dispatch, 17 controller integration). Total: 456.
 
+---
+
+## ADR 0022 — Phase 9: Navigation Mode, Explore Mode, voice input, and scene queries
+
+**Status:** Accepted.
+
+**Context:** Phase 8 wired the real-time pipeline but only Navigation Mode was
+functional, and only with a basic destination text field. Explore Mode was a
+placeholder. Users had no way to ask questions about their environment, and there
+was no voice input.
+
+**Decision:**
+
+1. **Voice input** (`src/voice`): `VoiceInput` class wrapping the browser
+   `SpeechRecognition` API with vendor prefix detection, push-to-talk semantics
+   (not always-listening), and `submitText` text fallback. Standard
+   `subscribe`/`getSnapshot` pattern.
+2. **Scene query pipeline**: extend `VisionProvider` with an optional
+   `queryScene(input, options)` method that returns concise free-form text.
+   Implement in Gemini (separate system instruction for short answers) and
+   fixture provider. New `POST /api/vision/query` server endpoint. Browser-side
+   `SceneQueryClient` + `SceneQueryHandler` (integrated into
+   `NavigationSessionController` via `submitQuery`).
+3. **Session creator improvements**: recent destinations stored in
+   `localStorage` (max 5, no auth/cloud), selectable via buttons. Submit label
+   changes per mode.
+4. **Explore Mode** (`src/app/_explore`): `ExploreScreen` with camera viewport,
+   safety indicator, push-to-talk + text input, query status display. Shares
+   `NavigationSessionController` (no destination/route). `QueryInput` component.
+5. **Navigation Mode**: now complete with destination input flow.
+6. **Controller updates**: `NavigationSessionController` gains `submitQuery`,
+   `cancelQuery`, and `query` in the snapshot. `SceneQueryHandler` created and
+   disposed as part of the subsystem lifecycle.
+
+**Consequences:**
+
+- Both product modes are functional end-to-end.
+- `VisionProvider` has an optional `queryScene` method; providers that don't
+  implement it return an `unsupported_feature` error from the endpoint.
+- Explore Mode does not use routing or destination — it is pure obstacle/
+  environment awareness plus user queries.
+- Recent destinations use browser `localStorage` only — no auth, no cloud
+  storage. Unavailable storage is silently skipped.
+- Voice input is push-to-talk only — no always-listening microphone behavior.
+- 37 new tests (20 voice input, 10 scene query handler, 7 query contract).
+  Total: 493.
+

@@ -22,7 +22,30 @@ export type {
 } from "./analyze-contract";
 export { base64ByteLength, decodeImageDataUrl } from "./image";
 export type { DecodedImage } from "./image";
+export {
+  SceneQueryFailureSchema,
+  SceneQueryRequestSchema,
+  SceneQueryResponseSchema,
+  SceneQuerySuccessSchema,
+  isSceneQuerySuccess,
+} from "./query-contract";
+export type {
+  SceneQueryFailure,
+  SceneQueryRequest,
+  SceneQueryResponse,
+  SceneQuerySuccess,
+} from "./query-contract";
 export { blobToDataUrl, createAnalysisClient } from "./analysis-client";
+export {
+  DEFAULT_QUERY_TIMEOUT_MS,
+  QUERY_ENDPOINT,
+  createSceneQueryClient,
+} from "./query-client";
+export type {
+  SceneQueryClient,
+  SceneQueryClientOptions,
+  SceneQueryClientRequest,
+} from "./query-client";
 export type {
   AnalysisClient,
   AnalysisClientOptions,

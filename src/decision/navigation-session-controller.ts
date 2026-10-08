@@ -14,10 +14,12 @@ import {
 import {
   blobToDataUrl,
   createAnalysisClient,
+  createSceneQueryClient,
   INITIAL_PERCEPTION_STATE,
   PerceptionController,
   type AnalysisClient,
   type PerceptionState,
+  type SceneQueryClient,
 } from "@/perception";
 import { SafetyEngine, type SafetyContext } from "@/safety";
 import { SpeechEngine, WebTtsProvider, type VoiceSettings } from "@/speech";
@@ -25,6 +27,10 @@ import {
   SESSION_CONTROLLER_CONFIG,
   type SessionControllerConfig,
 } from "./config";
+import {
+  SceneQueryHandler,
+  type SceneQuerySnapshot,
+} from "./scene-query-handler";
 import { SpeechDispatch, type SpeechSink } from "./speech-dispatch";
 import type {
   PerceptionFreshness,
@@ -47,6 +53,7 @@ const UNKNOWN_SAFETY: SafetyAssessment = {
 
 export interface NavigationSessionControllerDeps {
   analysisClient?: AnalysisClient;
+  queryClient?: SceneQueryClient;
   voiceSettings?: VoiceSettings;
   config?: Partial<SessionControllerConfig>;
   now?: () => number;
@@ -75,8 +82,11 @@ export class NavigationSessionController {
   private speechEngine: SpeechEngine | null = null;
   private speechDispatch: SpeechDispatch | null = null;
 
+  private sceneQueryHandler: SceneQueryHandler | null = null;
+
   // External dependencies
   private readonly analysisClient: AnalysisClient;
+  private readonly queryClient: SceneQueryClient;
   private voiceSettings: VoiceSettings;
 
   // State
@@ -100,6 +110,11 @@ export class NavigationSessionController {
     nextStep: null,
   };
   private lastError: string | null = null;
+  private querySnapshot: SceneQuerySnapshot = {
+    state: "idle",
+    lastAnswer: null,
+    lastError: null,
+  };
 
   // Stats
   private frameCount = 0;
@@ -117,6 +132,7 @@ export class NavigationSessionController {
 
   constructor(deps: NavigationSessionControllerDeps = {}) {
     this.analysisClient = deps.analysisClient ?? createAnalysisClient();
+    this.queryClient = deps.queryClient ?? createSceneQueryClient();
     this.voiceSettings = deps.voiceSettings ?? {
       enabled: true,
       rate: 1,
@@ -145,6 +161,7 @@ export class NavigationSessionController {
       route: this.routeState,
       lastError: this.lastError,
       stats: this.getStats(),
+      query: this.querySnapshot,
     };
   };
 
@@ -225,6 +242,17 @@ export class NavigationSessionController {
     if (!next) this.speechEngine?.stop();
   }
 
+  // ── Scene queries ────────────────────────────────────────────────
+
+  submitQuery(question: string): void {
+    if (this.phase !== "running" || !this.sceneQueryHandler) return;
+    void this.sceneQueryHandler.submitQuestion(question);
+  }
+
+  cancelQuery(): void {
+    this.sceneQueryHandler?.cancel();
+  }
+
   // ── Video attachment (for CameraViewport) ────────────────────────
 
   attachVideo(element: HTMLVideoElement | null): void {
@@ -293,6 +321,12 @@ export class NavigationSessionController {
       onError: (error) => this.onFrameError(error),
       visibility: null,
     });
+
+    this.sceneQueryHandler = new SceneQueryHandler({
+      queryClient: this.queryClient,
+      speechEngine: this.speechEngine,
+      captureFrame: () => this.frameCapture!.captureFrame({}),
+    });
   }
 
   private wireSubsystems(): void {
@@ -316,6 +350,12 @@ export class NavigationSessionController {
       this.notify();
     });
     this.cleanups.push(locationUnsub);
+
+    const queryUnsub = this.sceneQueryHandler!.subscribe(() => {
+      this.querySnapshot = this.sceneQueryHandler!.getSnapshot();
+      this.notify();
+    });
+    this.cleanups.push(queryUnsub);
   }
 
   private teardownSubsystems(): void {
@@ -340,6 +380,8 @@ export class NavigationSessionController {
     this.safetyEngine = null;
     this.speechEngine = null;
     this.speechDispatch = null;
+    this.sceneQueryHandler?.dispose();
+    this.sceneQueryHandler = null;
   }
 
   // ── Private: frame pipeline ──────────────────────────────────────

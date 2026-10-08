@@ -32,7 +32,6 @@ function createMockClient(analysis?: SceneAnalysis): AnalysisClient {
   };
 }
 
-
 const session = createSession({
   mode: "navigate",
   destination: { id: "d1", label: "Test" },

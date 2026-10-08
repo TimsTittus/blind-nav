@@ -11,6 +11,7 @@ anything) to tell the user.
 | `config.ts`                        | Tunable constants (analysis interval, freshness thresholds)  |
 | `types.ts`                         | `SessionControllerSnapshot`, `PerceptionFreshness`, etc.     |
 | `speech-dispatch.ts`               | Maps safety assessment + route state to speech calls         |
+| `scene-query-handler.ts`           | Coordinates user questions: frame capture → API → speech     |
 | `navigation-session-controller.ts` | Main orchestrator: camera → perception → safety → speech     |
 | `index.ts`                         | Barrel exports                                               |
 

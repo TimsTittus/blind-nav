@@ -3,6 +3,7 @@ import type { PerceptionState } from "@/perception";
 import type { SafetyAssessment } from "@/core";
 import type { LocationSnapshot } from "@/navigation";
 import type { RouteTrackerState } from "@/navigation";
+import type { SceneQuerySnapshot } from "./scene-query-handler";
 
 /** How fresh the most recent AI analysis is. */
 export type PerceptionFreshness = "fresh" | "aging" | "stale" | "none";
@@ -22,6 +23,7 @@ export interface SessionControllerSnapshot {
   readonly route: RouteTrackerState;
   readonly lastError: string | null;
   readonly stats: SessionStats;
+  readonly query: SceneQuerySnapshot;
 }
 
 export interface SessionStats {

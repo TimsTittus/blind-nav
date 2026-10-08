@@ -1,11 +1,13 @@
 # Architecture
 
-Status: **Phase 10 (Performance profiling and optimization complete)**;
-Phase 9 added voice input and Explore Mode, Phase 8 the decision engine /
-real-time pipeline, Phase 7 the deterministic safety engine, Phase 6 the
-navigation engine, Phase 5 the speech engine, Phase 4 the server-side Gemini
-vision pipeline, Phase 3 the browser camera subsystem, Phase 2 the mocked
-Navigation Mode UI, and Phase 1 the core domain model. This document describes
+Status: **Phase 11 (Evaluation framework complete)**;
+Phase 10 added performance profiling and optimization (PerformanceMonitor, WebP
+frame encoding, DuplicateSuppression prune timer), Phase 9 added voice input and
+Explore Mode, Phase 8 the decision engine / real-time pipeline, Phase 7 the
+deterministic safety engine, Phase 6 the navigation engine, Phase 5 the speech
+engine, Phase 4 the server-side Gemini vision pipeline, Phase 3 the browser
+camera subsystem, Phase 2 the mocked Navigation Mode UI, and Phase 1 the core
+domain model. This document describes
 the target software architecture the prototype is being built toward. The `core` domain model + Zod schemas exist (the Scene Representation is
 now the conservative Phase-4 shape), along with a concrete **Gemini
 `VisionProvider`** + dev fixtures (now with `queryScene` for free-form
@@ -271,8 +273,10 @@ next phase is not started automatically.
    enhanced debug overlay (see §21).
 9. Voice input, scene queries, and Explore Mode **(done)**.
 10. Performance profiling and optimization **(done)**.
-11. Full accessibility pass.
-12. Hardening: failure/lifecycle edge cases end-to-end.
+11. Evaluation framework — fixture scenes, TP/FP/FN scoring, latency,
+    reliability, security, privacy **(done)**.
+12. Full accessibility pass.
+13. Hardening: failure/lifecycle edge cases end-to-end.
 
 Later/future: local CV, vest-mounted camera, depth/sensor fusion.
 
@@ -619,3 +623,47 @@ the system produces identical outputs.
 - Vitest-based performance benchmark exercising the fixture provider, safety
   engine, and full pipeline with timing instrumentation.
 - Sub-millisecond results for all stages with fixture data.
+
+## 24. Evaluation framework (added in Phase 11)
+
+Phase 11 adds a repeatable evaluation framework in `src/evaluation/`. No behavior
+changes to the production bundle — all new code is test infrastructure.
+
+### Fixture scenes (16 total)
+
+`src/providers/fixture/fixtures.ts` was extended from 6 to 16 scenes, covering
+all significant pedestrian hazard categories:
+
+| Clear paths | Terrain/surface hazards | Dynamic/structural hazards | Uncertain |
+|-------------|------------------------|---------------------------|-----------|
+| `clear` | `puddle` | `obstacle` (pole + person) | `uncertain` |
+| `clear_road` | `pothole` | `parked_vehicle` | `low_light` |
+| | `curb` | `moving_person` | |
+| | | `stairs` (down) | |
+| | | `stairs_up` | |
+| | | `wall` | |
+| | | `narrow_path` | |
+| | | `road_crossing` | |
+| | | `blocked` | |
+
+### Evaluation types (`src/evaluation/types.ts`)
+
+- `EvalOutcome`: `true_positive | false_positive | false_negative | true_negative | unknown`
+- `EvalResult`: per-test outcome record
+- `summarize()`: aggregates TP/FP/FN/TN → precision, recall, FN-rate
+- `SAFETY_FLOOR`: minimum acceptable `SafetyLevel` per fixture scene
+- `MUST_NOT_BE_SAFE`: scenes that must never be assessed as `safe` or `unknown`
+
+### Test files
+
+| File | Category | Focus |
+|------|----------|-------|
+| `scene-understanding.eval.test.ts` | 1 & 2 | SceneType/path/terrain, obstacle/hazard presence |
+| `safety-decisions.eval.test.ts` | 3 | Safety floor, false negatives |
+| `speech-behavior.eval.test.ts` | 4 & 5 | Dispatch priority, queue, suppression |
+| `latency.eval.test.ts` | 6 | p95 thresholds per pipeline stage |
+| `reliability.eval.test.ts` | 7 | 10 failure scenarios |
+| `security.eval.test.ts` | — | Key exposure, payload, MIME, JSON, schema |
+| `privacy.eval.test.ts` | — | Frame storage, upload, console, location |
+
+Full detail: [docs/evaluation.md](evaluation.md) and [docs/testing.md](testing.md).

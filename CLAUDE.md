@@ -103,22 +103,18 @@ required and documented. Secrets stay on the server.
 
 ## Current status
 
-**Phase 10 — Performance profiling and optimization complete**, on top of
-Phase 9 (Navigation Mode + Explore Mode), Phase 8 (decision engine / real-time
-pipeline), Phase 7 (safety engine), Phase 6 (navigation engine), Phase 5
-(speech engine), Phase 4 (server-side Gemini vision pipeline), Phase 3
-(browser camera), Phase 2 (mocked Navigation Mode UI), and Phase 1 (core
-model, typed env). `src/performance` adds a development-only
-`PerformanceMonitor` tracking cameraFPS, captureLatencyMs, aiLatencyMs,
-aiRequestsPerMinute, aiFailureRate, perceptionAgeMs, gpsAccuracy, gpsAgeMs,
-speechQueueLength, and endToEndLatencyMs (bounded arrays, periodic pruning, no
-external telemetry). Integrated into `NavigationSessionController` with
-`getPerformanceMetrics()`. Fixed `DuplicateSuppression` unbounded map (now
-pruned every 30 s). `FrameCapture` prefers WebP encoding where supported
-(smaller payloads). AI pipeline verified already optimal (temperature 0,
-thinkingBudget 0, structured output, no unnecessary data). A Vitest benchmark
-exercises the full fixture pipeline. 24 new tests (517 total). There is still
-no local CV.
+**Phase 11 — Evaluation framework complete**, on top of Phase 10 (performance
+profiling and optimization), Phase 9 (Navigation Mode + Explore Mode), Phase 8
+(decision engine / real-time pipeline), Phase 7 (safety engine), Phase 6
+(navigation engine), Phase 5 (speech engine), Phase 4 (server-side Gemini
+vision pipeline), Phase 3 (browser camera), Phase 2 (mocked Navigation Mode
+UI), and Phase 1 (core model, typed env). `src/evaluation` adds a repeatable
+evaluation framework: 16 fixture scenes (up from 6), TP/FP/FN/TN scoring with
+zero-false-negative target for safety, 7 test categories (scene understanding,
+hazard detection, safety decision, navigation instruction, speech behavior,
+latency, failure handling), 10 reliability scenarios, 6 security checks, 4
+privacy checks. `docs/testing.md` and `docs/evaluation.md` provide reference
+documentation. 84 new tests (601 total). There is still no local CV.
 
-Next up is **Phase 11 — Full accessibility pass**. Do not start it without
+Next up is **Phase 12 — Full accessibility pass**. Do not start it without
 being asked.

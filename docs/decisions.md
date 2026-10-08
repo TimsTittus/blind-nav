@@ -780,3 +780,63 @@ degrades over time. The task explicitly defers new AI models and local CV.
 - 24 new tests (17 performance monitor, 4 benchmark, 3 frame-capture WebP).
   Total: 517.
 
+
+---
+
+## ADR 0024 — Phase 11: evaluation framework
+
+**Status:** Accepted.
+
+**Context:** The prototype has a complete real-time pipeline but no systematic
+way to verify quality beyond "it seemed to work." Before field testing or
+expansion, the system needs objective, repeatable evaluation: defined expected
+outcomes per scenario, explicit scoring for the failure modes that matter most
+(false negatives in safety), and automated regression coverage for every layer.
+
+**Decision:**
+
+1. **Fixture scenes expanded from 6 to 16** (`src/providers/fixture/fixtures.ts`).
+   Ten new scenes added: `clear_road`, `pothole`, `parked_vehicle`,
+   `moving_person`, `stairs_up`, `curb`, `wall`, `narrow_path`,
+   `road_crossing`, `low_light`. Each scene encodes its ground-truth
+   `SceneObservation` and corresponds to a real-world pedestrian situation.
+
+2. **Evaluation framework** (`src/evaluation/`): shared types and helpers
+   (`types.ts`, `helpers.ts`), a `summarize()` function that tallies TP/FP/FN/TN
+   and computes precision, recall, and FN-rate, and a `SAFETY_FLOOR` table
+   mapping every fixture scene to its minimum acceptable `SafetyLevel`.
+
+3. **Seven test categories:**
+   - Categories 1 & 2 (scene understanding / object detection): sceneType,
+     pathStatus, terrain, obstacle and hazard presence, zero false negatives.
+   - Category 3 (safety decision): every scene meets its safety floor; critical
+     scenes (`wall`, `blocked`, `stairs*`, `road_crossing`, `pothole`) are never
+     assessed as safe.
+   - Categories 4 & 5 (navigation instruction / speech behavior): dispatch
+     priority by safety level, queue ordering, interruption rules, duplicate
+     suppression, stop/disable controls.
+   - Category 6 (latency): p95 thresholds — fixture analyze <20 ms, safety assess
+     <5 ms, speech dispatch <2 ms, combined pipeline <30 ms.
+   - Category 7 (failure handling): 10 failure scenarios each verified to return
+     a typed `AppError` with `perceptionStatus: "unavailable"`.
+
+4. **Security tests:** API key not in `NEXT_PUBLIC_` scope; malicious/oversized
+   payloads; oversized image (>4 MB → 400); invalid MIME; malformed JSON; Zod
+   schema rejects adversarial model output.
+
+5. **Privacy tests:** no frames stored in `localStorage`; `fetch` only goes to
+   the internal `/api/vision/analyze` endpoint; no image data in console output;
+   no GPS coordinates in console output or performance metrics.
+
+6. **No behavior changes.** All new code is test infrastructure or fixture data.
+   The evaluation framework never runs in the production bundle.
+
+**Consequences:**
+
+- Every fixture scene is an explicit regression anchor. Changing fixture output
+  now fails a test before any downstream layer is affected.
+- False negative rate is tracked numerically. The current result is 0 across
+  all 16 scenes for both detection and safety decision categories.
+- 84 new tests (categories 1–7, security, privacy). Total: 601.
+- `docs/testing.md` and `docs/evaluation.md` provide reference material for
+  contributors and reviewers.

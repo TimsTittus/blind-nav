@@ -82,18 +82,56 @@ export interface FrameCaptureDeps {
 
 const HAVE_CURRENT_DATA = 2;
 
+let webpSupported: boolean | null = null;
+
+/**
+ * Test whether the browser's canvas can encode WebP. Cached after the first
+ * call so it runs once per session, not per frame.
+ */
+export function detectWebPSupport(createCanvas?: () => CanvasLike): boolean {
+  if (webpSupported !== null) return webpSupported;
+  try {
+    const c = createCanvas
+      ? createCanvas()
+      : (document.createElement("canvas") as unknown as CanvasLike);
+    c.width = 1;
+    c.height = 1;
+    let detected = false;
+    c.toBlob(
+      (blob) => {
+        detected = blob?.type === "image/webp";
+      },
+      "image/webp",
+      0.5,
+    );
+    webpSupported = detected;
+  } catch {
+    webpSupported = false;
+  }
+  return webpSupported;
+}
+
+/** Reset the cached WebP detection (for tests). */
+export function resetWebPDetection(): void {
+  webpSupported = null;
+}
+
 /**
  * Controlled, on-demand frame grabber. It never runs by itself — a caller (the
  * scheduler) decides when to capture, so nothing is streamed anywhere.
  *
  * The scratch canvas is reused: `toBlob` snapshots the bitmap synchronously,
  * so overlapping calls cannot corrupt each other.
+ *
+ * Prefers WebP encoding where the browser supports it (smaller payloads for
+ * the same visual quality). Falls back to JPEG.
  */
 export class FrameCapture {
   private readonly getSource: () => VideoSource | null;
   private readonly createCanvas: () => CanvasLike;
   private canvas: CanvasLike | null = null;
   private sequence = 0;
+  private preferredMimeType: string | null = null;
 
   constructor(
     getSource: () => VideoSource | null,
@@ -105,14 +143,24 @@ export class FrameCapture {
       (() => document.createElement("canvas") as unknown as CanvasLike);
   }
 
+  private resolveMimeType(): string {
+    if (this.preferredMimeType !== null) return this.preferredMimeType;
+    this.preferredMimeType = detectWebPSupport(this.createCanvas)
+      ? "image/webp"
+      : FRAME_CAPTURE_DEFAULTS.mimeType;
+    return this.preferredMimeType;
+  }
+
   /** Arrow property so it can be passed around as a bare callback. */
   captureFrame = async (
     options: FrameCaptureCallOptions = {},
   ): Promise<CapturedFrame> => {
     const { signal, ...overrides } = options;
+    const resolvedMimeType = overrides.mimeType ?? this.resolveMimeType();
     const config = FrameCaptureOptionsSchema.parse({
       ...FRAME_CAPTURE_DEFAULTS,
       ...overrides,
+      mimeType: resolvedMimeType,
     });
     throwIfAborted(signal);
 

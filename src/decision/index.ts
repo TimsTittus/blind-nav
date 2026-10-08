@@ -15,3 +15,4 @@ export type {
   SessionPhase,
   SessionStats,
 } from "./types";
+export type { PerformanceMetrics } from "@/performance";

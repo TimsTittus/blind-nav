@@ -1,15 +1,17 @@
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   FrameCapture,
   FrameCaptureError,
+  detectWebPSupport,
   fitWithin,
+  resetWebPDetection,
   type FrameCaptureCallOptions,
 } from "./frame-capture";
 
 function setup(
   video = { videoWidth: 1920, videoHeight: 1080, readyState: 4 },
-  encode: (type?: string, quality?: number) => Blob | null = (type) =>
-    new Blob(["x".repeat(10)], { type: type ?? "image/jpeg" }),
+  encode: (type?: string, quality?: number) => Blob | null = () =>
+    new Blob(["x".repeat(10)], { type: "image/jpeg" }),
 ) {
   const drawImage = vi.fn();
   const toBlob = vi.fn(
@@ -34,6 +36,45 @@ function setup(
     setSource: (next: typeof video | null) => (source = next),
   };
 }
+
+describe("detectWebPSupport", () => {
+  afterEach(() => resetWebPDetection());
+
+  it("returns true when canvas encodes image/webp", () => {
+    const createCanvas = () => ({
+      width: 0,
+      height: 0,
+      getContext: () => null,
+      toBlob: (cb: (b: Blob | null) => void, type?: string) =>
+        cb(new Blob([], { type: type ?? "" })),
+    });
+    expect(detectWebPSupport(createCanvas)).toBe(true);
+  });
+
+  it("returns false when canvas cannot encode webp", () => {
+    const createCanvas = () => ({
+      width: 0,
+      height: 0,
+      getContext: () => null,
+      toBlob: (cb: (b: Blob | null) => void) =>
+        cb(new Blob([], { type: "image/png" })),
+    });
+    expect(detectWebPSupport(createCanvas)).toBe(false);
+  });
+
+  it("caches the result", () => {
+    const createCanvas = vi.fn(() => ({
+      width: 0,
+      height: 0,
+      getContext: () => null,
+      toBlob: (cb: (b: Blob | null) => void, type?: string) =>
+        cb(new Blob([], { type: type ?? "" })),
+    }));
+    detectWebPSupport(createCanvas);
+    detectWebPSupport(createCanvas);
+    expect(createCanvas).toHaveBeenCalledTimes(1);
+  });
+});
 
 describe("fitWithin", () => {
   it("scales down preserving aspect ratio", () => {
@@ -61,6 +102,8 @@ describe("fitWithin", () => {
 });
 
 describe("FrameCapture.captureFrame", () => {
+  afterEach(() => resetWebPDetection());
+
   it("returns a binary Blob using defaults (JPEG, ≤1024)", async () => {
     const { capture, toBlob, canvas } = setup();
     const frame = await capture.captureFrame();
@@ -95,12 +138,13 @@ describe("FrameCapture.captureFrame", () => {
     );
   });
 
-  it("increments the sequence and reuses one canvas", async () => {
+  it("increments the sequence and reuses the capture canvas", async () => {
     const { capture, createCanvas } = setup();
     const a = await capture.captureFrame();
+    const callsAfterFirst = createCanvas.mock.calls.length;
     const b = await capture.captureFrame();
     expect([a.sequence, b.sequence]).toEqual([1, 2]);
-    expect(createCanvas).toHaveBeenCalledTimes(1);
+    expect(createCanvas).toHaveBeenCalledTimes(callsAfterFirst);
   });
 
   it("rejects invalid options", async () => {
@@ -154,5 +198,32 @@ describe("FrameCapture.captureFrame", () => {
     await expect(
       capture.captureFrame({ signal: controller.signal }),
     ).rejects.toMatchObject({ kind: "aborted" });
+  });
+
+  it("prefers WebP when browser supports it", async () => {
+    resetWebPDetection();
+    const webpEncode = (type?: string) =>
+      new Blob(["x"], { type: type ?? "image/webp" });
+    const { capture, toBlob } = setup(undefined, webpEncode);
+    const frame = await capture.captureFrame();
+    expect(frame.mimeType).toBe("image/webp");
+    expect(toBlob).toHaveBeenCalledWith(
+      expect.any(Function),
+      "image/webp",
+      0.7,
+    );
+  });
+
+  it("respects explicit mimeType override even when WebP is available", async () => {
+    resetWebPDetection();
+    const webpEncode = (type?: string) =>
+      new Blob(["x"], { type: type ?? "image/webp" });
+    const { capture, toBlob } = setup(undefined, webpEncode);
+    await capture.captureFrame({ mimeType: "image/jpeg" });
+    expect(toBlob).toHaveBeenCalledWith(
+      expect.any(Function),
+      "image/jpeg",
+      0.7,
+    );
   });
 });

@@ -15,6 +15,8 @@ export interface SpeechEngineOptions {
 
 let nextId = 0;
 
+const SUPPRESSION_PRUNE_INTERVAL_MS = 30_000;
+
 export class SpeechEngine {
   private readonly provider: TtsProvider;
   private readonly queue: SpeechQueue;
@@ -23,6 +25,7 @@ export class SpeechEngine {
   private _settings: VoiceSettings;
   private _paused = false;
   private disposed = false;
+  private pruneTimer: ReturnType<typeof setInterval> | null = null;
 
   onStateChange: (() => void) | null;
 
@@ -45,6 +48,11 @@ export class SpeechEngine {
       this.advance();
       this.onStateChange?.();
     };
+
+    this.pruneTimer = setInterval(
+      () => this.suppression.prune(this.now()),
+      SUPPRESSION_PRUNE_INTERVAL_MS,
+    );
   }
 
   get settings(): VoiceSettings {
@@ -130,6 +138,10 @@ export class SpeechEngine {
 
   dispose(): void {
     this.disposed = true;
+    if (this.pruneTimer !== null) {
+      clearInterval(this.pruneTimer);
+      this.pruneTimer = null;
+    }
     this.stop();
     this.suppression.clear();
     this.provider.onEnd = null;

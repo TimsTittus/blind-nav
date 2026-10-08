@@ -5,7 +5,13 @@ export type { CameraSnapshot, CameraFacing } from "./controller";
 export { classifyCameraError } from "./errors";
 export type { CameraError, CameraErrorKind } from "./errors";
 export { FRAME_CAPTURE_DEFAULTS, FRAME_CAPTURE_LIMITS } from "./config";
-export { FrameCapture, FrameCaptureError, fitWithin } from "./frame-capture";
+export {
+  FrameCapture,
+  FrameCaptureError,
+  fitWithin,
+  detectWebPSupport,
+  resetWebPDetection,
+} from "./frame-capture";
 export type {
   CapturedFrame,
   FrameCaptureCallOptions,

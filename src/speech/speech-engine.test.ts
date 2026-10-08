@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import type { SpeechPriority } from "@/core";
 import { DEFAULT_VOICE_SETTINGS, type VoiceSettings } from "./config";
 import { SpeechEngine, type SpeechEngineOptions } from "./speech-engine";
@@ -52,6 +52,8 @@ function fakeProvider(): TtsProvider & {
   return provider;
 }
 
+const engines: SpeechEngine[] = [];
+
 function createEngine(
   provider: ReturnType<typeof fakeProvider>,
   settings: VoiceSettings = DEFAULT_VOICE_SETTINGS,
@@ -63,10 +65,16 @@ function createEngine(
     cooldownOverrides: FAST_COOLDOWNS,
   };
   if (now) options.now = now;
-  return new SpeechEngine(options);
+  const engine = new SpeechEngine(options);
+  engines.push(engine);
+  return engine;
 }
 
 describe("SpeechEngine", () => {
+  afterEach(() => {
+    for (const engine of engines) engine.dispose();
+    engines.length = 0;
+  });
   describe("basic speak", () => {
     it("speaks a message immediately when idle", () => {
       const p = fakeProvider();

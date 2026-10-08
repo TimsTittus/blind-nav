@@ -1,12 +1,12 @@
 # Architecture
 
-Status: **Phase 9 (Navigation Mode + Explore Mode complete)**; Phase 8 added the
-decision engine / real-time pipeline, Phase 7 the deterministic safety engine,
-Phase 6 the navigation engine, Phase 5 the speech engine, Phase 4 the
-server-side Gemini vision pipeline, Phase 3 the browser camera subsystem,
-Phase 2 the mocked Navigation Mode UI, and Phase 1 the core domain model. This
-document describes the target software architecture the prototype is being built
-toward. The `core` domain model + Zod schemas exist (the Scene Representation is
+Status: **Phase 10 (Performance profiling and optimization complete)**;
+Phase 9 added voice input and Explore Mode, Phase 8 the decision engine /
+real-time pipeline, Phase 7 the deterministic safety engine, Phase 6 the
+navigation engine, Phase 5 the speech engine, Phase 4 the server-side Gemini
+vision pipeline, Phase 3 the browser camera subsystem, Phase 2 the mocked
+Navigation Mode UI, and Phase 1 the core domain model. This document describes
+the target software architecture the prototype is being built toward. The `core` domain model + Zod schemas exist (the Scene Representation is
 now the conservative Phase-4 shape), along with a concrete **Gemini
 `VisionProvider`** + dev fixtures (now with `queryScene` for free-form
 questions), the server **analyze and query routes**, a client **perception
@@ -99,6 +99,7 @@ Each layer has a README with detail. Summary:
 | [`navigation`](../src/navigation)| Route/GPS/position/heading reasoning                             | core                |
 | [`decision`](../src/decision)  | Reconcile safety + navigation + scene → decision & cadence        | core, safety, navigation |
 | [`speech`](../src/speech)      | Speak decisions; prioritize safety; duplicate suppression; swappable TTS | core          |
+| [`performance`](../src/performance)| Dev-only metrics: FPS, latency, failure rates, end-to-end timing | —            |
 | [`app`](../src/app)            | UI + server route handlers (`app/api/**`)                         | all                 |
 
 Dependencies point **toward `core`**; lower layers never import UI.
@@ -268,8 +269,10 @@ next phase is not started automatically.
    and duplicate suppression. Perception freshness tracking (fresh/aging/
    stale/none). Navigation Mode UI wired to real controller state with an
    enhanced debug overlay (see §21).
-9. Full accessibility pass.
-10. Hardening: failure/lifecycle edge cases end-to-end.
+9. Voice input, scene queries, and Explore Mode **(done)**.
+10. Performance profiling and optimization **(done)**.
+11. Full accessibility pass.
+12. Hardening: failure/lifecycle edge cases end-to-end.
 
 Later/future: local CV, vest-mounted camera, depth/sensor fusion.
 
@@ -570,3 +573,49 @@ infrastructure. Code: [`src/voice`](../src/voice/), [`src/app/_explore`](../src/
 - `QueryInput` component: push-to-talk button + text form.
 - No destination required, no route tracking — pure obstacle/environment
   awareness plus user questions.
+
+## 23. Performance profiling and optimization (added in Phase 10)
+
+Development-only measurement infrastructure for the real-time pipeline, plus
+targeted fixes for issues discovered during the audit. No behavior changes;
+the system produces identical outputs.
+
+### PerformanceMonitor (`src/performance`)
+- **`PerformanceMonitor`** class: collects 10 metrics across camera, AI,
+  navigation, speech, and the end-to-end pipeline. All data stays in-process —
+  no external telemetry. Bounded at 300 timestamp entries with 30 s prune
+  interval.
+- Integrated into `NavigationSessionController`: frame capture latency, AI
+  request end/failure, safety assessment, speech dispatch, GPS updates, and
+  speech queue length are recorded at each pipeline stage.
+- `controller.getPerformanceMetrics()` returns the current
+  `PerformanceMetrics` snapshot for debug overlays or logging.
+
+### Memory audit
+- **`DuplicateSuppression`** had an unbounded `Map<string, CooldownEntry>` —
+  now pruned every 30 s by a timer in `SpeechEngine`. The `prune()` method
+  already existed but was never called. `dispose()` clears the timer.
+- All other subsystem cleanup patterns were audited and found sound.
+
+### Network verification
+- `PerceptionController` enforces one request in flight with latest-frame-wins
+  (pending slot coalescence). Timeouts and abort signals are wired at every
+  layer (analysis client, query client, Gemini provider). No concurrent
+  request explosion is possible.
+
+### Image optimization
+- `FrameCapture` now detects WebP canvas encoding support at startup and
+  prefers `image/webp` (smaller payloads at the same quality). Falls back to
+  JPEG. Detection is cached per session.
+- Camera orientation is handled natively by the `<video>` element — no extra
+  canvas transform needed.
+
+### AI optimization (verified, no changes needed)
+- Already uses `temperature: 0`, `thinkingBudget: 0` (no unnecessary
+  reasoning), and structured JSON output (`responseSchema`).
+- No navigation history or previous frames are sent (one frame per request).
+
+### Benchmark
+- Vitest-based performance benchmark exercising the fixture provider, safety
+  engine, and full pipeline with timing instrumentation.
+- Sub-millisecond results for all stages with fixture data.

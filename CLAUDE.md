@@ -103,22 +103,22 @@ required and documented. Secrets stay on the server.
 
 ## Current status
 
-**Phase 9 — Navigation Mode + Explore Mode complete**, on top of Phase 8
-(decision engine / real-time pipeline), Phase 7 (safety engine), Phase 6
-(navigation engine), Phase 5 (speech engine), Phase 4 (server-side Gemini
-vision pipeline), Phase 3 (browser camera), Phase 2 (mocked Navigation Mode
-UI), and Phase 1 (core model, typed env). `src/voice` adds a `VoiceInput`
-abstraction (browser SpeechRecognition with vendor prefix, push-to-talk
-semantics, text fallback). `VisionProvider` gains an optional `queryScene`
-method for free-form questions answered from a camera frame (implemented in
-Gemini and fixture providers). A new `POST /api/vision/query` endpoint and
-`SceneQueryClient` complete the query pipeline. `SceneQueryHandler` in
-`src/decision` coordinates frame capture → API → speech, integrated into
-`NavigationSessionController` via `submitQuery`. The `SessionCreator` now
-supports recent destinations (localStorage, max 5). `src/app/_explore` adds
-`ExploreScreen` with camera, safety overlay, push-to-talk + text query input,
-and query status display. Both Navigation Mode and Explore Mode are fully
-wired to real state. 37 new tests (493 total). There is still no local CV.
+**Phase 10 — Performance profiling and optimization complete**, on top of
+Phase 9 (Navigation Mode + Explore Mode), Phase 8 (decision engine / real-time
+pipeline), Phase 7 (safety engine), Phase 6 (navigation engine), Phase 5
+(speech engine), Phase 4 (server-side Gemini vision pipeline), Phase 3
+(browser camera), Phase 2 (mocked Navigation Mode UI), and Phase 1 (core
+model, typed env). `src/performance` adds a development-only
+`PerformanceMonitor` tracking cameraFPS, captureLatencyMs, aiLatencyMs,
+aiRequestsPerMinute, aiFailureRate, perceptionAgeMs, gpsAccuracy, gpsAgeMs,
+speechQueueLength, and endToEndLatencyMs (bounded arrays, periodic pruning, no
+external telemetry). Integrated into `NavigationSessionController` with
+`getPerformanceMetrics()`. Fixed `DuplicateSuppression` unbounded map (now
+pruned every 30 s). `FrameCapture` prefers WebP encoding where supported
+(smaller payloads). AI pipeline verified already optimal (temperature 0,
+thinkingBudget 0, structured output, no unnecessary data). A Vitest benchmark
+exercises the full fixture pipeline. 24 new tests (517 total). There is still
+no local CV.
 
-Next up is **Phase 10 — Full accessibility pass**. Do not start it without
+Next up is **Phase 11 — Full accessibility pass**. Do not start it without
 being asked.

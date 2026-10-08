@@ -21,6 +21,7 @@ import {
   type PerceptionState,
   type SceneQueryClient,
 } from "@/perception";
+import { PerformanceMonitor, type PerformanceMetrics } from "@/performance";
 import { SafetyEngine, type SafetyContext } from "@/safety";
 import { SpeechEngine, WebTtsProvider, type VoiceSettings } from "@/speech";
 import {
@@ -83,6 +84,7 @@ export class NavigationSessionController {
   private speechDispatch: SpeechDispatch | null = null;
 
   private sceneQueryHandler: SceneQueryHandler | null = null;
+  private readonly perfMonitor: PerformanceMonitor;
 
   // External dependencies
   private readonly analysisClient: AnalysisClient;
@@ -141,6 +143,7 @@ export class NavigationSessionController {
     };
     this.config = { ...SESSION_CONTROLLER_CONFIG, ...deps.config };
     this.now = deps.now ?? (() => Date.now());
+    this.perfMonitor = new PerformanceMonitor({ now: this.now });
   }
 
   // ── useSyncExternalStore interface ───────────────────────────────
@@ -189,6 +192,7 @@ export class NavigationSessionController {
 
       this.frameScheduler!.start();
       this.startSafetyLoop();
+      this.perfMonitor.start();
 
       this.setPhase("running");
     } catch (error) {
@@ -224,7 +228,12 @@ export class NavigationSessionController {
 
   dispose(): void {
     this.stop();
+    this.perfMonitor.dispose();
     this.listeners.clear();
+  }
+
+  getPerformanceMetrics(): PerformanceMetrics {
+    return this.perfMonitor.getMetrics();
   }
 
   // ── Voice settings ───────────────────────────────────────────────
@@ -309,6 +318,10 @@ export class NavigationSessionController {
       speak: (text, priority) => {
         this.speechEngine?.speak(text, priority);
         this.lastSpeechAt = this.now();
+        this.perfMonitor.recordSpeechDispatched();
+        this.perfMonitor.recordSpeechQueueLength(
+          this.speechEngine?.pendingCount ?? 0,
+        );
         this.notify();
       },
     };
@@ -359,6 +372,7 @@ export class NavigationSessionController {
   }
 
   private teardownSubsystems(): void {
+    this.perfMonitor.stop();
     this.stopSafetyLoop();
     this.frameScheduler?.stop();
     this.perception?.dispose();
@@ -387,6 +401,8 @@ export class NavigationSessionController {
   // ── Private: frame pipeline ──────────────────────────────────────
 
   private async onFrame(frame: CapturedFrame): Promise<void> {
+    const captureLatency = this.now() - frame.capturedAt;
+    this.perfMonitor.recordFrameCapture(captureLatency);
     this.trackFps();
     let dataUrl: string;
     try {
@@ -419,7 +435,17 @@ export class NavigationSessionController {
       this.perceptionState.analysis !== prev.analysis
     ) {
       this.aiRequestCount++;
+      if (this.perceptionState.latencyMs !== null) {
+        this.perfMonitor.recordAiRequestEnd(
+          this.now() - this.perceptionState.latencyMs,
+        );
+      }
       this.runSafetyAssessment();
+    } else if (
+      this.perceptionState.lastError &&
+      this.perceptionState.lastError !== prev.lastError
+    ) {
+      this.perfMonitor.recordAiFailure();
     }
 
     const prevFreshness = this.computeFreshnessWith(prev);
@@ -443,6 +469,7 @@ export class NavigationSessionController {
 
     const result = this.safetyEngine.assess(context);
     this.safetyAssessment = result.assessment;
+    this.perfMonitor.recordSafetyAssessed();
 
     this.speechDispatch?.onSafetyUpdate(
       result.assessment,
@@ -476,6 +503,9 @@ export class NavigationSessionController {
   // ── Private: location → route ────────────────────────────────────
 
   private onLocationUpdate(): void {
+    this.perfMonitor.recordGpsUpdate(
+      this.locationSnapshot.location?.accuracyMeters ?? null,
+    );
     if (!this.routeTracker || !this.locationSnapshot.location) return;
     const prevState = this.routeState;
     this.routeState = this.routeTracker.update(this.locationSnapshot.location);

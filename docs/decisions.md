@@ -728,3 +728,55 @@ was no voice input.
 - 37 new tests (20 voice input, 10 scene query handler, 7 query contract).
   Total: 493.
 
+---
+
+## ADR 0023 — Phase 10: performance profiling and optimization
+
+**Status:** Accepted.
+
+**Context:** Phases 1–9 built all subsystems end-to-end. Before adding new AI
+models or further features, the system needs measurement infrastructure to
+identify bottlenecks and verify that nothing leaks, duplicates requests, or
+degrades over time. The task explicitly defers new AI models and local CV.
+
+**Decision:**
+
+1. **`PerformanceMonitor`** (`src/performance`): development-only metrics
+   collector tracking cameraFPS, captureLatencyMs, aiLatencyMs,
+   aiRequestsPerMinute, aiFailureRate, perceptionAgeMs, gpsAccuracy, gpsAgeMs,
+   speechQueueLength, and endToEndLatencyMs. All data stays in-process — no
+   external telemetry. Bounded at 300 timestamp entries with periodic pruning
+   (30 s interval). Integrated into `NavigationSessionController` with metric
+   recording at each pipeline stage.
+2. **Memory audit.** `DuplicateSuppression.cooldowns` Map was unbounded — now
+   pruned every 30 s via a timer in `SpeechEngine` (the `prune()` method
+   existed but was never called). `SpeechEngine.dispose()` clears the timer.
+   All other subsystems' cleanup patterns were audited and found sound:
+   `CameraController` (token invalidation, track stop on all exit paths),
+   `PerceptionController` (abort + dispose), `FrameScheduler` (generation
+   invalidation), `SceneQueryHandler` (abort + listener clear).
+3. **Network verification.** Confirmed: `PerceptionController` enforces one
+   request in flight with latest-frame-wins (pending slot). Timeouts and
+   abort signals are wired at every layer. No concurrent request explosion is
+   possible.
+4. **Image optimization.** `FrameCapture` now detects WebP support at startup
+   and prefers `image/webp` encoding (smaller payloads for the same quality).
+   Falls back to JPEG where the browser lacks WebP canvas encoding. Detection
+   result is cached per session. Camera orientation is already handled natively
+   by the `<video>` element (no extra transform needed).
+5. **AI optimization.** Already optimized: `temperature: 0`,
+   `thinkingBudget: 0`, structured JSON output (`responseSchema`). No
+   navigation history or previous frames are sent (confirmed by code audit).
+6. **Benchmark.** A Vitest-based benchmark exercises the fixture provider,
+   safety engine, and full pipeline with timing instrumentation. Sub-
+   millisecond results for all stages with fixture data.
+
+**Consequences:**
+
+- A `PerformanceMonitor` is available for any dev or debugging session;
+  `controller.getPerformanceMetrics()` returns the latest snapshot.
+- No behavior changes: the system produces identical outputs. The optimization
+  is measurement infrastructure + one leak fix + one image encoding improvement.
+- 24 new tests (17 performance monitor, 4 benchmark, 3 frame-capture WebP).
+  Total: 517.
+

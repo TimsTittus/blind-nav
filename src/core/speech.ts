@@ -1,15 +1,25 @@
 import { z } from "zod";
-import { DecisionKindSchema, PrioritySchema } from "./decision";
+import { DecisionKindSchema } from "./decision";
 import {
   EpochMillisSchema,
   NonEmptyStringSchema,
   UuidSchema,
 } from "./primitives";
 
+export const SpeechPrioritySchema = z.enum([
+  "critical",
+  "high",
+  "navigation",
+  "information",
+  "low",
+]);
+
+export type SpeechPriority = z.infer<typeof SpeechPrioritySchema>;
+
 export const SpeechInstructionSchema = z.object({
   id: UuidSchema,
   text: NonEmptyStringSchema,
-  priority: PrioritySchema,
+  priority: SpeechPrioritySchema,
   interrupt: z.boolean(),
   createdAt: EpochMillisSchema,
   decisionKind: DecisionKindSchema.optional(),

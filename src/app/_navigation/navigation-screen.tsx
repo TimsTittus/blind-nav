@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { createDevLoggingConsumer, useCamera, useFrameLoop } from "@/camera";
 import type { NavigationSession } from "@/core";
+import { useSpeech } from "@/speech";
 import { useSession } from "../_session/use-session";
 import { CameraViewport } from "./camera-viewport";
 import { DebugOverlay } from "./debug-overlay";
@@ -13,6 +14,7 @@ import { AWAITING_SCENARIO_ID } from "./mock-scenarios";
 import { NavigationInstruction } from "./navigation-instruction";
 import { NavigationStatusOverlay } from "./navigation-status-overlay";
 import { SessionControls } from "./session-controls";
+import { SpeechTestPanel } from "./speech-test-panel";
 import { SystemStatus } from "./system-status";
 import { buildViewModel } from "./view-model";
 
@@ -78,10 +80,11 @@ function ActiveNavigation({
     pause: pauseCamera,
     resume: resumeCamera,
   } = camera;
-  const [voiceEnabled, setVoiceEnabled] = useState(true);
+  const speech = useSpeech();
   const [paused, setPaused] = useState(false);
   const [scenarioId, setScenarioId] = useState(AWAITING_SCENARIO_ID);
   const [debugOpen, setDebugOpen] = useState(false);
+  const [speechTestOpen, setSpeechTestOpen] = useState(false);
 
   useEffect(() => {
     void startCamera();
@@ -93,6 +96,13 @@ function ActiveNavigation({
     if (paused) pauseCamera();
     else resumeCamera();
   }, [paused, camera.state, pauseCamera, resumeCamera]);
+
+  // Sync voice enabled/disabled with speech engine.
+  function handleToggleVoice() {
+    const next = !speech.settings.enabled;
+    speech.updateSettings({ enabled: next });
+    if (!next) speech.stop();
+  }
 
   useFrameLoop({
     enabled: DEBUG_AVAILABLE && camera.state === "active",
@@ -109,6 +119,7 @@ function ActiveNavigation({
 
   function handleStop() {
     camera.stop();
+    speech.stop();
     onStop();
   }
 
@@ -137,21 +148,31 @@ function ActiveNavigation({
         <SystemStatus items={view.systems} />
         <div className="nav-screen__controls">
           <SessionControls
-            voiceEnabled={voiceEnabled}
+            voiceEnabled={speech.settings.enabled}
             paused={paused}
-            onToggleVoice={() => setVoiceEnabled((value) => !value)}
+            onToggleVoice={handleToggleVoice}
             onTogglePause={() => setPaused((value) => !value)}
             onStop={handleStop}
           />
           {DEBUG_AVAILABLE ? (
-            <button
-              type="button"
-              className="control-button control-button--small"
-              aria-pressed={debugOpen}
-              onClick={() => setDebugOpen((value) => !value)}
-            >
-              Debug
-            </button>
+            <>
+              <button
+                type="button"
+                className="control-button control-button--small"
+                aria-pressed={debugOpen}
+                onClick={() => setDebugOpen((value) => !value)}
+              >
+                Debug
+              </button>
+              <button
+                type="button"
+                className="control-button control-button--small"
+                aria-pressed={speechTestOpen}
+                onClick={() => setSpeechTestOpen((value) => !value)}
+              >
+                Speech test
+              </button>
+            </>
           ) : null}
         </div>
       </div>
@@ -161,6 +182,12 @@ function ActiveNavigation({
           scenarioId={scenarioId}
           onScenarioChange={setScenarioId}
           onClose={() => setDebugOpen(false)}
+        />
+      ) : null}
+      {DEBUG_AVAILABLE && speechTestOpen ? (
+        <SpeechTestPanel
+          speech={speech}
+          onClose={() => setSpeechTestOpen(false)}
         />
       ) : null}
     </div>

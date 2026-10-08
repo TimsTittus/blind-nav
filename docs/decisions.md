@@ -458,3 +458,55 @@ speech, or local CV).
   remain for the Safety Engine phase. See [`docs/gemini.md`](gemini.md) for
   configuration.
 
+---
+
+## ADR 0018 — Phase 5: speech engine with priority queue and swappable TTS
+
+**Status:** Accepted (2026-10-08)
+
+**Context.** Audio is the primary interface for the target user. The system
+needs spoken output with priority-based interruption (safety-critical messages
+must pre-empt routine guidance), duplicate suppression (identical instructions
+must not repeat excessively), and a swappable TTS backend (browser
+`SpeechSynthesis` first, native mobile or cloud TTS later).
+
+**Decision.**
+
+- **Five speech priorities** (`critical` > `high` > `navigation` >
+  `information` > `low`) in `core/speech.ts`, separate from the four-level
+  decision `Priority`. The `SpeechInstruction` schema uses the speech-specific
+  set. Interruption rules: critical can interrupt anything; high can interrupt
+  navigation/information/low; navigation can interrupt low; information and low
+  cannot interrupt.
+- **`TtsProvider` interface** in `src/speech/tts-provider.ts` (`speak`, `stop`,
+  `pause`, `resume`, `isSpeaking`, `isSupported`, `onEnd`, `onError`).
+  `WebTtsProvider` wraps browser `SpeechSynthesis`; future implementations can
+  be swapped without touching callers.
+- **`SpeechQueue`** — priority-ordered, FIFO within same priority, returns an
+  interrupt signal on enqueue.
+- **`DuplicateSuppression`** — per-text cooldowns keyed by priority (3–15 s).
+  Prevents spam from repeated identical messages (e.g. "Path clear" produced
+  10 times in 5 seconds).
+- **`SpeechEngine`** — orchestrator composing queue + suppression + provider.
+  Event-driven: speaks only when a new instruction arrives, not continuously.
+  `speak(text, priority)` / `stop()` / `pause()` / `resume()` / `dispose()`.
+- **Voice settings** (rate, pitch, volume, enabled) persisted in `localStorage`
+  with safe-range clamping and graceful fallback for unavailable storage.
+- **React hook** `useSpeech()` creates the engine on mount, disposes on unmount,
+  and syncs settings and state.
+- **No speech recognition.** Microphone input (voice commands, destination input)
+  is explicitly deferred to a later phase.
+- **Dev panel.** A `SpeechTestPanel` (dev-only, dead-code-eliminated in prod)
+  fires five test phrases (`"Path clear"`, `"Puddle ahead"`, `"Obstacle ahead"`,
+  `"STOP"`, `"Turn right in 20 meters"`) at their priorities, with pause/stop
+  and voice-settings controls.
+
+**Consequences.**
+
+- The speech engine is ready for the Decision Engine to drive with
+  `SpeechInstruction`s; until then, it is invoked via the dev panel or
+  programmatically.
+- The voice toggle in the navigation UI now controls the real engine.
+- Screen-reader announcements (ARIA live regions) remain independent of TTS —
+  they work even when speech is disabled or unsupported.
+

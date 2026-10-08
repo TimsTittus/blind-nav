@@ -103,23 +103,19 @@ required and documented. Secrets stay on the server.
 
 ## Current status
 
-**Phase 4 — Server-side Gemini vision pipeline complete**, on top of Phase 3
-(browser camera), Phase 2 (mocked Navigation Mode UI), and Phase 1 (core model,
-typed env). The Scene Representation in `core` is now the conservative Phase-4
-schema (categorical enums, `Hazard`, explicit `uncertainty`, **no meters** — no
-depth sensor). `src/providers` has a server-only `GeminiVisionProvider`
-(`@google/genai`, structured output, Zod-revalidated, typed error mapping) and a
-dev `FixtureVisionProvider` (clear/puddle/obstacle/stairs/blocked/uncertain)
-behind one `VisionProvider`. `POST /api/vision/analyze` validates request → MIME
-→ size → provider → returns a typed `SceneAnalysis` or a typed error with
-`perceptionStatus: "unavailable"` (never a silent "path clear"). `src/perception`
-adds the wire contract, image boundary, browser analysis client, and a
-`PerceptionController` (one in-flight, monotonic sequence, no stale overwrites,
-abortable) plus a camera→perception `FrameConsumer` bridge. Keys are server-only
-and the Gemini module is not in the client-safe barrel. Gemini mocked in unit
-tests. Config: [`docs/gemini.md`](docs/gemini.md). The pipeline is **not** yet
-mounted in `/navigate` (deferred to the Safety Engine phase), so safety stays
-honestly UNKNOWN. There is still no GPS, routing, speech, or local CV.
+**Phase 5 — Speech engine complete**, on top of Phase 4 (server-side Gemini
+vision pipeline), Phase 3 (browser camera), Phase 2 (mocked Navigation Mode UI),
+and Phase 1 (core model, typed env). `src/speech` adds a priority-ordered speech
+queue with interruption rules, duplicate suppression with per-priority cooldowns,
+browser `SpeechSynthesis` behind a swappable `TtsProvider` interface,
+voice-settings persistence (`localStorage`), a `SpeechEngine` orchestrator, and a
+`useSpeech()` React hook. Five speech priorities: `critical` > `high` >
+`navigation` > `information` > `low`. The voice toggle in the navigation UI now
+controls the real engine. A dev-only **Speech test** panel fires five test phrases
+at their priorities. The engine is event-driven and does not speak continuously.
+No speech recognition (deferred). The perception pipeline is **not** yet mounted
+in `/navigate` (deferred to the Safety Engine phase). There is still no GPS,
+routing, or local CV.
 
 Next up is **Phase 6 — the deterministic Safety Engine** (`src/safety`), which
 also mounts perception into the UI and revisits the `StatusCategory`/`SafetyLevel`

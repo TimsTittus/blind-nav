@@ -1,17 +1,19 @@
 # Architecture
 
-Status: **Phase 4 (server-side Gemini vision pipeline)**; Phase 3 added the
-browser camera subsystem, Phase 2 the mocked Navigation Mode UI, and Phase 1 the
-core domain model. This document describes the target software architecture the
-prototype is being built toward. The `core` domain model + Zod schemas exist
-(the Scene Representation is now the conservative Phase-4 shape), along with a
-concrete **Gemini `VisionProvider`** + dev fixtures, the server **analyze route**,
-and a client **perception pipeline** (analysis client, single-in-flight
-controller with no stale overwrites, camera→perception bridge), plus typed env
-config, the typed error taxonomy, and a minimal accessible UI shell with a
-client-held session. The remaining feature layers (`safety`, `navigation`,
-`decision`, `speech` logic) still exist as documented seams and gain real logic
-in later phases.
+Status: **Phase 5 (speech engine)**; Phase 4 added the server-side Gemini vision
+pipeline, Phase 3 the browser camera subsystem, Phase 2 the mocked Navigation
+Mode UI, and Phase 1 the core domain model. This document describes the target
+software architecture the prototype is being built toward. The `core` domain
+model + Zod schemas exist (the Scene Representation is now the conservative
+Phase-4 shape), along with a concrete **Gemini `VisionProvider`** + dev fixtures,
+the server **analyze route**, and a client **perception pipeline** (analysis
+client, single-in-flight controller with no stale overwrites, camera→perception
+bridge), plus typed env config, the typed error taxonomy, a minimal accessible
+UI shell with a client-held session, and a **speech engine** (`src/speech`) with
+a priority queue, interruption rules, duplicate suppression, and voice-settings
+persistence behind a swappable `TtsProvider` interface (browser `SpeechSynthesis`
+first). The remaining feature layers (`safety`, `navigation`, `decision`) still
+exist as documented seams and gain real logic in later phases.
 
 ## 1. Goals and non-goals
 
@@ -86,7 +88,7 @@ Each layer has a README with detail. Summary:
 | [`safety`](../src/safety)      | Deterministic safety assessment from the scene                    | core                |
 | [`navigation`](../src/navigation)| Route/GPS/position/heading reasoning                             | core                |
 | [`decision`](../src/decision)  | Reconcile safety + navigation + scene → decision & cadence        | core, safety, navigation |
-| [`speech`](../src/speech)      | Speak decisions; prioritize safety; ARIA announcements            | core                |
+| [`speech`](../src/speech)      | Speak decisions; prioritize safety; duplicate suppression; swappable TTS | core          |
 | [`app`](../src/app)            | UI + server route handlers (`app/api/**`)                         | all                 |
 
 Dependencies point **toward `core`**; lower layers never import UI.
@@ -229,11 +231,15 @@ next phase is not started automatically.
    to the camera at the `FrameConsumer` seam (see §17). Phase 5's "real Gemini"
    work was folded in here; mounting the pipeline in the live UI is deferred to
    the Safety Engine phase.
-5. ~~Real Gemini provider~~ — folded into Phase 4.
+5. **Speech Engine (done):** `src/speech` — priority queue with interruption
+   rules, duplicate suppression with per-priority cooldowns, browser
+   `SpeechSynthesis` behind a swappable `TtsProvider` interface, voice-settings
+   persistence, React hook, and a dev-only speech test panel in the navigation
+   UI (see §18). ~~Real Gemini provider~~ was folded into Phase 4.
 6. Deterministic Safety Engine.
 7. Navigation Engine (destination, route, position, heading).
 8. Decision Engine (reconciliation + cadence).
-9. Speech Engine + full accessibility pass.
+9. Full accessibility pass.
 10. Hardening: failure/lifecycle edge cases end-to-end.
 
 Later/future: local CV, vest-mounted camera, depth/sensor fusion.
@@ -327,3 +333,41 @@ Zod-validated SceneAnalysis`. Code: [`src/providers`](../src/providers),
   `FrameConsumer` seam but is not mounted into `/navigate` yet: that couples
   perception to the still-mocked navigation/safety and changes a run's privacy
   posture (frames leaving the device), which belongs with the Safety Engine.
+
+## 18. Speech engine (added in Phase 5)
+
+Audio is primary; the speech engine is event-driven and speaks only when a new
+instruction arrives. Code: [`src/speech`](../src/speech/README.md).
+
+- **`TtsProvider` interface.** A narrow abstraction (`speak`, `stop`, `pause`,
+  `resume`, `isSpeaking`, `isSupported`, `onEnd`, `onError`) so the underlying
+  engine can be replaced — browser `SpeechSynthesis` now, native mobile TTS or
+  cloud TTS later. `WebTtsProvider` is the first implementation.
+- **Speech priority.** Five levels in `core/speech.ts`: `critical` (0) > `high`
+  (1) > `navigation` (2) > `information` (3) > `low` (4). Interruption rules:
+  critical can interrupt anything; high can interrupt navigation/information/low;
+  navigation can interrupt low; information and low cannot interrupt.
+- **`SpeechQueue`.** Priority-ordered queue. Higher-priority entries sort ahead
+  of lower ones; same-priority is FIFO. `enqueue` returns `{ shouldInterrupt }`
+  so the engine knows when to cancel the current utterance.
+- **`DuplicateSuppression`.** Per-text cooldowns keyed by priority. If the same
+  text is submitted again within the cooldown window (3 s for critical up to
+  15 s for low), it is silently dropped. `prune()` cleans expired entries.
+- **`SpeechEngine`.** Orchestrator composing queue + suppression + provider.
+  `speak(text, priority)` checks suppression → enqueues → interrupts or advances;
+  `stop()` / `pause()` / `resume()` / `dispose()` manage lifecycle; an
+  `onStateChange` callback fires on every transition for React integration.
+- **Voice settings.** `VoiceSettings` (rate, pitch, volume, enabled) loaded from
+  and saved to `localStorage` via `preferences.ts`. Clamped to safe ranges.
+- **React hook.** `useSpeech()` creates a `SpeechEngine` on mount, disposes on
+  unmount, syncs settings, and exposes `speak`, `stop`, `pause`, `resume`,
+  `isSpeaking`, `isPaused`, `isSupported`, `settings`, `updateSettings`.
+- **UI integration.** The VOICE toggle in `SessionControls` now toggles
+  `speech.settings.enabled` and stops speech when disabled. A dev-only
+  **Speech test** panel (`SpeechTestPanel`) in the navigation UI lets developers
+  fire the five test phrases at their priorities, control pause/stop, and adjust
+  voice settings.
+- **Not yet driven by real decisions.** The speech engine is wired and testable
+  but is not yet connected to a Decision Engine — it is invoked manually via the
+  dev panel or programmatically via `useSpeech().speak()`. The Decision Engine
+  phase will produce `SpeechInstruction`s that the engine consumes.

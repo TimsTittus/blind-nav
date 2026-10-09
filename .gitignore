@@ -38,3 +38,8 @@ next-env.d.ts
 .vscode/*
 !.vscode/extensions.json
 *.pem
+
+# Local CV model weights. Never committed: the SeaFormer/ADE20K licence review
+# from ADR 0026 is unresolved, so weights are installed per-developer with
+# `bun run models:install` (see docs/fast-perception.md).
+/public/models/

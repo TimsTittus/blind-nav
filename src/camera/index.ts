@@ -19,6 +19,8 @@ export type {
 } from "./frame-capture";
 export { FrameScheduler } from "./frame-scheduler";
 export type { FrameSchedulerOptions, SchedulerState } from "./frame-scheduler";
+export { documentVisibility } from "./visibility";
+export type { VisibilitySource } from "./visibility";
 export { createDevLoggingConsumer, frameMetadata } from "./frame-consumer";
 export type { FrameConsumer, FrameMetadata } from "./frame-consumer";
 export { useCamera } from "./use-camera";

@@ -7,6 +7,17 @@ import {
 } from "@/camera";
 import type { NavigationSession, SafetyAssessment } from "@/core";
 import {
+  CONSERVATIVE_TRUST_POLICY,
+  FastFrameSource,
+  FastPerceptionController,
+  type FastPerceptionConfig,
+  type FastPerceptionState,
+  type FastTrustPolicy,
+  type LocalVisionBackend,
+  type RgbaFrame,
+} from "@/fast-perception";
+import { fusePerception, type FusedPerception } from "@/fusion";
+import {
   LocationController,
   RouteTracker,
   type LocationSnapshot,
@@ -22,7 +33,11 @@ import {
   type SceneQueryClient,
 } from "@/perception";
 import { PerformanceMonitor, type PerformanceMetrics } from "@/performance";
-import { SafetyEngine, type SafetyContext } from "@/safety";
+import {
+  SafetyEngine,
+  type PerceptionFusionInput,
+  type SafetyContext,
+} from "@/safety";
 import { SpeechEngine, WebTtsProvider, type VoiceSettings } from "@/speech";
 import {
   SESSION_CONTROLLER_CONFIG,
@@ -42,6 +57,18 @@ import type {
 
 type Listener = () => void;
 
+const IDLE_FAST_PERCEPTION: FastPerceptionState = {
+  availability: "unavailable",
+  frame: null,
+  appliedSequence: -1,
+  lastError: null,
+  inFlight: false,
+  intervalMs: 0,
+  inferenceMs: null,
+  deviceTooSlow: false,
+  schedulerState: "stopped",
+};
+
 const UNKNOWN_SAFETY: SafetyAssessment = {
   level: "unknown",
   action: "none",
@@ -58,6 +85,21 @@ export interface NavigationSessionControllerDeps {
   voiceSettings?: VoiceSettings;
   config?: Partial<SessionControllerConfig>;
   now?: () => number;
+  /**
+   * Creates the local inference backend. Omitted means cloud-only, which is
+   * the default: no weights ship with the app (ADR 0026/0027). Rejecting is a
+   * supported outcome — the session continues cloud-only.
+   */
+  createFastBackend?: () => Promise<LocalVisionBackend>;
+  /** What local evidence is allowed to claim. */
+  trustPolicy?: FastTrustPolicy;
+  fastPerceptionConfig?: Partial<FastPerceptionConfig>;
+  /**
+   * Overrides the pixel grab for the local loop. Defaults to reading the live
+   * camera via {@link FastFrameSource}; injectable so the loop can be driven
+   * without a real video element.
+   */
+  grabFastFrame?: (size: number) => RgbaFrame;
 }
 
 /**
@@ -84,6 +126,14 @@ export class NavigationSessionController {
 
   private sceneQueryHandler: SceneQueryHandler | null = null;
   private readonly perfMonitor: PerformanceMonitor;
+
+  private fastFrameSource: FastFrameSource | null = null;
+  private fastPerception: FastPerceptionController | null = null;
+  private readonly createFastBackend:
+    (() => Promise<LocalVisionBackend>) | null;
+  private readonly trustPolicy: FastTrustPolicy;
+  private readonly fastPerceptionConfig: Partial<FastPerceptionConfig>;
+  private readonly grabFastFrameOverride: ((size: number) => RgbaFrame) | null;
 
   private readonly analysisClient: AnalysisClient;
   private readonly queryClient: SceneQueryClient;
@@ -115,6 +165,13 @@ export class NavigationSessionController {
     lastError: null,
   };
 
+  private fastState: FastPerceptionState = IDLE_FAST_PERCEPTION;
+  private fusion: FusedPerception | null = null;
+  private fastPerceptionError: string | null = null;
+  private localInferenceCount = 0;
+  private lastDispatchedLevel: SafetyAssessment["level"] | null = null;
+  private lastDispatchedAt = -Infinity;
+
   private frameCount = 0;
   private fpsWindowStart = 0;
   private fps = 0;
@@ -137,6 +194,10 @@ export class NavigationSessionController {
     this.config = { ...SESSION_CONTROLLER_CONFIG, ...deps.config };
     this.now = deps.now ?? (() => Date.now());
     this.perfMonitor = new PerformanceMonitor({ now: this.now });
+    this.createFastBackend = deps.createFastBackend ?? null;
+    this.trustPolicy = deps.trustPolicy ?? CONSERVATIVE_TRUST_POLICY;
+    this.fastPerceptionConfig = deps.fastPerceptionConfig ?? {};
+    this.grabFastFrameOverride = deps.grabFastFrame ?? null;
   }
 
   subscribe = (listener: Listener): (() => void) => {
@@ -156,6 +217,9 @@ export class NavigationSessionController {
       lastError: this.lastError,
       stats: this.getStats(),
       query: this.querySnapshot,
+      fastPerception: this.fastState,
+      fusion: this.fusion,
+      fastPerceptionError: this.fastPerceptionError,
     };
   };
 
@@ -184,6 +248,10 @@ export class NavigationSessionController {
       this.perfMonitor.start();
 
       this.setPhase("running");
+
+      // Local perception is strictly additive: it loads in the background and
+      // a failure never takes the cloud path (or the session) down.
+      void this.initFastPerception();
     } catch (error) {
       this.lastError =
         error instanceof Error ? error.message : "Failed to start session";
@@ -202,6 +270,7 @@ export class NavigationSessionController {
   pause(): void {
     if (this.phase !== "running") return;
     this.frameScheduler?.pause();
+    this.fastPerception?.pause();
     this.camera?.pause();
     this.speechEngine?.pause();
     this.setPhase("paused");
@@ -211,6 +280,7 @@ export class NavigationSessionController {
     if (this.phase !== "paused") return;
     this.camera?.resume();
     this.frameScheduler?.resume();
+    this.fastPerception?.resume();
     this.speechEngine?.resume();
     this.setPhase("running");
   }
@@ -281,6 +351,10 @@ export class NavigationSessionController {
       client: this.analysisClient,
       now: this.now,
     });
+
+    this.fastFrameSource = new FastFrameSource(
+      () => this.camera?.getActiveVideo() ?? null,
+    );
 
     this.location = new LocationController();
     this.routeTracker = new RouteTracker({ now: this.now });
@@ -356,6 +430,7 @@ export class NavigationSessionController {
     this.perfMonitor.stop();
     this.stopSafetyLoop();
     this.frameScheduler?.stop();
+    this.fastPerception?.dispose();
     this.perception?.dispose();
     this.camera?.stop();
     this.location?.stop();
@@ -369,6 +444,10 @@ export class NavigationSessionController {
     this.camera = null;
     this.frameCapture = null;
     this.frameScheduler = null;
+    this.fastPerception = null;
+    this.fastFrameSource = null;
+    this.fastState = IDLE_FAST_PERCEPTION;
+    this.fusion = null;
     this.perception = null;
     this.location = null;
     this.routeTracker = null;
@@ -432,27 +511,149 @@ export class NavigationSessionController {
     }
   }
 
+  /**
+   * Starts the local loop. Called once per session, in the background: a
+   * missing model file or an unsupported runtime is an expected outcome that
+   * leaves the session running cloud-only.
+   */
+  private async initFastPerception(): Promise<void> {
+    if (!this.createFastBackend) {
+      this.fastPerceptionError = "Local perception is not configured.";
+      this.notify();
+      return;
+    }
+    if (!this.config.fastPerceptionEnabled) {
+      this.fastPerceptionError = "Local perception is disabled by config.";
+      this.notify();
+      return;
+    }
+
+    let backend: LocalVisionBackend;
+    try {
+      backend = await this.createFastBackend();
+    } catch (error) {
+      this.fastPerceptionError =
+        error instanceof Error
+          ? error.message
+          : "Local perception backend is unavailable.";
+      this.notify();
+      return;
+    }
+
+    // The session may have been stopped while the model was loading.
+    const grabFrame =
+      this.grabFastFrameOverride ??
+      (this.fastFrameSource
+        ? (size: number) => this.fastFrameSource!.grab(size)
+        : null);
+    if (this.phase !== "running" || !grabFrame) {
+      backend.dispose();
+      return;
+    }
+
+    const controller = new FastPerceptionController({
+      backend,
+      grabFrame,
+      config: this.fastPerceptionConfig,
+      now: this.now,
+    });
+    this.fastPerception = controller;
+
+    const unsubscribe = controller.subscribe(() => {
+      const previous = this.fastState;
+      this.fastState = controller.getSnapshot();
+      this.onFastPerceptionUpdate(previous);
+      this.notify();
+    });
+    this.cleanups.push(unsubscribe);
+
+    this.fastPerceptionError = null;
+    controller.start();
+    this.notify();
+  }
+
+  private onFastPerceptionUpdate(previous: FastPerceptionState): void {
+    if (this.phase !== "running") return;
+
+    const frame = this.fastState.frame;
+    if (frame && frame !== previous.frame) {
+      this.localInferenceCount++;
+      this.perfMonitor.recordLocalInference(frame.inferenceMs);
+      this.runSafetyAssessment();
+      return;
+    }
+
+    if (
+      this.fastState.availability === "error" &&
+      previous.availability !== "error"
+    ) {
+      this.perfMonitor.recordLocalFailure();
+      // Losing local evidence can only *reduce* what is known, so reassess.
+      this.runSafetyAssessment();
+    }
+  }
+
   private runSafetyAssessment(): void {
     if (!this.safetyEngine) return;
 
+    const now = this.now();
+    const fused = fusePerception({
+      cloud: this.perceptionState.analysis,
+      local: this.fastState.frame,
+      policy: this.trustPolicy,
+      now,
+    });
+    this.fusion = fused;
+
+    const fusionInput: PerceptionFusionInput | undefined =
+      fused.mode === "hybrid" || fused.mode === "local_only"
+        ? {
+            localOnly: fused.mode === "local_only",
+            conflicts: fused.conflicts.map(
+              (c) =>
+                `${c.question}: cloud says ${c.cloud}, local says ${c.local}`,
+            ),
+          }
+        : undefined;
+
     const context: SafetyContext = {
-      sceneAnalysis: this.perceptionState.analysis,
+      sceneAnalysis: fused.analysis,
       location: this.locationSnapshot.location,
       heading: this.locationSnapshot.heading,
       route: this.session?.route ?? null,
       currentRouteStep: this.routeState.currentStep,
-      now: this.now(),
+      now,
+      ...(fusionInput ? { fusion: fusionInput } : {}),
     };
 
     const result = this.safetyEngine.assess(context);
     this.safetyAssessment = result.assessment;
     this.perfMonitor.recordSafetyAssessed();
 
-    this.speechDispatch?.onSafetyUpdate(
-      result.assessment,
-      result.fusionOverride,
-      this.now(),
-    );
+    if (this.shouldDispatchSpeech(result.assessment, now)) {
+      this.lastDispatchedLevel = result.assessment.level;
+      this.lastDispatchedAt = now;
+      this.speechDispatch?.onSafetyUpdate(
+        result.assessment,
+        result.fusionOverride,
+        now,
+      );
+    }
+  }
+
+  /**
+   * The local loop reassesses safety several times a second, but
+   * `SpeechDispatch` announces `danger`/`critical` immediately and without a
+   * cooldown — correct for a real escalation, unusable at 7 Hz. So a repeat of
+   * the level already announced is held back until the safety cooldown has
+   * elapsed. A *change* in level is always passed through at once.
+   */
+  private shouldDispatchSpeech(
+    assessment: SafetyAssessment,
+    now: number,
+  ): boolean {
+    if (assessment.level !== this.lastDispatchedLevel) return true;
+    return now - this.lastDispatchedAt >= this.config.safetySpeechCooldownMs;
   }
 
   private startSafetyLoop(): void {
@@ -512,6 +713,11 @@ export class NavigationSessionController {
     this.fps = 0;
     this.aiRequestCount = 0;
     this.lastSpeechAt = null;
+    this.localInferenceCount = 0;
+    this.lastDispatchedLevel = null;
+    this.lastDispatchedAt = -Infinity;
+    this.fusion = null;
+    this.fastPerceptionError = null;
   }
 
   private trackFps(): void {
@@ -531,6 +737,8 @@ export class NavigationSessionController {
       aiLatencyMs: this.perceptionState.latencyMs,
       lastAnalysisAt: this.perceptionState.lastUpdatedAt,
       lastSpeechAt: this.lastSpeechAt,
+      localInferenceCount: this.localInferenceCount,
+      localLatencyMs: this.fastState.inferenceMs,
     };
   }
 

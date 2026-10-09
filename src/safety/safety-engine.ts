@@ -7,7 +7,12 @@ import {
   hasConflictingObstacles,
   worstSignal,
 } from "./rules";
-import type { FusionOverride, SafetyContext } from "./types";
+import type {
+  FusionOverride,
+  PerceptionFusionInput,
+  SafetyContext,
+  ThreatSignal,
+} from "./types";
 
 export interface SafetyResult {
   readonly assessment: SafetyAssessment;
@@ -81,6 +86,8 @@ export class SafetyEngine {
       };
     }
 
+    combined = applyFusionPenalty(combined, context.fusion);
+
     const locationDegraded =
       context.location !== null &&
       this.isLocationStale(context.location.timestamp, now);
@@ -103,6 +110,7 @@ export class SafetyEngine {
     if (locationDegraded) {
       reasons.push("Location data is stale");
     }
+    reasons.push(...fusionReasons(context.fusion));
 
     return {
       assessment: {
@@ -113,7 +121,10 @@ export class SafetyEngine {
         basedOnAnalysisId: scene.analysisId,
         assessedAt: now,
         expiresAt: now + this.assessmentTtlMs,
-        degraded: locationDegraded || scene.availability === "stale",
+        degraded:
+          locationDegraded ||
+          scene.availability === "stale" ||
+          isFusionDegraded(context.fusion),
       },
       fusionOverride,
     };
@@ -145,4 +156,50 @@ export class SafetyEngine {
       fusionOverride: null,
     };
   }
+}
+
+/**
+ * Perception assembled from disagreeing or single-source evidence is never
+ * reported as `safe`.
+ *
+ * A conflict between the cloud and the local model means the system does not
+ * actually know the path is clear, and local-only evidence means the model that
+ * can read a scene has not answered yet. Both land on `caution`, which is the
+ * conservative warning state — not a stop, because over-stopping trains the
+ * user to ignore the system, and not `safe`, because that would be a claim
+ * neither source supports.
+ */
+function applyFusionPenalty(
+  signal: ThreatSignal,
+  fusion: PerceptionFusionInput | undefined,
+): ThreatSignal {
+  if (!fusion) return signal;
+  if (signal.level !== "safe") return signal;
+  if (fusion.conflicts.length === 0 && !fusion.localOnly) return signal;
+
+  return {
+    ...signal,
+    level: "caution",
+    action: "continue_cautiously",
+    reason: fusion.localOnly
+      ? "Cloud perception unavailable; local evidence only"
+      : "Perception sources disagree",
+  };
+}
+
+function fusionReasons(fusion: PerceptionFusionInput | undefined): string[] {
+  if (!fusion) return [];
+  const reasons: string[] = [];
+  if (fusion.localOnly) {
+    reasons.push("Cloud perception unavailable; local evidence only");
+  }
+  for (const conflict of fusion.conflicts) {
+    reasons.push(`Perception conflict: ${conflict}`);
+  }
+  return reasons;
+}
+
+function isFusionDegraded(fusion: PerceptionFusionInput | undefined): boolean {
+  if (!fusion) return false;
+  return fusion.localOnly || fusion.conflicts.length > 0;
 }

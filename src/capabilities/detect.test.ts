@@ -7,6 +7,7 @@ import {
   detectSpeech,
   detectAll,
   INITIAL_CAPABILITIES,
+  detectLocalPerception,
 } from "./detect";
 
 function mockPermissions(results: Record<string, PermissionState>) {
@@ -189,7 +190,7 @@ describe("detectOrientation", () => {
 });
 
 describe("detectAll", () => {
-  it("returns all five capability reports", async () => {
+  it("returns all six capability reports", async () => {
     const result = await detectAll();
     expect(Object.keys(result)).toEqual([
       "camera",
@@ -197,6 +198,7 @@ describe("detectAll", () => {
       "speech",
       "microphone",
       "orientation",
+      "localPerception",
     ]);
     for (const report of Object.values(result)) {
       expect(report).toHaveProperty("state");
@@ -210,5 +212,30 @@ describe("INITIAL_CAPABILITIES", () => {
     for (const report of Object.values(INITIAL_CAPABILITIES)) {
       expect(report.state).toBe("checking");
     }
+  });
+});
+
+describe("detectLocalPerception", () => {
+  it("is unavailable when no model is installed", async () => {
+    const report = await detectLocalPerception("/models/missing.onnx", {
+      fetchImpl: () => Promise.resolve(new Response(null, { status: 404 })),
+    });
+    expect(report.state).toBe("unavailable");
+    expect(report.reason).toContain("No local model installed");
+  });
+
+  it("is unavailable when the model cannot be fetched at all", async () => {
+    const report = await detectLocalPerception("/models/x.onnx", {
+      fetchImpl: () => Promise.reject(new Error("offline")),
+    });
+    expect(report.state).toBe("unavailable");
+  });
+
+  it("is available once a model is present, naming the runtime", async () => {
+    const report = await detectLocalPerception("/models/present.onnx", {
+      fetchImpl: () => Promise.resolve(new Response(null, { status: 200 })),
+    });
+    expect(report.state).toBe("available");
+    expect(report.reason).toMatch(/WebGPU|WebAssembly/u);
   });
 });

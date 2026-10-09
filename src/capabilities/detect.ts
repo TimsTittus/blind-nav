@@ -1,3 +1,4 @@
+import { DEFAULT_MODEL_URL } from "@/fast-perception";
 import type { CapabilityReport, CapabilitySet } from "./types";
 import { CHECKING_REPORT } from "./types";
 
@@ -155,17 +156,80 @@ export async function detectOrientation(): Promise<CapabilityReport> {
   return unavailable("Orientation sensors not supported.");
 }
 
+/**
+ * Local perception needs two separate things, and both are reported honestly
+ * because neither can be assumed:
+ *
+ * 1. **A runtime.** WebGPU where the device has a real GPU, WASM otherwise.
+ *    WASM without cross-origin isolation is single-threaded, which Phase 13
+ *    measured at roughly 1.5× the multi-threaded time — usable, but reported.
+ * 2. **Weights.** No model ships with the app (ADR 0026/0027 — the ADE20K
+ *    licence review is unresolved), so a `HEAD` request checks whether a
+ *    developer has placed one. A missing model is `unavailable`, never a quiet
+ *    fallback that leaves the user believing local checks are running.
+ */
+export async function detectLocalPerception(
+  modelUrl = DEFAULT_MODEL_URL,
+  deps: { fetchImpl?: typeof fetch } = {},
+): Promise<CapabilityReport> {
+  if (typeof window === "undefined" || typeof navigator === "undefined") {
+    return unavailable("Not in a browser environment.");
+  }
+
+  const hasWasm = typeof WebAssembly === "object";
+  const gpu = (navigator as Navigator & { gpu?: unknown }).gpu;
+  const hasWebGpu = gpu !== undefined;
+
+  if (!hasWasm && !hasWebGpu) {
+    return unavailable("Neither WebGPU nor WebAssembly is supported.");
+  }
+
+  const doFetch = deps.fetchImpl ?? fetch;
+  let modelPresent = false;
+  try {
+    const response = await doFetch(modelUrl, { method: "HEAD" });
+    modelPresent = response.ok;
+  } catch {
+    modelPresent = false;
+  }
+
+  if (!modelPresent) {
+    return unavailable(
+      "No local model installed. The app ships without weights; see docs/fast-perception.md.",
+    );
+  }
+
+  const isolated =
+    typeof globalThis.crossOriginIsolated === "boolean"
+      ? globalThis.crossOriginIsolated
+      : false;
+  const runtime = hasWebGpu
+    ? "WebGPU"
+    : isolated
+      ? "WebAssembly (multi-threaded)"
+      : "WebAssembly (single-threaded)";
+
+  return available(`Local perception available via ${runtime}.`);
+}
+
 export async function detectAll(): Promise<CapabilitySet> {
-  const [camera, location, speech, microphone, orientation] = await Promise.all(
-    [
+  const [camera, location, speech, microphone, orientation, localPerception] =
+    await Promise.all([
       detectCamera(),
       detectLocation(),
       detectSpeech(),
       detectMicrophone(),
       detectOrientation(),
-    ],
-  );
-  return { camera, location, speech, microphone, orientation };
+      detectLocalPerception(),
+    ]);
+  return {
+    camera,
+    location,
+    speech,
+    microphone,
+    orientation,
+    localPerception,
+  };
 }
 
 export const INITIAL_CAPABILITIES: CapabilitySet = {
@@ -174,4 +238,5 @@ export const INITIAL_CAPABILITIES: CapabilitySet = {
   speech: CHECKING_REPORT,
   microphone: CHECKING_REPORT,
   orientation: CHECKING_REPORT,
+  localPerception: CHECKING_REPORT,
 };

@@ -18,12 +18,25 @@ software architecture.
 
 ## Status
 
-**Phase 13 — Local computer-vision research spike (evaluation only).** Local
-models (SeaFormer-S, SegFormer-B0, RF-DETR, D-FINE, Depth Anything V2) were
-benchmarked and scored against the fixture-scene safety floors in an isolated
-spike ([`spikes/local-cv/`](spikes/local-cv/README.md)). Nothing was integrated;
-Gemini remains the only vision provider. Findings:
-[`docs/local-cv-evaluation.md`](docs/local-cv-evaluation.md).
+**Phase 14 — on-device vision integrated alongside Gemini.** A small
+segmentation model (SeaFormer-S via `onnxruntime-web`, WebGPU → WASM) now runs
+locally several times a second and its findings are merged with Gemini's before
+the deterministic Safety Engine sees anything. Local evidence can only **add**
+risk, never claim a clear path, and — because Phase 13 measured its
+`blocked` signal at precision 0.13 — cannot by itself trigger a stop.
+Disagreements between the two sources are represented explicitly rather than
+resolved away. Details: [`docs/fast-perception.md`](docs/fast-perception.md).
+
+**No model weights ship with the app**: the ADE20K/SeaFormer licence review is
+unresolved, so `public/models/` is gitignored and populated with
+`bun run models:install`. Without it the app runs cloud-only and reports that in
+the capability panel. **Nothing here has been verified on a phone**, and no
+frame rate has been shown to be safe.
+
+**Phase 13** benchmarked local CV candidates (SeaFormer-S, SegFormer-B0,
+RF-DETR, D-FINE, Depth Anything V2) in an isolated spike
+([`spikes/local-cv/`](spikes/local-cv/README.md)) and recommended SeaFormer-S on
+latency and memory: [`docs/local-cv-evaluation.md`](docs/local-cv-evaluation.md).
 
 **Phase 12** made the app an installable PWA with a capability-detection layer
 and mobile UI optimizations ([`docs/pwa.md`](docs/pwa.md); not yet verified on
@@ -75,6 +88,8 @@ bun run dev                  # http://localhost:3000
 | `bun run typecheck`   | `tsc --noEmit`                                    |
 | `bun run test`        | Run unit tests (`test:watch`, `test:coverage`)    |
 | `bun run test:e2e`    | Playwright e2e (run `bunx playwright install` first) |
+| `bun run models:install` | Install local CV weights into `public/models/` (not committed) |
+| `bun run models:clean`   | Remove the installed weights                   |
 | `bun run check`       | format:check + lint + typecheck + test (one shot) |
 
 ## Project layout
@@ -92,7 +107,9 @@ src/
   core/         Shared domain types + Zod schemas + errors (single source of truth)
   config/       Typed, Zod-validated env (server-only + client-safe public)
   perception/   Sensor input → validated Scene Representation + query client
-  providers/    Replaceable AI vision provider abstraction (server-only)
+  providers/    Replaceable AI vision provider abstraction (cloud = server-only)
+  fast-perception/ On-device CV: normalized fast answers + trust policy (client-only)
+  fusion/       Merges cloud + local vision; keeps conflicts explicit
   safety/       Deterministic safety engine (independent of the LLM)
   navigation/   Route / GPS / position / heading reasoning
   decision/     Reconciles safety + navigation + scene into decisions + scene queries
@@ -110,6 +127,8 @@ Each `src/*` layer has a `README.md` describing its responsibilities and rules.
 
 - [`docs/architecture.md`](docs/architecture.md) — architecture & data flow
 - [`docs/decisions.md`](docs/decisions.md) — decision records
+- [`docs/fast-perception.md`](docs/fast-perception.md) — on-device vision: setup, trust policy, measurements
+- [`docs/local-cv-evaluation.md`](docs/local-cv-evaluation.md) — the Phase 13 model evaluation
 - [`CLAUDE.md`](CLAUDE.md) — working guide for contributors and AI assistants
 
 ## Privacy

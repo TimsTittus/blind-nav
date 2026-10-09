@@ -7,6 +7,10 @@ Framework-agnostic domain model shared across all layers. This is where the
 
 - Canonical TypeScript types for the domain (scene, obstacle, path, pose,
   heading, route step, safety level, confidence, timestamps/freshness).
+- `fast-perception.ts` holds the **normalized local-CV contract** added in
+  Phase 14 (`FastObstacle`, `FastPerceptionFrame`, six tri-state answers). It
+  lives here because `fusion`, `decision` and the UI all read it, while
+  model-specific shapes stay inside `src/fast-perception`.
 - Zod schemas that are the single source of truth for validating any data that
   crosses a trust boundary (model output, browser APIs, network responses).
 - Small pure helpers over those types (no I/O, no React, no provider SDKs).

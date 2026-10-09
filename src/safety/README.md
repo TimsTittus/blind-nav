@@ -10,11 +10,23 @@ rules reference.
 | File                | Purpose                                                |
 | ------------------- | ------------------------------------------------------ |
 | `config.ts`         | Tunable constants (staleness thresholds, TTL)          |
-| `types.ts`          | `SafetyContext`, `ThreatSignal`, `FusionOverride`      |
+| `types.ts`          | `SafetyContext`, `ThreatSignal`, `FusionOverride`, `PerceptionFusionInput` |
 | `rules.ts`          | Deterministic obstacle/hazard/path → threat evaluation |
 | `fusion.ts`         | Navigation instruction suppression when hazards exist  |
 | `safety-engine.ts`  | `SafetyEngine` — main entry point: `assess(context)`  |
 | `index.ts`          | Barrel exports                                         |
+
+## Multi-source perception (Phase 14)
+
+The engine is unchanged in structure and still decides risk alone. It now
+optionally receives `PerceptionFusionInput` — a flat `{ localOnly, conflicts }`
+shape, deliberately *not* the fusion layer's own types, so this layer never
+learns that local computer vision exists.
+
+Effect: perception that rests on a single source or on **disagreeing** sources
+is never reported as `safe` and is always marked `degraded`. It is **not**
+escalated to a stop — over-stopping teaches users to ignore the system. Omit the
+field and behaviour is exactly as it was in Phase 7.
 
 ## Usage
 

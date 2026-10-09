@@ -60,13 +60,20 @@ application actions.
 ```
 Camera (+ future sensors)
       │
-      ▼
-Perception Layer ─────────── uses ──▶ Providers (replaceable AI vision)
-      │                                   (server-only; Zod-validated)
-      ▼
-Scene Representation  (core/ types + Zod schemas; carries confidence + freshness)
-      │
-      ├───────────────▶ Safety Engine        (deterministic, LLM-independent)
+      ├─▶ Fast Perception ──▶ FastPerceptionFrame        (on-device, ≈6.7 FPS)
+      │     (local CV; client-only; Phase 14)
+      │                               │
+      └─▶ Perception Layer ─ uses ─▶ Providers (replaceable AI vision)
+            │                           (server-only; Zod-validated)
+            ▼                           │
+      Scene Representation  (core/ types + Zod; confidence + freshness)
+            │                           │
+            └──────────┬────────────────┘
+                       ▼
+              Fusion  (vision-vs-vision; local may only ADD risk;
+                       conflicts kept, not resolved away)
+                       │
+      ├────────────────▶ Safety Engine        (deterministic, LLM-independent)
       │                       │
 GPS / Route (separate input)  │
       │                       ▼
@@ -85,6 +92,10 @@ Key separations:
   auditable rules. Safety never asks a model "is this safe?".
 - **Vision vs. GPS/route.** Visual perception and route/position are separate
   inputs, reconciled only in the Decision Engine — never blended upstream.
+- **Local vision vs. cloud vision.** Two perception sources at different
+  frequencies, reconciled only in the Fusion layer (Phase 14), and never
+  by preferring one source: freshness decides admissibility, caution decides
+  outcome, and disagreement is represented explicitly.
 - **Decision vs. everything.** Only the Decision Engine turns inputs into
   user-facing intent, and it enforces that **safety outranks navigation
   convenience**.
@@ -98,12 +109,14 @@ Each layer has a README with detail. Summary:
 | [`core`](../src/core)          | Domain types + Zod schemas (Scene Representation); pure helpers   | —                   |
 | [`providers`](../src/providers)| `VisionProvider` interface + concrete providers (server-only)     | core                |
 | [`perception`](../src/perception)| Frames → validated scene; multi-rate pipeline; concurrency       | core, providers     |
+| [`fast-perception`](../src/fast-perception)| On-device CV → normalized `FastPerceptionFrame`; trust policy (client-only) | core, camera |
+| [`fusion`](../src/fusion)      | Merge cloud + local vision into one validated scene; keep conflicts | core, providers, fast-perception |
 | [`safety`](../src/safety)      | Deterministic safety assessment from scene + navigation context   | core                |
 | [`navigation`](../src/navigation)| Route/GPS/position/heading reasoning                             | core                |
 | [`decision`](../src/decision)  | Reconcile safety + navigation + scene → decision & cadence        | core, safety, navigation |
 | [`speech`](../src/speech)      | Speak decisions; prioritize safety; duplicate suppression; swappable TTS | core          |
 | [`performance`](../src/performance)| Dev-only metrics: FPS, latency, failure rates, end-to-end timing | —            |
-| [`capabilities`](../src/capabilities)| Runtime capability detection (camera, GPS, speech, mic, orientation) | —            |
+| [`capabilities`](../src/capabilities)| Runtime capability detection (camera, GPS, speech, mic, orientation, on-device vision) | fast-perception |
 | [`app`](../src/app)            | UI + server route handlers (`app/api/**`)                         | all                 |
 
 Dependencies point **toward `core`**; lower layers never import UI.
@@ -734,3 +747,81 @@ A research spike, not a feature: nothing in `src/` changed. Code is isolated in
 - **Open before integration:** phone and real-GPU WebGPU measurements, a
   held-out target-viewpoint dataset, and a legal review of ADE20K-trained
   weights.
+
+---
+
+## 27. Local fast perception and source fusion (added in Phase 14)
+
+Full detail: [`docs/fast-perception.md`](fast-perception.md), ADR 0027.
+
+Gemini is no longer the only source looking at the camera, and it is still the
+only source doing semantic reasoning.
+
+### Two loops, one Safety Engine
+
+| Loop             | Cadence                | Owner                            |
+| ---------------- | ---------------------- | -------------------------------- |
+| Local inference  | 150 ms target, self-paced | `FastPerceptionController` (`src/fast-perception`) |
+| Cloud analysis   | 1000 ms                | `PerceptionController` (`src/perception`), unchanged |
+
+Both feed `fusePerception()`, which produces one validated `SceneAnalysis`. The
+Safety Engine is unchanged in structure and remains the only component that
+decides risk. Frequencies are **starting targets; no frame rate has been shown
+to be safe on any device.**
+
+The local loop measures its own cost and raises its interval so inference never
+occupies more than half of wall-clock time — it cannot starve camera capture,
+the UI or speech. `FrameScheduler` gained a dynamic-interval option for this.
+
+### Normalized representation (`core/fast-perception.ts`)
+
+`FastObstacle { type, region, confidence, movement }` plus six **tri-state**
+answers (something ahead / blocked / sidewalk / stairs / large obstacle /
+traversable), where `null` means "this model cannot say" and is never read as
+"no". Tensors, class indices and ADE20K label strings never leave
+`src/fast-perception`.
+
+### Trust policy
+
+Local answers are admitted according to the per-question reliability Phase 13
+measured, not at face value. Under the shipped default the local model can
+raise the path to `partially_blocked` (→ `caution`) but **cannot force a stop**,
+and `sidewalk`/`traversable` can never reduce risk at all. See
+[`src/fast-perception/README.md`](../src/fast-perception/README.md).
+
+### Fusion
+
+Asymmetric by construction: local evidence may only add risk; absence of
+evidence is `unknown`, never `clear`; the cloud keeps sole authority over
+description, terrain, scene type and recommended action. Conflicts are retained
+and reach the Safety Engine through a flat `PerceptionFusionInput`, so `safety`
+never learns that local CV exists. Conflicted or local-only perception is never
+`safe` and always `degraded`. See [`src/fusion/README.md`](../src/fusion/README.md).
+
+A missing or stale cloud result falls back to local evidence — the case where
+local CV warns before Gemini has answered.
+
+### Providers
+
+`LocalVisionProvider` and `HybridVisionProvider` implement the existing
+`VisionProvider` interface, giving the three comparison arms. `LocalVisionProvider`
+is **client-side**, unlike every provider before it. The live pipeline uses the
+two loops plus fusion rather than `HybridVisionProvider`, so neither source
+blocks the other.
+
+### Weights and deployment
+
+`onnxruntime-web` is a production dependency, loaded by dynamic import.
+`next.config.ts` sets COOP/COEP for multi-threaded WASM. **No model weights ship
+with the app** — `public/models/` is gitignored, populated by
+`bun run models:install` — because the ADE20K licence review from ADR 0026 is
+unresolved. A missing model is a reported `unavailable` capability, and the
+session continues cloud-only.
+
+### Measured
+
+Hybrid matches cloud-only floor compliance (16/16 fixture scenes), adds no new
+false stops, and surfaces 4 conflicts cloud-only cannot see. Local-only misses
+4 of 16, including potholes, kerbs and crossings, which have no segmentation
+class. Real weights run at ~104–138 ms per frame (WASM single-thread, laptop).
+**Unmeasured: any phone, real-GPU WebGPU, CPU/GPU utilisation, memory, battery.**

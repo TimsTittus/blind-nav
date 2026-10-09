@@ -23,11 +23,14 @@
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
+    "models:install": "mkdir -p public/models && cp spikes/local-cv/models/seaformer_s_ade_384.onnx spikes/local-cv/models/seaformer_classes.json public/models/",
+    "models:clean": "rm -rf public/models",
     "check": "bun run format:check && bun run lint && bun run typecheck && bun run test"
   },
   "dependencies": {
     "@google/genai": "^2.27.0",
     "next": "16.4.0",
+    "onnxruntime-web": "1.30.0",
     "react": "19.3.0",
     "react-dom": "19.3.0",
     "zod": "4.6.5"

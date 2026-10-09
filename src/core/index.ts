@@ -1,5 +1,6 @@
 export * from "./primitives";
 export * from "./perception";
+export * from "./fast-perception";
 export * from "./navigation";
 export * from "./safety";
 export * from "./decision";

@@ -18,6 +18,10 @@ without sending any telemetry externally.
 | gpsAgeMs            | Time since last GPS fix         |
 | speechQueueLength   | Current TTS queue depth         |
 | endToEndLatencyMs   | Frame capture → speech dispatch |
+| localFPS / localLatencyMs / localMedianLatencyMs | On-device inference (Phase 14) |
+| localFailureRate    | Local inference failures / attempts |
+| localDutyCycle      | Share of wall-clock time inside local inference |
+| jsHeapMB            | Whole-tab JS heap; Chromium-only, `null` elsewhere |
 
 ## Boundaries
 

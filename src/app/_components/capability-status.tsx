@@ -17,6 +17,7 @@ const CAPABILITY_LABELS: Record<string, string> = {
   speech: "Speech output",
   microphone: "Voice input",
   orientation: "Orientation",
+  localPerception: "On-device vision",
 };
 
 function CapabilityRow({

@@ -36,6 +36,28 @@ lives in [`spikes/local-cv/`](../spikes/local-cv/README.md).
 
 ## 2. Method
 
+### Criteria, and where each is answered
+
+The brief listed twelve comparison criteria. Each is answered below; the basis
+column separates what was **measured** on this hardware from what is a **desk
+check** of documentation. Nothing here was decided on benchmark accuracy alone
+(see recommendation 2).
+
+| Criterion                     | Section     | Basis                                                       |
+| ----------------------------- | ----------- | ----------------------------------------------------------- |
+| Mobile / browser feasibility  | §4          | Measured in desktop Chromium; **no phone measured**         |
+| Inference latency             | §4          | Measured (Node CPU, 1 and 4 threads; browser WASM)          |
+| Model size                    | §3, §4      | Measured (ONNX file sizes, fp32 and int8)                   |
+| Accuracy                      | §5, §6      | Measured on 40 hand-labelled images                         |
+| Licensing                     | §3          | Desk check of model cards, repos and training-set terms     |
+| Available pretrained weights  | §3          | Desk check, plus the SeaFormer export done here             |
+| WebGPU support                | §4, §3.1    | Backend available in ORT-Web; **not measured on a real GPU** |
+| ONNX / TensorFlow.js support  | §3.1        | ONNX measured; TensorFlow.js desk check only                |
+| CPU fallback                  | §4          | Measured (WASM in browser, ORT CPU in Node, single-thread)  |
+| Memory requirements           | §4          | Measured (RSS after load and peak)                          |
+| Ease of deployment            | §3.2        | Observed while building this spike                          |
+| Suitability for outdoor scenes | §5.1       | Measured; all 40 test images are outdoor street-level        |
+
 ### Target questions
 
 The local model only needs to answer six fast, yes/no questions about the
@@ -101,6 +123,61 @@ which is why it maps better onto the target questions.
 device's orientation sensor (`DeviceOrientationEvent`, already covered by the
 Phase-12 capability layer) than from a model. Revisit once the camera mounting is
 fixed.
+
+### 3.1 Runtime support: ONNX vs TensorFlow.js
+
+ONNX Runtime was the only runtime benchmarked, and TensorFlow.js was rejected on
+a desk check rather than measured. The reasoning:
+
+- **ONNX covers the whole candidate set.** Every candidate except SeaFormer-S
+  has ready-made ONNX weights; SeaFormer-S was exported here. ONNX Runtime Web
+  then offers WebGPU, WASM (CPU) and WebNN behind one API, so the GPU path and
+  the CPU fallback need no second code path.
+- **No ready-made TensorFlow.js weights were found for any shortlisted
+  candidate** (SeaFormer-S, SegFormer-B0, Depth Anything V2-S, RF-DETR nano,
+  D-FINE, RT-DETRv2). This was a Hub/npm search, not an exhaustive one.
+- **The TensorFlow.js model zoo does not cover these questions well.** Its
+  maintained segmentation offerings are DeepLab v3 and person/body segmentation
+  (BodyPix, MediaPipe selfie segmentation); detection is COCO-SSD /
+  EfficientDet-Lite, i.e. the same COCO classes that §3 shows miss walls,
+  barriers, stairs and curbs. Only the DeepLab v3 ADE20K variant is on-target,
+  and it is an older, heavier backbone than SeaFormer-S. Current maintenance
+  status of those packages was not verified.
+- **Converting would cost a second export pipeline.** PyTorch →
+  SavedModel/Keras → `tensorflowjs_converter`, where unsupported ops are a known
+  failure mode for transformer-style models. We already have to maintain one
+  export path (for SeaFormer); a second runtime would add work and shrink the
+  candidate set.
+
+Conclusion: no reason to add TensorFlow.js. This is a desk assessment — if ORT-Web
+WebGPU turns out to be unusable on real phones (§4), TensorFlow.js with DeepLab v3
+is the fallback worth measuring, not a current recommendation.
+
+### 3.2 Ease of deployment
+
+Effort observed while building the spike, lowest first:
+
+- **Hub ONNX models (SegFormer-B0, RF-DETR, D-FINE, RT-DETRv2, Depth Anything
+  V2-S, YOLOS): lowest effort** — install, fetch, run. But community exports
+  cannot be trusted blind: the D-FINE-N export produced degenerate output
+  (duplicate boxes, missed people filling the frame) and had to be excluded. Any
+  export needs validating against the reference implementation before use.
+- **SeaFormer-S: highest effort, and the recommendation depends on it.** No ONNX
+  on the Hub; weights published only via Google Drive/Baidu; the official repo
+  needs `mmcv`/`mmsegmentation`. It took a vendored, mmcv-free export script
+  ([`tools/export_seaformer.py`](../spikes/local-cv/tools/export_seaformer.py))
+  checked for numerical parity with PyTorch. Production use means **hosting our
+  own ONNX file**, which is exactly what the licensing review in §8 must cover.
+- **Pre/post-processing is ours either way.** The `transformers.js` pipeline is
+  convenient but unusable for real time (§4), so each model is run as a direct
+  ORT session with our own resize/normalise/argmax. Modest, and already written.
+- **Two app-level costs for browser deployment**, neither yet paid: WASM threads
+  need **cross-origin isolation** (COOP/COEP response headers, a Next.js-wide
+  change that can break third-party embeds), and 16–99 MB of weights need a
+  caching decision against the Phase-12 service worker, which currently
+  precaches a small offline shell.
+- **DeepLabV3-MobileViT-S was dropped partly on deployment grounds**: VOC classes
+  plus no support in the `transformers.js` v4 segmentation pipeline.
 
 ## 4. Latency and memory
 
@@ -203,6 +280,46 @@ What the numbers mean:
   filling the frame).
 - **Depth alone answers almost nothing usefully** with a simple ratio
   heuristic.
+
+### 5.1 Suitability for outdoor scenes
+
+All 40 test images are outdoor, street-level scenes — the 16 fixture scenes are
+all outdoor navigation — so every number in this document is an outdoor number.
+There is no indoor comparison, and none is claimed. Breaking the Safety Engine
+results (§6) down by scene shows *which* outdoor conditions fail, as
+`floor misses / unnecessary STOPs / images`:
+
+| Scene           | [v1] SeaFormer-S | [v2] SeaFormer + RF-DETR | Outdoor-specific reading                                      |
+| --------------- | ---------------- | ------------------------ | ------------------------------------------------------------- |
+| `stairs`, `stairs_up` | 0 / 0 / 6  | 0 / 0 / 6                | Outdoor steps are the clear win; no false positives           |
+| `narrow_path`   | 0 / **3** / 3    | 0 / **3** / 3            | Walkable-but-narrow outdoor paths always read as impassable   |
+| `pothole`       | **2** / 0 / 3    | **2** / 0 / 3            | No ADE20K class; road-surface defects are invisible to it     |
+| `puddle`        | 0 / 1 / 2        | 0 / 2 / 2                | Wet surfaces/reflections confuse the ground mask              |
+| `road_crossing` | **1** / 0 / 2    | 0 / 0 / 2                | Crossings need semantics (signals, markings) — cloud's job    |
+| `wall`, `blocked` | **4** / 0 / 5  | 0 / 0 / 5                | v2 catches them only by over-stopping everywhere else         |
+| `low_light`     | 0 / 1 / 3        | 0 / **3** / 3            | Dusk/low sun degrades the mask into false alarms              |
+| `clear`, `clear_road` | 0 / 3 / 5  | 0 / 3 / 5                | Open outdoor horizons are mistaken for obstruction            |
+| `parked_vehicle`, `moving_person` | 0 / 2 / 5 | 0 / 5 / 5     | Detectors fire correctly, but the rules escalate too readily  |
+
+Three scenes are omitted from the table because neither configuration misses
+their floor: `curb` (0 / 0 / 2 under v1, 0 / 1 / 2 under v2), `obstacle`
+(0 / 0 / 2, 0 / 2 / 2) and `uncertain` (0 / 1 / 2, 0 / 2 / 2). Including them,
+the over-stop counts sum to the 11 and 21 reported in §6.
+
+Outdoor-specific conclusions:
+
+- **Open sky and receding roads are the core problem.** The same cue that marks a
+  real barrier — walkable ground ending — also marks a road vanishing at the
+  horizon or trees at the end of a street. That is why `clear`, `clear_road` and
+  `narrow_path` over-stop while `wall` and `blocked` get missed.
+- **Outdoor lighting range is unmeasured risk.** `low_light` degrades sharply
+  under the more sensitive v2 rules (1 → 3 over-stops of 3). Direct sun, glare and
+  night were not tested at all.
+- **Road-surface hazards are out of reach of ADE20K segmentation.** Potholes,
+  puddles and crossings have no class, and stay cloud responsibilities.
+- **Viewpoint caveat applies most here**: these are photographer-framed outdoor
+  photos, not chest-height footage from a moving walker, so outdoor horizon
+  geometry in real use will differ (§2, §8).
 
 ## 6. Through the Safety Engine (vs. fixture floors)
 

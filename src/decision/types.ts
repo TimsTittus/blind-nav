@@ -1,4 +1,6 @@
 import type { CameraState } from "@/camera";
+import type { FastPerceptionState } from "@/fast-perception";
+import type { FusedPerception } from "@/fusion";
 import type { PerceptionState } from "@/perception";
 import type { SafetyAssessment } from "@/core";
 import type { LocationSnapshot } from "@/navigation";
@@ -24,6 +26,12 @@ export interface SessionControllerSnapshot {
   readonly lastError: string | null;
   readonly stats: SessionStats;
   readonly query: SceneQuerySnapshot;
+  /** Local fast perception. `availability: "unavailable"` when not running. */
+  readonly fastPerception: FastPerceptionState;
+  /** How the scene handed to the Safety Engine was assembled. */
+  readonly fusion: FusedPerception | null;
+  /** Why local perception is not running, when it is not. */
+  readonly fastPerceptionError: string | null;
 }
 
 export interface SessionStats {
@@ -32,4 +40,8 @@ export interface SessionStats {
   readonly aiLatencyMs: number | null;
   readonly lastAnalysisAt: number | null;
   readonly lastSpeechAt: number | null;
+  /** Completed local inferences this session. */
+  readonly localInferenceCount: number;
+  /** Last local model time (ms). */
+  readonly localLatencyMs: number | null;
 }

@@ -48,13 +48,19 @@ Add an ADR for any significant decision.
 - **The LLM is not the safety mechanism.** Perception only *describes* the world
   as validated structured data; the deterministic **Safety Engine** decides
   risk. The LLM never controls navigation or triggers arbitrary app actions.
-- **Layer separation:** `core` ← `providers`/`perception`/`safety`/`navigation`
+- **Layer separation:** `core` ←
+  `providers`/`perception`/`fast-perception`/`fusion`/`safety`/`navigation`
   → `decision` → `speech` → `app`. Dependencies point toward `core`; lower
   layers never import UI. One concern per layer. See each `src/*/README.md`.
 - **Vision vs. GPS/route are separate inputs,** reconciled only in the Decision
   Engine. Safety outranks navigation convenience.
+- **Local vision vs. cloud vision** are reconciled only in `src/fusion`, and
+  never by preferring a source. Local evidence can only **add** risk, and what
+  it is allowed to claim is governed by `FastTrustPolicy`.
 - **AI provider is replaceable** behind the `VisionProvider` interface in
-  `src/providers`. Gemini is just the first implementation.
+  `src/providers`. Gemini is just the first implementation; `LocalVisionProvider`
+  and `HybridVisionProvider` were added in Phase 14. The local inference runtime
+  is separately replaceable behind `LocalVisionBackend`.
 - **Validate everything external with Zod.** Never trust arbitrary model JSON,
   browser-API output, or network responses. Parse at the boundary.
 - **Represent uncertainty explicitly.** Stale/unavailable/ambiguous perception
@@ -103,31 +109,49 @@ required and documented. Secrets stay on the server.
 
 ## Current status
 
-**Phase 12 — Installable PWA, capability detection, and mobile UI**, on top of
-Phase 11 (evaluation framework), Phase 10 (performance profiling and
-optimization), Phase 9 (Navigation Mode + Explore Mode), Phase 8 (decision
-engine / real-time pipeline), Phase 7 (safety engine), Phase 6 (navigation
-engine), Phase 5 (speech engine), Phase 4 (server-side Gemini vision pipeline),
-Phase 3 (browser camera), Phase 2 (mocked Navigation Mode UI), and Phase 1
-(core model, typed env). Phase 12 adds: installable PWA (web manifest, service
-worker, icons, install prompt), capability detection layer
-(`src/capabilities/` — Camera, Location, Speech, Microphone, Orientation with
-five states and permission-change re-detection), CapabilityStatus UI on the
-home page, mobile UI optimizations (prominent STOP button, touch-action
-manipulation, safe-area insets, accidental-touch prevention). `docs/pwa.md`
-documents expected browser support, permissions, and known limitations; none of
-it has been verified on a real phone yet.
+**Phase 14 — local perception integrated behind a trust policy and fusion.**
+On top of Phase 13 (local CV research spike), Phase 12 (PWA, capability
+detection, mobile UI), Phase 11 (evaluation framework), Phase 10 (performance),
+Phase 9 (Navigation + Explore modes), Phase 8 (decision engine), Phase 7 (safety
+engine), Phase 6 (navigation engine), Phase 5 (speech), Phase 4 (server-side
+Gemini vision), Phase 3 (camera), Phase 2 (mocked UI), Phase 1 (core model).
 
-**Phase 13 — Local CV research spike (complete, not integrated).** Code lives in
-`spikes/local-cv/` (own `package.json`/`tsconfig`; excluded from the root
-tsconfig, ESLint, and Vitest; nothing in `src/` imports it). Findings and
-recommendation: `docs/local-cv-evaluation.md` (ADR 0026). Gemini is still the
-only provider in the navigation loop; there is no local CV in the app.
+Phase 14 adds two new layers and keeps Gemini in charge of semantics:
 
-Next recommended: **real-device verification** (phones: Phase-12 PWA/camera/
-speech behaviour and the Phase-13 browser benchmark incl. real-GPU WebGPU), then
-hardening of failure/lifecycle edge cases. Do not start either without being
-asked.
+- **`src/fast-perception/`** — on-device segmentation (SeaFormer-S via
+  `onnxruntime-web`, WebGPU → WASM) behind a `LocalVisionBackend` seam. Produces
+  the normalized `FastPerceptionFrame` contract in `core/fast-perception.ts`;
+  tensors and ADE20K class names never leave the layer. A self-pacing loop
+  (150 ms target) keeps inference under half of wall-clock time.
+- **`src/fusion/`** — merges cloud and local vision. Local evidence may only
+  **add** risk; absence of evidence is `unknown`, never `clear`; conflicts are
+  kept, not resolved away. Neither source is preferred by identity.
+- **`FastTrustPolicy`** — local answers are admitted per the reliability Phase 13
+  measured. Default: `stairs`/`somethingAhead`/`largeObstacle` may raise risk to
+  `caution`; `blocked` (precision 0.13) **may not force a stop**;
+  `sidewalk`/`traversable` can never reduce risk.
+- `LocalVisionProvider` + `HybridVisionProvider`; `PerceptionFusionInput` on the
+  Safety Engine (conflicted or local-only perception is never `safe`);
+  local metrics in `PerformanceMonitor`; an `localPerception` capability;
+  COOP/COEP headers.
+
+**No model weights are committed** (`public/models/` is gitignored; install
+locally with `bun run models:install`), because the ADE20K/SeaFormer licence
+review from ADR 0026 is unresolved. A clean checkout therefore builds without
+weights and the app runs cloud-only and says so; `models:install` is a
+development convenience, not a deployment step.
+
+Docs: [`docs/fast-perception.md`](docs/fast-perception.md), ADR 0027.
+
+**Still unverified, and the reason this is not production-ready:** no phone has
+ever run this, there are no real-GPU WebGPU numbers, and CPU/GPU/memory/battery
+are unmeasured. `blocked` and `large obstacle` still have no acceptable
+operating point. See `docs/fast-perception.md` §9.
+
+Next recommended: **real-device verification** (Android + iOS: Phase-12
+PWA/camera/speech, Phase-13 browser benchmark with a real GPU, and Phase-14
+local inference latency, duty cycle and battery), then hardening of
+failure/lifecycle edge cases. Do not start without being asked.
 
 DO NOT:
 
@@ -155,3 +179,11 @@ DO NOT:
 - implement hardware before the software prototype works
 - introduce SeaFormer merely because it was mentioned
 - use deprecated Gemini APIs without checking current official documentation
+- commit or deploy model weights (`public/models/` is gitignored; the ADE20K
+  licence review is unresolved)
+- let local CV assert `blocked`, set `recommendedImmediateAction`, report
+  terrain, or reduce risk in any way
+- claim any frame rate is safe — none has been validated on a device
+- let model-specific shapes (tensors, class indices, ADE20K labels) leave
+  `src/fast-perception`
+- resolve a cloud/local conflict by preferring a source instead of representing it

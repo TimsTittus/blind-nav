@@ -12,4 +12,9 @@ export {
 } from "./rules";
 export { SafetyEngine } from "./safety-engine";
 export type { SafetyResult } from "./safety-engine";
-export type { FusionOverride, SafetyContext, ThreatSignal } from "./types";
+export type {
+  FusionOverride,
+  PerceptionFusionInput,
+  SafetyContext,
+  ThreatSignal,
+} from "./types";

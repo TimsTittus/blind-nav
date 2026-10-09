@@ -12,6 +12,7 @@ structured view of what the current environment supports.
 | **Speech**      | `speechSynthesis`, available voices                                                             |
 | **Microphone**  | `SpeechRecognition` / `webkitSpeechRecognition`, microphone permission                         |
 | **Orientation** | `AbsoluteOrientationSensor` / `RelativeOrientationSensor` / `DeviceOrientationEvent`           |
+| **Local perception** | WebGPU / WebAssembly support **and** whether model weights are actually installed (they do not ship with the app) |
 
 ## States
 

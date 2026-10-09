@@ -958,3 +958,95 @@ Gemini. SeaFormer was suggested for segmentation but was not to be assumed best.
 - `docs/pwa.md` was corrected in the same change: its browser matrix had been
   labelled "tested" without real-device testing and described behaviour the
   code does not have.
+
+---
+
+## ADR 0027 — Phase 14: local perception integrated behind a trust policy and an asymmetric merge
+
+**Status:** Accepted.
+
+**Context:** ADR 0026 evaluated local computer vision and recommended **not**
+integrating it, gating any integration on phone measurements, a weights licence
+review, a held-out dataset and a better approach to the "blocked" question.
+Phase 14 was nevertheless specified: integrate the selected model, keep Gemini
+working, run local perception faster than the cloud, normalise its output, and
+fuse the two sources without automatically preferring either.
+
+Those gates are **not** met, and this ADR does not claim otherwise. The
+integration is therefore built so that the unmet gates constrain what the
+feature can do, rather than being deferred to a later cleanup:
+
+- No weights are committed or deployed, so the licence question is untouched.
+- The feature is inert unless a developer installs a model.
+- The questions Phase 13 measured as unreliable cannot raise a stop.
+- Local evidence is structurally incapable of lowering risk.
+
+**Decision:**
+
+1. **A new `fast-perception` layer** (`src/fast-perception/`) owns local
+   inference. Model-specific shapes — tensors, class indices, ADE20K label
+   strings — stop there. Everything above consumes the normalized
+   `FastPerceptionFrame` contract in `core/fast-perception.ts`
+   (`FastObstacle { type, region, confidence, movement }`, plus six tri-state
+   answers where `null` means "cannot say" and is never read as "no").
+2. **A `LocalVisionBackend` seam** keeps the runtime replaceable.
+   `OnnxVisionBackend` (onnxruntime-web 1.30, WebGPU → WASM) is the first
+   implementation, imported dynamically so a cloud-only build never downloads
+   it. `RecordedVisionBackend` replays recorded grids for deterministic tests.
+3. **`onnxruntime-web` becomes a production dependency**, and `next.config.ts`
+   sets COOP/COEP so multi-threaded WASM works. The app loads no cross-origin
+   resources today, so the isolation cost is currently zero; adding any will
+   require CORP/`crossorigin` handling.
+4. **Weights are configuration, absent by default.** `public/models/` is
+   gitignored and populated by `bun run models:install`. A missing model is a
+   first-class `unavailable` state surfaced in the capability panel, never a
+   silent degradation.
+5. **A `FastTrustPolicy` governs what local evidence may claim**, keyed to the
+   per-question reliability Phase 13 measured. The shipped default lets
+   `stairs`, `somethingAhead` and `largeObstacle` raise risk only as far as
+   `partially_blocked` (→ `caution`); `blocked` (precision 0.13) is recorded but
+   **may not force a stop**; `sidewalk` and `traversable` can never escalate at
+   all, whatever a policy says.
+6. **A new `fusion` layer** merges the sources asymmetrically: local evidence may
+   only add risk, absence of evidence is `unknown` rather than `clear`, and the
+   cloud keeps sole authority over description, terrain, scene type and
+   recommended action. Disagreements are **retained** as `conflicts`, resolved
+   only by "took the more cautious reading" — never by preferring a source.
+7. **The Safety Engine stays the only component that decides risk**, and learns
+   nothing about computer vision: it receives a flat `PerceptionFusionInput`
+   (`localOnly`, `conflicts`). Conflicted or local-only perception is never
+   reported as `safe` and is always `degraded` — but is not escalated to a stop,
+   because over-stopping teaches users to ignore the system.
+8. **The local loop self-paces.** `FrameScheduler` gained a dynamic interval, and
+   the controller raises its interval so inference never occupies more than
+   `1 / backoffFactor` of wall-clock time. 150 ms (≈6.7 FPS) is a starting
+   target, explicitly not a validated or safe one.
+9. **A speech rate gate** in the session controller holds back repeats of an
+   already-announced safety level until the cooldown elapses, because
+   `SpeechDispatch` intentionally announces `danger`/`critical` immediately and
+   a 7 Hz loop would otherwise spam the user. Level *changes* still pass through
+   at once.
+10. **`HybridVisionProvider`** composes a cloud provider with
+    `LocalVisionProvider` at the interface level, giving the three comparison
+    arms the brief asked for. The live pipeline does not use it: the two loops
+    run at different frequencies and are fused by the session controller, so
+    neither blocks the other.
+
+**Consequences:**
+
+- Default behaviour is unchanged. With no weights installed the app is
+  cloud-only. `public/models/` is gitignored, so a clean checkout (and therefore
+  any CI or production build from git) contains no weights, and `next build`
+  copies nothing from `public/` into `.next`. A deploy that rsyncs a developer's
+  working tree *would* carry locally installed weights — `models:install` is a
+  development convenience, not a deployment step.
+- Measured: hybrid matches cloud-only on floor compliance (16/16), adds no new
+  false stops, and surfaces 4 conflicts cloud-only cannot see; local-only misses
+  4 of 16 scenes and is not viable alone.
+- Verified with real weights through the production backend on real photos
+  (~104–138 ms, WASM single-thread, laptop). Still unmeasured: **any phone**,
+  real-GPU WebGPU, CPU/GPU utilisation, memory and battery.
+- The ADR 0026 gates remain open and now also gate turning
+  `allowBlockedAssertion` on. `docs/fast-perception.md` §9 tracks them.
+- New production dependency and app-wide response headers are the real costs of
+  this phase.

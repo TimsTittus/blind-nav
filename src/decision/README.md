@@ -12,13 +12,23 @@ anything) to tell the user.
 | `types.ts`                         | `SessionControllerSnapshot`, `PerceptionFreshness`, etc.     |
 | `speech-dispatch.ts`               | Maps safety assessment + route state to speech calls         |
 | `scene-query-handler.ts`           | Coordinates user questions: frame capture → API → speech     |
-| `navigation-session-controller.ts` | Main orchestrator: camera → perception → safety → speech     |
+| `navigation-session-controller.ts` | Main orchestrator: camera → perception (cloud + local) → fusion → safety → speech |
 | `index.ts`                         | Barrel exports                                               |
 
 ## Responsibilities
 
 - Orchestrate the real-time pipeline: camera capture → AI analysis →
   safety assessment → speech output.
+- Own **both** perception loops (Phase 14): the cloud path at ~1 FPS and the
+  local [`fast-perception`](../fast-perception/README.md) loop at its self-paced
+  rate, merging them through [`fusion`](../fusion/README.md) before every safety
+  assessment. Local perception loads in the background and a failure never takes
+  the session or the cloud path down.
+- **Rate-limit safety speech.** `SpeechDispatch` announces `danger`/`critical`
+  immediately and without a cooldown, which is right for a real escalation and
+  unusable at the local loop's frequency. The controller holds back repeats of
+  an already-announced level until the cooldown elapses; a level *change* always
+  passes through at once.
 - Enforce priority: **safety outranks navigation convenience.** A stop/caution
   from [`safety/`](../safety/README.md) overrides a "turn/continue" from
   [`navigation/`](../navigation/README.md).

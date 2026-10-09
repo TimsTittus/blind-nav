@@ -14,7 +14,12 @@ export interface FrameSchedulerOptions<T> {
   onFrame: (frame: T) => void | Promise<void>;
   onError?: (error: unknown) => void;
   onStateChange?: (state: SchedulerState) => void;
-  intervalMs?: number;
+  /**
+   * Fixed delay between jobs, or a function consulted after each job so a
+   * consumer can pace itself against measured cost. Always clamped to
+   * `FRAME_CAPTURE_LIMITS.minIntervalMs`.
+   */
+  intervalMs?: number | (() => number);
   /** Stop after this many consecutive failures (a broken source). */
   maxConsecutiveErrors?: number;
   /** Aborting stops the scheduler for good. */
@@ -36,7 +41,7 @@ export interface FrameSchedulerOptions<T> {
  */
 export class FrameScheduler<T> {
   private readonly options: FrameSchedulerOptions<T>;
-  private readonly intervalMs: number;
+  private readonly resolveInterval: () => number;
   private readonly maxErrors: number;
   private readonly visibility: VisibilitySource | null;
 
@@ -53,10 +58,11 @@ export class FrameScheduler<T> {
 
   constructor(options: FrameSchedulerOptions<T>) {
     this.options = options;
-    this.intervalMs = Math.max(
-      FRAME_CAPTURE_LIMITS.minIntervalMs,
-      options.intervalMs ?? FRAME_CAPTURE_DEFAULTS.intervalMs,
-    );
+    const interval = options.intervalMs ?? FRAME_CAPTURE_DEFAULTS.intervalMs;
+    this.resolveInterval =
+      typeof interval === "function"
+        ? () => clampInterval(interval())
+        : () => clampInterval(interval);
     this.maxErrors =
       options.maxConsecutiveErrors ?? SCHEDULER_MAX_CONSECUTIVE_ERRORS;
     this.visibility =
@@ -175,7 +181,9 @@ export class FrameScheduler<T> {
       this.inFlight = false;
       if (this.jobAbort === abort) this.jobAbort = null;
       if (this.current === "running" && !this.timer) {
-        this.schedule(Math.max(0, this.intervalMs - (Date.now() - startedAt)));
+        this.schedule(
+          Math.max(0, this.resolveInterval() - (Date.now() - startedAt)),
+        );
       }
     }
   }
@@ -197,4 +205,9 @@ export class FrameScheduler<T> {
   private report(error: unknown): void {
     this.options.onError?.(error);
   }
+}
+
+function clampInterval(value: number): number {
+  if (!Number.isFinite(value)) return FRAME_CAPTURE_DEFAULTS.intervalMs;
+  return Math.max(FRAME_CAPTURE_LIMITS.minIntervalMs, value);
 }

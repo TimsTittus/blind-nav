@@ -1,6 +1,7 @@
 export {
   detectAll,
   detectCamera,
+  detectLocalPerception,
   detectLocation,
   detectMicrophone,
   detectOrientation,

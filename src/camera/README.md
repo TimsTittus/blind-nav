@@ -10,7 +10,7 @@ code only — never import it from a route handler.
 | `controller.ts`                   | `CameraController`: stream lifecycle, pause reasons, switching, cleanup        |
 | `errors.ts`                       | Classifies untrusted `getUserMedia` rejections into stable `CameraError`s      |
 | `frame-capture.ts`                | `FrameCapture.captureFrame({ maxWidth, maxHeight, quality })` → `Blob`         |
-| `frame-scheduler.ts`              | `FrameScheduler`: start / stop / pause / resume, no overlap, abortable         |
+| `frame-scheduler.ts`              | `FrameScheduler`: start / stop / pause / resume, no overlap, abortable. `intervalMs` also accepts a function, so a consumer can pace itself against measured cost (used by the Phase-14 local loop) |
 | `frame-consumer.ts`               | `FrameConsumer` interface + dev-only metadata logger                           |
 | `use-camera.ts`, `use-frame-loop.ts` | React bindings                                                              |
 | `config.ts`                       | Defaults and limits (1000 ms, 1024 px box, JPEG 0.7)                           |

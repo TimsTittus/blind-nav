@@ -37,6 +37,10 @@ export class PerformanceMonitor {
   private lastFrameCapturedAt: number | null = null;
   private lastEndToEndLatencyMs: number | null = null;
 
+  private localInferences: TimestampedEntry[] = [];
+  private localFailures: number[] = [];
+  private lastLocalLatencyMs: number | null = null;
+
   private pruneTimer: ReturnType<typeof setInterval> | null = null;
 
   constructor(options?: { now?: () => number }) {
@@ -73,6 +77,9 @@ export class PerformanceMonitor {
     this.speechQueueLength = 0;
     this.lastFrameCapturedAt = null;
     this.lastEndToEndLatencyMs = null;
+    this.localInferences = [];
+    this.localFailures = [];
+    this.lastLocalLatencyMs = null;
   }
 
   recordFrameCapture(captureLatencyMs: number): void {
@@ -102,6 +109,22 @@ export class PerformanceMonitor {
     this.aiRequests.push({ timestamp: now });
     this.trimArray(this.aiFailures);
     this.trimEntries(this.aiRequests);
+  }
+
+  /** One completed local inference, with its model time. */
+  recordLocalInference(inferenceMs: number): void {
+    const now = this.now();
+    this.localInferences.push({ timestamp: now, durationMs: inferenceMs });
+    this.lastLocalLatencyMs = inferenceMs;
+    this.trimEntries(this.localInferences);
+  }
+
+  recordLocalFailure(): void {
+    const now = this.now();
+    this.localFailures.push(now);
+    this.localInferences.push({ timestamp: now });
+    this.trimArray(this.localFailures);
+    this.trimEntries(this.localInferences);
   }
 
   recordSafetyAssessed(): void {
@@ -154,6 +177,29 @@ export class PerformanceMonitor {
 
     const gpsAgeMs = this.lastGpsAt !== null ? now - this.lastGpsAt : null;
 
+    const recentLocal = this.localInferences.filter(
+      (e) => e.timestamp > cutoff,
+    );
+    const recentLocalFailures = countSince(this.localFailures, cutoff);
+    const localDurations = recentLocal
+      .map((e) => e.durationMs)
+      .filter((d): d is number => d !== undefined);
+    const localWindowSeconds = Math.min(
+      (now - (this.localInferences[0]?.timestamp ?? now)) / 1_000,
+      60,
+    );
+    const localFPS =
+      localWindowSeconds > 0
+        ? Math.round((recentLocal.length / localWindowSeconds) * 10) / 10
+        : 0;
+    const localTotalMs = localDurations.reduce((sum, d) => sum + d, 0);
+    const localDutyCycle =
+      localWindowSeconds > 0
+        ? Math.round(
+            Math.min(1, localTotalMs / (localWindowSeconds * 1_000)) * 100,
+          ) / 100
+        : 0;
+
     return {
       cameraFPS,
       captureLatencyMs: this.lastCaptureLatencyMs,
@@ -165,6 +211,15 @@ export class PerformanceMonitor {
       gpsAgeMs,
       speechQueueLength: this.speechQueueLength,
       endToEndLatencyMs: this.lastEndToEndLatencyMs,
+      localFPS,
+      localLatencyMs: this.lastLocalLatencyMs,
+      localMedianLatencyMs: median(localDurations),
+      localFailureRate:
+        recentLocal.length > 0
+          ? Math.round((recentLocalFailures / recentLocal.length) * 100) / 100
+          : 0,
+      localDutyCycle,
+      jsHeapMB: readJsHeapMB(),
     };
   }
 
@@ -173,6 +228,10 @@ export class PerformanceMonitor {
     this.frameTimestamps = this.frameTimestamps.filter((t) => t > cutoff);
     this.aiRequests = this.aiRequests.filter((e) => e.timestamp > cutoff);
     this.aiFailures = this.aiFailures.filter((t) => t > cutoff);
+    this.localInferences = this.localInferences.filter(
+      (e) => e.timestamp > cutoff,
+    );
+    this.localFailures = this.localFailures.filter((t) => t > cutoff);
   }
 
   private trimArray(arr: number[]): void {
@@ -195,4 +254,29 @@ function countSince(timestamps: number[], cutoff: number): number {
     else break;
   }
   return count;
+}
+
+function median(values: number[]): number | null {
+  if (values.length === 0) return null;
+  const sorted = [...values].sort((a, b) => a - b);
+  const middle = Math.floor(sorted.length / 2);
+  const value =
+    sorted.length % 2 === 0
+      ? ((sorted[middle - 1] ?? 0) + (sorted[middle] ?? 0)) / 2
+      : (sorted[middle] ?? 0);
+  return Math.round(value * 10) / 10;
+}
+
+/**
+ * `performance.memory` is a non-standard Chromium extension and is absent
+ * elsewhere, so this returns null rather than guessing. It measures the whole
+ * tab, not the model.
+ */
+function readJsHeapMB(): number | null {
+  const memory = (
+    performance as Performance & { memory?: { usedJSHeapSize?: number } }
+  ).memory;
+  const used = memory?.usedJSHeapSize;
+  if (typeof used !== "number") return null;
+  return Math.round((used / 1e6) * 10) / 10;
 }

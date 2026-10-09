@@ -13,6 +13,11 @@ export interface SessionControllerConfig {
   readonly navigationSpeechCooldownMs: number;
   /** Minimum gap between repeated safety speech of the same level (ms). */
   readonly safetySpeechCooldownMs: number;
+  /**
+   * Run the local fast-perception loop alongside the cloud path. Off unless a
+   * backend factory is supplied, and a backend with no weights disables itself.
+   */
+  readonly fastPerceptionEnabled: boolean;
 }
 
 export const SESSION_CONTROLLER_CONFIG: SessionControllerConfig = {
@@ -23,4 +28,5 @@ export const SESSION_CONTROLLER_CONFIG: SessionControllerConfig = {
   safetyTtlMs: 3_000,
   navigationSpeechCooldownMs: 5_000,
   safetySpeechCooldownMs: 3_000,
+  fastPerceptionEnabled: true,
 };

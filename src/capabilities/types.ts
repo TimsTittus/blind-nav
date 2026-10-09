@@ -12,6 +12,8 @@ export interface CapabilitySet {
   readonly speech: CapabilityReport;
   readonly microphone: CapabilityReport;
   readonly orientation: CapabilityReport;
+  /** Local computer-vision inference: runtime support **and** model weights. */
+  readonly localPerception: CapabilityReport;
 }
 
 export const CHECKING_REPORT: CapabilityReport = {

@@ -16,8 +16,19 @@ narrow interface; concrete providers implement it.
   so the pipeline runs with no API key.
 - `normalize.ts` — shared: stamps a `SceneObservation` with server identity /
   freshness and derives `availability`, producing a Zod-validated `SceneAnalysis`.
-- Later: OpenRouter models, local object detection, semantic segmentation, depth
-  estimation — added without touching callers.
+- `local/` — **`LocalVisionProvider`** (Phase 14, **client-only**): on-device
+  segmentation via [`fast-perception`](../fast-perception/README.md), mapped
+  through the same `SceneObservation` boundary under a trust policy. Unlike every
+  provider before it, this one is constructed in the browser, not the route
+  handler. The real-time path does not use it — `FastPerceptionController` talks
+  to the backend directly, because decoding a base64 data URL per frame would
+  cost more than the inference.
+- `hybrid/` — **`HybridVisionProvider`** (Phase 14): a cloud provider plus
+  `LocalVisionProvider`, reconciled by [`fusion`](../fusion/README.md). Used for
+  the cloud-only / local-only / hybrid comparison; the live pipeline runs the two
+  loops at their own frequencies instead, so neither blocks the other.
+- Later: OpenRouter models, object detection, depth estimation — added without
+  touching callers.
 
 **Rules — critical**
 

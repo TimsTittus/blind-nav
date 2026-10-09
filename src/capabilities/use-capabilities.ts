@@ -21,6 +21,29 @@ export function useCapabilities(): CapabilitySet {
     };
 
     const unsubscribers: Array<() => void> = [];
+
+    if (typeof window !== "undefined") {
+      window.addEventListener("focus", onPermissionChange);
+      window.addEventListener("capabilities:refresh", onPermissionChange);
+      unsubscribers.push(() => {
+        window.removeEventListener("focus", onPermissionChange);
+        window.removeEventListener("capabilities:refresh", onPermissionChange);
+      });
+    }
+
+    if (
+      typeof navigator !== "undefined" &&
+      navigator.mediaDevices &&
+      typeof navigator.mediaDevices.addEventListener === "function"
+    ) {
+      navigator.mediaDevices.addEventListener("devicechange", onPermissionChange);
+      unsubscribers.push(() => {
+        navigator.mediaDevices?.removeEventListener(
+          "devicechange",
+          onPermissionChange,
+        );
+      });
+    }
     if (typeof navigator !== "undefined" && navigator.permissions) {
       for (const name of ["camera", "microphone", "geolocation"]) {
         void navigator.permissions

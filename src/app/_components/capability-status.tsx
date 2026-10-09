@@ -1,7 +1,9 @@
 "use client";
 
+import { useState } from "react";
 import { useCapabilities } from "@/capabilities";
 import type { CapabilityReport, CapabilityState } from "@/capabilities";
+import { requestCapabilityPermission } from "@/capabilities/permissions";
 
 const STATE_LABELS: Record<CapabilityState, string> = {
   checking: "Checking",
@@ -23,35 +25,69 @@ const CAPABILITY_LABELS: Record<string, string> = {
 function CapabilityRow({
   name,
   report,
+  onRequestPermission,
+  isRequesting,
 }: {
   name: string;
   report: CapabilityReport;
+  onRequestPermission?: (name: string) => void;
+  isRequesting?: boolean;
 }) {
+  const canRequest =
+    report.state === "prompt" &&
+    (name === "location" || name === "camera" || name === "microphone");
+
   return (
     <li className={`capability-row capability-row--${report.state}`}>
-      <span className="capability-row__indicator" aria-hidden="true">
-        {report.state === "available"
-          ? "✓"
-          : report.state === "unavailable"
-            ? "✗"
-            : report.state === "denied"
-              ? "⛔"
-              : report.state === "prompt"
-                ? "○"
-                : "…"}
-      </span>
-      <span className="capability-row__name">
-        {CAPABILITY_LABELS[name] ?? name}
-      </span>
-      <span className="capability-row__state">
-        {STATE_LABELS[report.state]}
-      </span>
+      <div className="capability-row__header">
+        <span className="capability-row__indicator" aria-hidden="true">
+          {report.state === "available"
+            ? "✓"
+            : report.state === "unavailable"
+              ? "✗"
+              : report.state === "denied"
+                ? "⛔"
+                : report.state === "prompt"
+                  ? "○"
+                  : "…"}
+        </span>
+        <span className="capability-row__name">
+          {CAPABILITY_LABELS[name] ?? name}
+        </span>
+        <span className="capability-row__state">
+          {STATE_LABELS[report.state]}
+        </span>
+        {canRequest && onRequestPermission ? (
+          <button
+            type="button"
+            className="capability-row__action"
+            disabled={isRequesting}
+            onClick={() => onRequestPermission(name)}
+            aria-label={`Enable ${CAPABILITY_LABELS[name] ?? name}`}
+          >
+            {isRequesting ? "Prompting…" : "Enable"}
+          </button>
+        ) : null}
+      </div>
+      {report.reason && report.state !== "available" ? (
+        <p className="capability-row__reason">{report.reason}</p>
+      ) : null}
     </li>
   );
 }
 
 export function CapabilityStatus() {
   const caps = useCapabilities();
+  const [requesting, setRequesting] = useState<string | null>(null);
+
+  const handleRequestPermission = async (name: string) => {
+    setRequesting(name);
+    try {
+      await requestCapabilityPermission(name);
+    } finally {
+      setRequesting(null);
+    }
+  };
 
   const entries = Object.entries(caps) as Array<[string, CapabilityReport]>;
   const allAvailable = entries.every(([, r]) => r.state === "available");
@@ -70,7 +106,13 @@ export function CapabilityStatus() {
       ) : null}
       <ul className="capability-status__list">
         {entries.map(([name, report]) => (
-          <CapabilityRow key={name} name={name} report={report} />
+          <CapabilityRow
+            key={name}
+            name={name}
+            report={report}
+            onRequestPermission={handleRequestPermission}
+            isRequesting={requesting === name}
+          />
         ))}
       </ul>
       {allAvailable ? (

@@ -36,7 +36,11 @@ export async function detectCamera(): Promise<CapabilityReport> {
   }
 
   if (!navigator.mediaDevices?.getUserMedia) {
-    if (location.protocol !== "https:" && location.hostname !== "localhost") {
+    if (
+      location.protocol !== "https:" &&
+      location.hostname !== "localhost" &&
+      location.hostname !== "127.0.0.1"
+    ) {
       return unavailable("Camera requires HTTPS.");
     }
     return unavailable("getUserMedia not supported by this browser.");

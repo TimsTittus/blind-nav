@@ -11,3 +11,4 @@ export {
 export type { CapabilityReport, CapabilitySet, CapabilityState } from "./types";
 export { CHECKING_REPORT } from "./types";
 export { useCapabilities } from "./use-capabilities";
+export { requestCapabilityPermission } from "./permissions";

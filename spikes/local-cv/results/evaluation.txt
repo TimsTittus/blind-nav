@@ -1,0 +1,224 @@
+
+[v1] seaformer-s-ade-fp32-512
+  somethingAhead  acc 0.65 rec 0.91 prec 0.63 TP20 FP12 FN2 TN6 ?0 dangerous 2
+  blocked         acc 0.55 rec 0.33 prec 0.13 TP2 FP14 FN4 TN20 ?0 dangerous 4
+  sidewalk        acc 0.73 rec 0.62 prec 1.00 TP18 FP0 FN11 TN11 ?0 dangerous 0
+  stairs          acc 0.98 rec 0.83 prec 1.00 TP5 FP0 FN1 TN34 ?0 dangerous 1
+  largeObstacle   acc 0.57 rec 0.70 prec 0.33 TP7 FP14 FN3 TN16 ?0 dangerous 3
+  traversable     acc 0.55 rec 0.59 prec 0.83 TP20 FP4 FN14 TN2 ?0 dangerous 4
+
+[v1] seaformer-s-ade-fp32-384
+  somethingAhead  acc 0.63 rec 0.91 prec 0.61 TP20 FP13 FN2 TN5 ?0 dangerous 2
+  blocked         acc 0.65 rec 0.67 prec 0.25 TP4 FP12 FN2 TN22 ?0 dangerous 2
+  sidewalk        acc 0.65 rec 0.55 prec 0.94 TP16 FP1 FN13 TN10 ?0 dangerous 1
+  stairs          acc 0.95 rec 0.67 prec 1.00 TP4 FP0 FN2 TN34 ?0 dangerous 2
+  largeObstacle   acc 0.57 rec 0.80 prec 0.35 TP8 FP15 FN2 TN15 ?0 dangerous 2
+  traversable     acc 0.65 rec 0.65 prec 0.92 TP22 FP2 FN12 TN4 ?0 dangerous 2
+
+[v1] seaformer-s-ade-q8-512
+  somethingAhead  acc 0.53 rec 0.86 prec 0.54 TP19 FP16 FN3 TN2 ?0 dangerous 3
+  blocked         acc 0.57 rec 0.50 prec 0.18 TP3 FP14 FN3 TN20 ?0 dangerous 3
+  sidewalk        acc 0.30 rec 0.03 prec 1.00 TP1 FP0 FN28 TN11 ?0 dangerous 0
+  stairs          acc 0.88 rec 1.00 prec 0.55 TP6 FP5 FN0 TN29 ?0 dangerous 0
+  largeObstacle   acc 0.50 rec 0.80 prec 0.31 TP8 FP18 FN2 TN12 ?0 dangerous 2
+  traversable     acc 0.57 rec 0.59 prec 0.87 TP20 FP3 FN14 TN3 ?0 dangerous 3
+
+[v1] segformer-b0-ade-fp32-512
+  somethingAhead  acc 0.57 rec 0.82 prec 0.58 TP18 FP13 FN4 TN5 ?0 dangerous 4
+  blocked         acc 0.63 rec 0.33 prec 0.15 TP2 FP11 FN4 TN23 ?0 dangerous 4
+  sidewalk        acc 0.70 rec 0.62 prec 0.95 TP18 FP1 FN11 TN10 ?0 dangerous 1
+  stairs          acc 0.95 rec 0.67 prec 1.00 TP4 FP0 FN2 TN34 ?0 dangerous 2
+  largeObstacle   acc 0.63 rec 0.80 prec 0.38 TP8 FP13 FN2 TN17 ?0 dangerous 2
+  traversable     acc 0.63 rec 0.68 prec 0.85 TP23 FP4 FN11 TN2 ?0 dangerous 4
+
+[v1] segformer-b0-ade-fp32-384
+  somethingAhead  acc 0.57 rec 0.82 prec 0.58 TP18 FP13 FN4 TN5 ?0 dangerous 4
+  blocked         acc 0.65 rec 0.33 prec 0.17 TP2 FP10 FN4 TN24 ?0 dangerous 4
+  sidewalk        acc 0.73 rec 0.66 prec 0.95 TP19 FP1 FN10 TN10 ?0 dangerous 1
+  stairs          acc 0.95 rec 0.67 prec 1.00 TP4 FP0 FN2 TN34 ?0 dangerous 2
+  largeObstacle   acc 0.65 rec 0.90 prec 0.41 TP9 FP13 FN1 TN17 ?0 dangerous 1
+  traversable     acc 0.65 rec 0.71 prec 0.86 TP24 FP4 FN10 TN2 ?0 dangerous 4
+
+[v1] segformer-b0-ade-q8-512
+  somethingAhead  acc 0.57 rec 0.82 prec 0.58 TP18 FP13 FN4 TN5 ?0 dangerous 4
+  blocked         acc 0.60 rec 0.33 prec 0.14 TP2 FP12 FN4 TN22 ?0 dangerous 4
+  sidewalk        acc 0.70 rec 0.62 prec 0.95 TP18 FP1 FN11 TN10 ?0 dangerous 1
+  stairs          acc 0.95 rec 0.67 prec 1.00 TP4 FP0 FN2 TN34 ?0 dangerous 2
+  largeObstacle   acc 0.63 rec 0.80 prec 0.38 TP8 FP13 FN2 TN17 ?0 dangerous 2
+  traversable     acc 0.60 rec 0.65 prec 0.85 TP22 FP4 FN12 TN2 ?0 dangerous 4
+
+[v1] rfdetr-nano-q8
+  somethingAhead  acc 0.45 rec 0.41 prec 0.50 TP9 FP9 FN13 TN9 ?0 dangerous 13
+  blocked         acc 0.20 rec 1.00 prec 0.20 TP1 FP4 FN0 TN0 ?35 dangerous 0
+  sidewalk        acc   -  rec   -  prec   -  TP0 FP0 FN0 TN0 ?40 dangerous 0
+  stairs          acc   -  rec   -  prec   -  TP0 FP0 FN0 TN0 ?40 dangerous 0
+  largeObstacle   acc 0.73 rec 0.30 prec 0.43 TP3 FP4 FN7 TN26 ?0 dangerous 7
+  traversable     acc 0.20 rec 0.00 prec   -  TP0 FP0 FN4 TN1 ?35 dangerous 0
+
+[v1] dfine-s-q8
+  somethingAhead  acc 0.45 rec 0.45 prec 0.50 TP10 FP10 FN12 TN8 ?0 dangerous 12
+  blocked         acc 0.50 rec 1.00 prec 0.50 TP2 FP2 FN0 TN0 ?36 dangerous 0
+  sidewalk        acc   -  rec   -  prec   -  TP0 FP0 FN0 TN0 ?40 dangerous 0
+  stairs          acc   -  rec   -  prec   -  TP0 FP0 FN0 TN0 ?40 dangerous 0
+  largeObstacle   acc 0.75 rec 0.30 prec 0.50 TP3 FP3 FN7 TN27 ?0 dangerous 7
+  traversable     acc 0.50 rec 0.00 prec   -  TP0 FP0 FN2 TN2 ?36 dangerous 0
+
+[v1] rtdetrv2-r18-q8
+  somethingAhead  acc 0.50 rec 0.50 prec 0.55 TP11 FP9 FN11 TN9 ?0 dangerous 11
+  blocked         acc 0.33 rec 1.00 prec 0.33 TP1 FP2 FN0 TN0 ?37 dangerous 0
+  sidewalk        acc   -  rec   -  prec   -  TP0 FP0 FN0 TN0 ?40 dangerous 0
+  stairs          acc   -  rec   -  prec   -  TP0 FP0 FN0 TN0 ?40 dangerous 0
+  largeObstacle   acc 0.73 rec 0.30 prec 0.43 TP3 FP4 FN7 TN26 ?0 dangerous 7
+  traversable     acc 0.33 rec 0.00 prec   -  TP0 FP0 FN2 TN1 ?37 dangerous 0
+
+[v1] yolos-tiny-q8
+  somethingAhead  acc 0.45 rec 0.45 prec 0.50 TP10 FP10 FN12 TN8 ?0 dangerous 12
+  blocked         acc 0.25 rec 1.00 prec 0.25 TP1 FP3 FN0 TN0 ?36 dangerous 0
+  sidewalk        acc   -  rec   -  prec   -  TP0 FP0 FN0 TN0 ?40 dangerous 0
+  stairs          acc   -  rec   -  prec   -  TP0 FP0 FN0 TN0 ?40 dangerous 0
+  largeObstacle   acc 0.80 rec 0.40 prec 0.67 TP4 FP2 FN6 TN28 ?0 dangerous 6
+  traversable     acc 0.25 rec 0.00 prec   -  TP0 FP0 FN3 TN1 ?36 dangerous 0
+
+[v1] dfine-n-fp32
+  somethingAhead  acc 0.45 rec 0.14 prec 0.50 TP3 FP3 FN19 TN15 ?0 dangerous 19
+  blocked         acc 1.00 rec 1.00 prec 1.00 TP1 FP0 FN0 TN0 ?39 dangerous 0
+  sidewalk        acc   -  rec   -  prec   -  TP0 FP0 FN0 TN0 ?40 dangerous 0
+  stairs          acc   -  rec   -  prec   -  TP0 FP0 FN0 TN0 ?40 dangerous 0
+  largeObstacle   acc 0.75 rec 0.00 prec   -  TP0 FP0 FN10 TN30 ?0 dangerous 10
+  traversable     acc 1.00 rec   -  prec   -  TP0 FP0 FN0 TN1 ?39 dangerous 0
+
+[v1] dfine-n-q8
+  somethingAhead  acc 0.40 rec 0.14 prec 0.38 TP3 FP5 FN19 TN13 ?0 dangerous 19
+  blocked         acc 1.00 rec 1.00 prec 1.00 TP2 FP0 FN0 TN0 ?38 dangerous 0
+  sidewalk        acc   -  rec   -  prec   -  TP0 FP0 FN0 TN0 ?40 dangerous 0
+  stairs          acc   -  rec   -  prec   -  TP0 FP0 FN0 TN0 ?40 dangerous 0
+  largeObstacle   acc 0.75 rec 0.00 prec   -  TP0 FP0 FN10 TN30 ?0 dangerous 10
+  traversable     acc 1.00 rec   -  prec   -  TP0 FP0 FN0 TN2 ?38 dangerous 0
+
+[v1] depth-anything-v2-s-fp32-266
+  somethingAhead  acc 0.50 rec 0.09 prec 1.00 TP2 FP0 FN20 TN18 ?0 dangerous 20
+  blocked         acc   -  rec   -  prec   -  TP0 FP0 FN0 TN0 ?40 dangerous 0
+  sidewalk        acc   -  rec   -  prec   -  TP0 FP0 FN0 TN0 ?40 dangerous 0
+  stairs          acc   -  rec   -  prec   -  TP0 FP0 FN0 TN0 ?40 dangerous 0
+  largeObstacle   acc   -  rec   -  prec   -  TP0 FP0 FN0 TN0 ?40 dangerous 0
+  traversable     acc   -  rec   -  prec   -  TP0 FP0 FN0 TN0 ?40 dangerous 0
+
+[v1] depth-anything-v2-s-fp32-518
+  somethingAhead  acc 0.50 rec 0.09 prec 1.00 TP2 FP0 FN20 TN18 ?0 dangerous 20
+  blocked         acc 1.00 rec 1.00 prec 1.00 TP1 FP0 FN0 TN0 ?39 dangerous 0
+  sidewalk        acc   -  rec   -  prec   -  TP0 FP0 FN0 TN0 ?40 dangerous 0
+  stairs          acc   -  rec   -  prec   -  TP0 FP0 FN0 TN0 ?40 dangerous 0
+  largeObstacle   acc   -  rec   -  prec   -  TP0 FP0 FN0 TN0 ?40 dangerous 0
+  traversable     acc 1.00 rec   -  prec   -  TP0 FP0 FN0 TN1 ?39 dangerous 0
+
+[v1] depth-anything-v2-s-q8-518
+  somethingAhead  acc 0.50 rec 0.09 prec 1.00 TP2 FP0 FN20 TN18 ?0 dangerous 20
+  blocked         acc 1.00 rec 1.00 prec 1.00 TP1 FP0 FN0 TN0 ?39 dangerous 0
+  sidewalk        acc   -  rec   -  prec   -  TP0 FP0 FN0 TN0 ?40 dangerous 0
+  stairs          acc   -  rec   -  prec   -  TP0 FP0 FN0 TN0 ?40 dangerous 0
+  largeObstacle   acc   -  rec   -  prec   -  TP0 FP0 FN0 TN0 ?40 dangerous 0
+  traversable     acc 1.00 rec   -  prec   -  TP0 FP0 FN0 TN1 ?39 dangerous 0
+
+[v1] seaformer-s-ade-fp32-512 + rfdetr-nano-q8
+  somethingAhead  acc 0.57 rec 0.91 prec 0.57 TP20 FP15 FN2 TN3 ?0 dangerous 2
+  blocked         acc 0.53 rec 0.33 prec 0.12 TP2 FP15 FN4 TN19 ?0 dangerous 4
+  sidewalk        acc 0.73 rec 0.62 prec 1.00 TP18 FP0 FN11 TN11 ?0 dangerous 0
+  stairs          acc 0.98 rec 0.83 prec 1.00 TP5 FP0 FN1 TN34 ?0 dangerous 1
+  largeObstacle   acc 0.55 rec 0.70 prec 0.32 TP7 FP15 FN3 TN15 ?0 dangerous 3
+  traversable     acc 0.53 rec 0.56 prec 0.83 TP19 FP4 FN15 TN2 ?0 dangerous 4
+
+[v1] seaformer-s-ade-fp32-512 + dfine-s-q8
+  somethingAhead  acc 0.57 rec 0.91 prec 0.57 TP20 FP15 FN2 TN3 ?0 dangerous 2
+  blocked         acc 0.53 rec 0.33 prec 0.12 TP2 FP15 FN4 TN19 ?0 dangerous 4
+  sidewalk        acc 0.73 rec 0.62 prec 1.00 TP18 FP0 FN11 TN11 ?0 dangerous 0
+  stairs          acc 0.98 rec 0.83 prec 1.00 TP5 FP0 FN1 TN34 ?0 dangerous 1
+  largeObstacle   acc 0.55 rec 0.70 prec 0.32 TP7 FP15 FN3 TN15 ?0 dangerous 3
+  traversable     acc 0.53 rec 0.56 prec 0.83 TP19 FP4 FN15 TN2 ?0 dangerous 4
+
+[v1] seaformer-s-ade-fp32-512 + rfdetr-nano-q8 + depth-anything-v2-s-fp32-266
+  somethingAhead  acc 0.57 rec 0.91 prec 0.57 TP20 FP15 FN2 TN3 ?0 dangerous 2
+  blocked         acc 0.53 rec 0.33 prec 0.12 TP2 FP15 FN4 TN19 ?0 dangerous 4
+  sidewalk        acc 0.73 rec 0.62 prec 1.00 TP18 FP0 FN11 TN11 ?0 dangerous 0
+  stairs          acc 0.98 rec 0.83 prec 1.00 TP5 FP0 FN1 TN34 ?0 dangerous 1
+  largeObstacle   acc 0.55 rec 0.70 prec 0.32 TP7 FP15 FN3 TN15 ?0 dangerous 3
+  traversable     acc 0.53 rec 0.56 prec 0.83 TP19 FP4 FN15 TN2 ?0 dangerous 4
+
+[v1] segformer-b0-ade-fp32-512 + rfdetr-nano-q8
+  somethingAhead  acc 0.53 rec 0.86 prec 0.54 TP19 FP16 FN3 TN2 ?0 dangerous 3
+  blocked         acc 0.60 rec 0.50 prec 0.19 TP3 FP13 FN3 TN21 ?0 dangerous 3
+  sidewalk        acc 0.70 rec 0.62 prec 0.95 TP18 FP1 FN11 TN10 ?0 dangerous 1
+  stairs          acc 0.95 rec 0.67 prec 1.00 TP4 FP0 FN2 TN34 ?0 dangerous 2
+  largeObstacle   acc 0.57 rec 0.80 prec 0.35 TP8 FP15 FN2 TN15 ?0 dangerous 2
+  traversable     acc 0.60 rec 0.62 prec 0.88 TP21 FP3 FN13 TN3 ?0 dangerous 3
+
+[v2] seaformer-s-ade-fp32-512
+  somethingAhead  acc 0.57 rec 0.91 prec 0.57 TP20 FP15 FN2 TN3 ?0 dangerous 2
+  blocked         acc 0.35 rec 1.00 prec 0.19 TP6 FP26 FN0 TN8 ?0 dangerous 0
+  sidewalk        acc 0.73 rec 0.62 prec 1.00 TP18 FP0 FN11 TN11 ?0 dangerous 0
+  stairs          acc 0.98 rec 0.83 prec 1.00 TP5 FP0 FN1 TN34 ?0 dangerous 1
+  largeObstacle   acc 0.57 rec 0.70 prec 0.33 TP7 FP14 FN3 TN16 ?0 dangerous 3
+  traversable     acc 0.35 rec 0.24 prec 1.00 TP8 FP0 FN26 TN6 ?0 dangerous 0
+
+[v2] seaformer-s-ade-fp32-384
+  somethingAhead  acc 0.57 rec 0.91 prec 0.57 TP20 FP15 FN2 TN3 ?0 dangerous 2
+  blocked         acc 0.38 rec 1.00 prec 0.19 TP6 FP25 FN0 TN9 ?0 dangerous 0
+  sidewalk        acc 0.65 rec 0.55 prec 0.94 TP16 FP1 FN13 TN10 ?0 dangerous 1
+  stairs          acc 0.95 rec 0.67 prec 1.00 TP4 FP0 FN2 TN34 ?0 dangerous 2
+  largeObstacle   acc 0.57 rec 0.80 prec 0.35 TP8 FP15 FN2 TN15 ?0 dangerous 2
+  traversable     acc 0.38 rec 0.26 prec 1.00 TP9 FP0 FN25 TN6 ?0 dangerous 0
+
+[v2] segformer-b0-ade-fp32-512
+  somethingAhead  acc 0.53 rec 0.86 prec 0.54 TP19 FP16 FN3 TN2 ?0 dangerous 3
+  blocked         acc 0.35 rec 1.00 prec 0.19 TP6 FP26 FN0 TN8 ?0 dangerous 0
+  sidewalk        acc 0.70 rec 0.62 prec 0.95 TP18 FP1 FN11 TN10 ?0 dangerous 1
+  stairs          acc 0.95 rec 0.67 prec 1.00 TP4 FP0 FN2 TN34 ?0 dangerous 2
+  largeObstacle   acc 0.63 rec 0.80 prec 0.38 TP8 FP13 FN2 TN17 ?0 dangerous 2
+  traversable     acc 0.35 rec 0.24 prec 1.00 TP8 FP0 FN26 TN6 ?0 dangerous 0
+
+[v2] seaformer-s-ade-fp32-512 + depth-anything-v2-s-fp32-266
+  somethingAhead  acc 0.57 rec 0.91 prec 0.57 TP20 FP15 FN2 TN3 ?0 dangerous 2
+  blocked         acc 0.75 rec 0.33 prec 0.25 TP2 FP6 FN4 TN28 ?0 dangerous 4
+  sidewalk        acc 0.73 rec 0.62 prec 1.00 TP18 FP0 FN11 TN11 ?0 dangerous 0
+  stairs          acc 0.98 rec 0.83 prec 1.00 TP5 FP0 FN1 TN34 ?0 dangerous 1
+  largeObstacle   acc 0.57 rec 0.70 prec 0.33 TP7 FP14 FN3 TN16 ?0 dangerous 3
+  traversable     acc 0.73 rec 0.79 prec 0.87 TP27 FP4 FN7 TN2 ?0 dangerous 4
+
+[v2] seaformer-s-ade-fp32-512 + rfdetr-nano-q8 + depth-anything-v2-s-fp32-266
+  somethingAhead  acc 0.57 rec 0.91 prec 0.57 TP20 FP15 FN2 TN3 ?0 dangerous 2
+  blocked         acc 0.75 rec 0.50 prec 0.30 TP3 FP7 FN3 TN27 ?0 dangerous 3
+  sidewalk        acc 0.73 rec 0.62 prec 1.00 TP18 FP0 FN11 TN11 ?0 dangerous 0
+  stairs          acc 0.98 rec 0.83 prec 1.00 TP5 FP0 FN1 TN34 ?0 dangerous 1
+  largeObstacle   acc 0.55 rec 0.70 prec 0.32 TP7 FP15 FN3 TN15 ?0 dangerous 3
+  traversable     acc 0.73 rec 0.76 prec 0.90 TP26 FP3 FN8 TN3 ?0 dangerous 3
+
+[v2] segformer-b0-ade-fp32-512 + rfdetr-nano-q8 + depth-anything-v2-s-fp32-266
+  somethingAhead  acc 0.53 rec 0.86 prec 0.54 TP19 FP16 FN3 TN2 ?0 dangerous 3
+  blocked         acc 0.80 rec 0.67 prec 0.40 TP4 FP6 FN2 TN28 ?0 dangerous 2
+  sidewalk        acc 0.70 rec 0.62 prec 0.95 TP18 FP1 FN11 TN10 ?0 dangerous 1
+  stairs          acc 0.95 rec 0.67 prec 1.00 TP4 FP0 FN2 TN34 ?0 dangerous 2
+  largeObstacle   acc 0.57 rec 0.80 prec 0.35 TP8 FP15 FN2 TN15 ?0 dangerous 2
+  traversable     acc 0.78 rec 0.79 prec 0.93 TP27 FP2 FN7 TN4 ?0 dangerous 2
+
+SAFETY [v1] seaformer-s-ade-fp32-512: meets floor 33/40 (fixture baseline 40/40), said SAFE 0, MUST_NOT_BE_SAFE violations 0, STOP where floor < danger: 11
+  below floor: pothole-1 (caution < danger), pothole-2 (caution < danger), wall-1 (caution < critical), wall-2 (caution < critical), road_crossing-2 (caution < danger), blocked-1 (caution < critical), blocked-2 (caution < critical)
+  stops: clear-2, clear-3, clear_road-2, puddle-2, parked_vehicle-2, moving_person-2, narrow_path-1, narrow_path-2, narrow_path-3, low_light-2, uncertain-2
+
+SAFETY [v1] seaformer-s-ade-fp32-512 + rfdetr-nano-q8: meets floor 33/40 (fixture baseline 40/40), said SAFE 0, MUST_NOT_BE_SAFE violations 0, STOP where floor < danger: 13
+  below floor: pothole-1 (caution < danger), pothole-2 (caution < danger), wall-1 (caution < critical), wall-2 (caution < critical), road_crossing-2 (caution < danger), blocked-1 (caution < critical), blocked-2 (caution < critical)
+  stops: clear-2, clear-3, clear_road-2, puddle-2, parked_vehicle-1, parked_vehicle-2, moving_person-1, moving_person-2, narrow_path-1, narrow_path-2, narrow_path-3, low_light-2, uncertain-2
+
+SAFETY [v1] segformer-b0-ade-fp32-512 + rfdetr-nano-q8: meets floor 34/40 (fixture baseline 40/40), said SAFE 0, MUST_NOT_BE_SAFE violations 0, STOP where floor < danger: 12
+  below floor: pothole-1 (caution < danger), pothole-2 (caution < danger), wall-2 (caution < critical), road_crossing-2 (caution < danger), blocked-1 (caution < critical), blocked-2 (caution < critical)
+  stops: clear-2, clear-3, clear_road-2, parked_vehicle-1, parked_vehicle-2, moving_person-1, moving_person-2, curb-1, narrow_path-2, narrow_path-3, low_light-2, uncertain-2
+
+SAFETY [v2] seaformer-s-ade-fp32-512 + rfdetr-nano-q8: meets floor 38/40 (fixture baseline 40/40), said SAFE 0, MUST_NOT_BE_SAFE violations 0, STOP where floor < danger: 21
+  below floor: pothole-1 (caution < danger), pothole-2 (caution < danger)
+  stops: clear-2, clear-3, clear_road-2, puddle-1, puddle-2, obstacle-1, obstacle-2, parked_vehicle-1, parked_vehicle-2, parked_vehicle-3, moving_person-1, moving_person-2, curb-2, narrow_path-1, narrow_path-2, narrow_path-3, low_light-1, low_light-2, low_light-3, uncertain-1, uncertain-2
+
+SAFETY [v2] seaformer-s-ade-fp32-512 + rfdetr-nano-q8 + depth-anything-v2-s-fp32-266: meets floor 33/40 (fixture baseline 40/40), said SAFE 0, MUST_NOT_BE_SAFE violations 0, STOP where floor < danger: 7
+  below floor: stairs-3 (caution < danger), pothole-1 (caution < danger), pothole-2 (caution < danger), wall-2 (caution < critical), road_crossing-2 (caution < danger), blocked-1 (caution < critical), blocked-2 (caution < critical)
+  stops: clear-2, clear-3, puddle-2, parked_vehicle-1, parked_vehicle-2, moving_person-1, moving_person-2
+
+SAFETY [v2] segformer-b0-ade-fp32-512 + rfdetr-nano-q8 + depth-anything-v2-s-fp32-266: meets floor 34/40 (fixture baseline 40/40), said SAFE 0, MUST_NOT_BE_SAFE violations 0, STOP where floor < danger: 6
+  below floor: stairs-3 (caution < danger), pothole-1 (caution < danger), pothole-2 (caution < danger), road_crossing-2 (caution < danger), blocked-1 (caution < critical), blocked-2 (caution < critical)
+  stops: clear-3, parked_vehicle-1, parked_vehicle-2, moving_person-1, moving_person-2, curb-1

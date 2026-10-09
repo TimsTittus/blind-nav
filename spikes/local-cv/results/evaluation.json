@@ -1,0 +1,4814 @@
+{
+  "accuracy": [
+    {
+      "config": "[v1] seaformer-s-ade-fp32-512",
+      "summary": {
+        "somethingAhead": {
+          "tp": 20,
+          "fp": 12,
+          "fn": 2,
+          "tn": 6,
+          "unanswered": 0,
+          "dangerousErrors": 2,
+          "accuracy": 0.65,
+          "recall": 0.91,
+          "precision": 0.63
+        },
+        "blocked": {
+          "tp": 2,
+          "fp": 14,
+          "fn": 4,
+          "tn": 20,
+          "unanswered": 0,
+          "dangerousErrors": 4,
+          "accuracy": 0.55,
+          "recall": 0.33,
+          "precision": 0.13
+        },
+        "sidewalk": {
+          "tp": 18,
+          "fp": 0,
+          "fn": 11,
+          "tn": 11,
+          "unanswered": 0,
+          "dangerousErrors": 0,
+          "accuracy": 0.73,
+          "recall": 0.62,
+          "precision": 1
+        },
+        "stairs": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 1,
+          "tn": 34,
+          "unanswered": 0,
+          "dangerousErrors": 1,
+          "accuracy": 0.98,
+          "recall": 0.83,
+          "precision": 1
+        },
+        "largeObstacle": {
+          "tp": 7,
+          "fp": 14,
+          "fn": 3,
+          "tn": 16,
+          "unanswered": 0,
+          "dangerousErrors": 3,
+          "accuracy": 0.57,
+          "recall": 0.7,
+          "precision": 0.33
+        },
+        "traversable": {
+          "tp": 20,
+          "fp": 4,
+          "fn": 14,
+          "tn": 2,
+          "unanswered": 0,
+          "dangerousErrors": 4,
+          "accuracy": 0.55,
+          "recall": 0.59,
+          "precision": 0.83
+        }
+      },
+      "dangerousErrorList": [
+        "stairs-3:stairs",
+        "pothole-1:somethingAhead",
+        "pothole-2:somethingAhead",
+        "wall-1:blocked",
+        "wall-1:traversable",
+        "wall-2:blocked",
+        "wall-2:largeObstacle",
+        "wall-2:traversable",
+        "blocked-1:blocked",
+        "blocked-1:largeObstacle",
+        "blocked-1:traversable",
+        "blocked-2:blocked",
+        "blocked-2:largeObstacle",
+        "blocked-2:traversable"
+      ]
+    },
+    {
+      "config": "[v1] seaformer-s-ade-fp32-384",
+      "summary": {
+        "somethingAhead": {
+          "tp": 20,
+          "fp": 13,
+          "fn": 2,
+          "tn": 5,
+          "unanswered": 0,
+          "dangerousErrors": 2,
+          "accuracy": 0.63,
+          "recall": 0.91,
+          "precision": 0.61
+        },
+        "blocked": {
+          "tp": 4,
+          "fp": 12,
+          "fn": 2,
+          "tn": 22,
+          "unanswered": 0,
+          "dangerousErrors": 2,
+          "accuracy": 0.65,
+          "recall": 0.67,
+          "precision": 0.25
+        },
+        "sidewalk": {
+          "tp": 16,
+          "fp": 1,
+          "fn": 13,
+          "tn": 10,
+          "unanswered": 0,
+          "dangerousErrors": 1,
+          "accuracy": 0.65,
+          "recall": 0.55,
+          "precision": 0.94
+        },
+        "stairs": {
+          "tp": 4,
+          "fp": 0,
+          "fn": 2,
+          "tn": 34,
+          "unanswered": 0,
+          "dangerousErrors": 2,
+          "accuracy": 0.95,
+          "recall": 0.67,
+          "precision": 1
+        },
+        "largeObstacle": {
+          "tp": 8,
+          "fp": 15,
+          "fn": 2,
+          "tn": 15,
+          "unanswered": 0,
+          "dangerousErrors": 2,
+          "accuracy": 0.57,
+          "recall": 0.8,
+          "precision": 0.35
+        },
+        "traversable": {
+          "tp": 22,
+          "fp": 2,
+          "fn": 12,
+          "tn": 4,
+          "unanswered": 0,
+          "dangerousErrors": 2,
+          "accuracy": 0.65,
+          "recall": 0.65,
+          "precision": 0.92
+        }
+      },
+      "dangerousErrorList": [
+        "moving_person-1:largeObstacle",
+        "stairs-1:stairs",
+        "stairs-3:stairs",
+        "pothole-1:somethingAhead",
+        "pothole-2:somethingAhead",
+        "road_crossing-2:sidewalk",
+        "blocked-1:blocked",
+        "blocked-1:largeObstacle",
+        "blocked-1:traversable",
+        "blocked-2:blocked",
+        "blocked-2:traversable"
+      ]
+    },
+    {
+      "config": "[v1] seaformer-s-ade-q8-512",
+      "summary": {
+        "somethingAhead": {
+          "tp": 19,
+          "fp": 16,
+          "fn": 3,
+          "tn": 2,
+          "unanswered": 0,
+          "dangerousErrors": 3,
+          "accuracy": 0.53,
+          "recall": 0.86,
+          "precision": 0.54
+        },
+        "blocked": {
+          "tp": 3,
+          "fp": 14,
+          "fn": 3,
+          "tn": 20,
+          "unanswered": 0,
+          "dangerousErrors": 3,
+          "accuracy": 0.57,
+          "recall": 0.5,
+          "precision": 0.18
+        },
+        "sidewalk": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 28,
+          "tn": 11,
+          "unanswered": 0,
+          "dangerousErrors": 0,
+          "accuracy": 0.3,
+          "recall": 0.03,
+          "precision": 1
+        },
+        "stairs": {
+          "tp": 6,
+          "fp": 5,
+          "fn": 0,
+          "tn": 29,
+          "unanswered": 0,
+          "dangerousErrors": 0,
+          "accuracy": 0.88,
+          "recall": 1,
+          "precision": 0.55
+        },
+        "largeObstacle": {
+          "tp": 8,
+          "fp": 18,
+          "fn": 2,
+          "tn": 12,
+          "unanswered": 0,
+          "dangerousErrors": 2,
+          "accuracy": 0.5,
+          "recall": 0.8,
+          "precision": 0.31
+        },
+        "traversable": {
+          "tp": 20,
+          "fp": 3,
+          "fn": 14,
+          "tn": 3,
+          "unanswered": 0,
+          "dangerousErrors": 3,
+          "accuracy": 0.57,
+          "recall": 0.59,
+          "precision": 0.87
+        }
+      },
+      "dangerousErrorList": [
+        "obstacle-1:somethingAhead",
+        "pothole-2:somethingAhead",
+        "wall-1:blocked",
+        "wall-1:largeObstacle",
+        "wall-1:traversable",
+        "wall-2:somethingAhead",
+        "wall-2:blocked",
+        "wall-2:largeObstacle",
+        "wall-2:traversable",
+        "blocked-1:blocked",
+        "blocked-1:traversable"
+      ]
+    },
+    {
+      "config": "[v1] segformer-b0-ade-fp32-512",
+      "summary": {
+        "somethingAhead": {
+          "tp": 18,
+          "fp": 13,
+          "fn": 4,
+          "tn": 5,
+          "unanswered": 0,
+          "dangerousErrors": 4,
+          "accuracy": 0.57,
+          "recall": 0.82,
+          "precision": 0.58
+        },
+        "blocked": {
+          "tp": 2,
+          "fp": 11,
+          "fn": 4,
+          "tn": 23,
+          "unanswered": 0,
+          "dangerousErrors": 4,
+          "accuracy": 0.63,
+          "recall": 0.33,
+          "precision": 0.15
+        },
+        "sidewalk": {
+          "tp": 18,
+          "fp": 1,
+          "fn": 11,
+          "tn": 10,
+          "unanswered": 0,
+          "dangerousErrors": 1,
+          "accuracy": 0.7,
+          "recall": 0.62,
+          "precision": 0.95
+        },
+        "stairs": {
+          "tp": 4,
+          "fp": 0,
+          "fn": 2,
+          "tn": 34,
+          "unanswered": 0,
+          "dangerousErrors": 2,
+          "accuracy": 0.95,
+          "recall": 0.67,
+          "precision": 1
+        },
+        "largeObstacle": {
+          "tp": 8,
+          "fp": 13,
+          "fn": 2,
+          "tn": 17,
+          "unanswered": 0,
+          "dangerousErrors": 2,
+          "accuracy": 0.63,
+          "recall": 0.8,
+          "precision": 0.38
+        },
+        "traversable": {
+          "tp": 23,
+          "fp": 4,
+          "fn": 11,
+          "tn": 2,
+          "unanswered": 0,
+          "dangerousErrors": 4,
+          "accuracy": 0.63,
+          "recall": 0.68,
+          "precision": 0.85
+        }
+      },
+      "dangerousErrorList": [
+        "puddle-2:somethingAhead",
+        "parked_vehicle-2:blocked",
+        "parked_vehicle-2:traversable",
+        "stairs-1:stairs",
+        "stairs-3:stairs",
+        "pothole-1:somethingAhead",
+        "pothole-2:somethingAhead",
+        "pothole-3:somethingAhead",
+        "wall-2:blocked",
+        "wall-2:traversable",
+        "road_crossing-2:sidewalk",
+        "blocked-1:blocked",
+        "blocked-1:largeObstacle",
+        "blocked-1:traversable",
+        "blocked-2:blocked",
+        "blocked-2:largeObstacle",
+        "blocked-2:traversable"
+      ]
+    },
+    {
+      "config": "[v1] segformer-b0-ade-fp32-384",
+      "summary": {
+        "somethingAhead": {
+          "tp": 18,
+          "fp": 13,
+          "fn": 4,
+          "tn": 5,
+          "unanswered": 0,
+          "dangerousErrors": 4,
+          "accuracy": 0.57,
+          "recall": 0.82,
+          "precision": 0.58
+        },
+        "blocked": {
+          "tp": 2,
+          "fp": 10,
+          "fn": 4,
+          "tn": 24,
+          "unanswered": 0,
+          "dangerousErrors": 4,
+          "accuracy": 0.65,
+          "recall": 0.33,
+          "precision": 0.17
+        },
+        "sidewalk": {
+          "tp": 19,
+          "fp": 1,
+          "fn": 10,
+          "tn": 10,
+          "unanswered": 0,
+          "dangerousErrors": 1,
+          "accuracy": 0.73,
+          "recall": 0.66,
+          "precision": 0.95
+        },
+        "stairs": {
+          "tp": 4,
+          "fp": 0,
+          "fn": 2,
+          "tn": 34,
+          "unanswered": 0,
+          "dangerousErrors": 2,
+          "accuracy": 0.95,
+          "recall": 0.67,
+          "precision": 1
+        },
+        "largeObstacle": {
+          "tp": 9,
+          "fp": 13,
+          "fn": 1,
+          "tn": 17,
+          "unanswered": 0,
+          "dangerousErrors": 1,
+          "accuracy": 0.65,
+          "recall": 0.9,
+          "precision": 0.41
+        },
+        "traversable": {
+          "tp": 24,
+          "fp": 4,
+          "fn": 10,
+          "tn": 2,
+          "unanswered": 0,
+          "dangerousErrors": 4,
+          "accuracy": 0.65,
+          "recall": 0.71,
+          "precision": 0.86
+        }
+      },
+      "dangerousErrorList": [
+        "puddle-2:somethingAhead",
+        "parked_vehicle-2:blocked",
+        "parked_vehicle-2:traversable",
+        "stairs-1:stairs",
+        "stairs-3:stairs",
+        "pothole-1:somethingAhead",
+        "pothole-2:somethingAhead",
+        "pothole-3:somethingAhead",
+        "wall-2:blocked",
+        "wall-2:traversable",
+        "road_crossing-2:sidewalk",
+        "blocked-1:blocked",
+        "blocked-1:largeObstacle",
+        "blocked-1:traversable",
+        "blocked-2:blocked",
+        "blocked-2:traversable"
+      ]
+    },
+    {
+      "config": "[v1] segformer-b0-ade-q8-512",
+      "summary": {
+        "somethingAhead": {
+          "tp": 18,
+          "fp": 13,
+          "fn": 4,
+          "tn": 5,
+          "unanswered": 0,
+          "dangerousErrors": 4,
+          "accuracy": 0.57,
+          "recall": 0.82,
+          "precision": 0.58
+        },
+        "blocked": {
+          "tp": 2,
+          "fp": 12,
+          "fn": 4,
+          "tn": 22,
+          "unanswered": 0,
+          "dangerousErrors": 4,
+          "accuracy": 0.6,
+          "recall": 0.33,
+          "precision": 0.14
+        },
+        "sidewalk": {
+          "tp": 18,
+          "fp": 1,
+          "fn": 11,
+          "tn": 10,
+          "unanswered": 0,
+          "dangerousErrors": 1,
+          "accuracy": 0.7,
+          "recall": 0.62,
+          "precision": 0.95
+        },
+        "stairs": {
+          "tp": 4,
+          "fp": 0,
+          "fn": 2,
+          "tn": 34,
+          "unanswered": 0,
+          "dangerousErrors": 2,
+          "accuracy": 0.95,
+          "recall": 0.67,
+          "precision": 1
+        },
+        "largeObstacle": {
+          "tp": 8,
+          "fp": 13,
+          "fn": 2,
+          "tn": 17,
+          "unanswered": 0,
+          "dangerousErrors": 2,
+          "accuracy": 0.63,
+          "recall": 0.8,
+          "precision": 0.38
+        },
+        "traversable": {
+          "tp": 22,
+          "fp": 4,
+          "fn": 12,
+          "tn": 2,
+          "unanswered": 0,
+          "dangerousErrors": 4,
+          "accuracy": 0.6,
+          "recall": 0.65,
+          "precision": 0.85
+        }
+      },
+      "dangerousErrorList": [
+        "puddle-2:somethingAhead",
+        "parked_vehicle-2:blocked",
+        "parked_vehicle-2:traversable",
+        "stairs-1:stairs",
+        "stairs-3:stairs",
+        "pothole-1:somethingAhead",
+        "pothole-2:somethingAhead",
+        "pothole-3:somethingAhead",
+        "wall-2:blocked",
+        "wall-2:traversable",
+        "road_crossing-2:sidewalk",
+        "blocked-1:blocked",
+        "blocked-1:largeObstacle",
+        "blocked-1:traversable",
+        "blocked-2:blocked",
+        "blocked-2:largeObstacle",
+        "blocked-2:traversable"
+      ]
+    },
+    {
+      "config": "[v1] rfdetr-nano-q8",
+      "summary": {
+        "somethingAhead": {
+          "tp": 9,
+          "fp": 9,
+          "fn": 13,
+          "tn": 9,
+          "unanswered": 0,
+          "dangerousErrors": 13,
+          "accuracy": 0.45,
+          "recall": 0.41,
+          "precision": 0.5
+        },
+        "blocked": {
+          "tp": 1,
+          "fp": 4,
+          "fn": 0,
+          "tn": 0,
+          "unanswered": 35,
+          "dangerousErrors": 0,
+          "accuracy": 0.2,
+          "recall": 1,
+          "precision": 0.2
+        },
+        "sidewalk": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 0,
+          "unanswered": 40,
+          "dangerousErrors": 0,
+          "accuracy": null,
+          "recall": null,
+          "precision": null
+        },
+        "stairs": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 0,
+          "unanswered": 40,
+          "dangerousErrors": 0,
+          "accuracy": null,
+          "recall": null,
+          "precision": null
+        },
+        "largeObstacle": {
+          "tp": 3,
+          "fp": 4,
+          "fn": 7,
+          "tn": 26,
+          "unanswered": 0,
+          "dangerousErrors": 7,
+          "accuracy": 0.73,
+          "recall": 0.3,
+          "precision": 0.43
+        },
+        "traversable": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 4,
+          "tn": 1,
+          "unanswered": 35,
+          "dangerousErrors": 0,
+          "accuracy": 0.2,
+          "recall": 0,
+          "precision": null
+        }
+      },
+      "dangerousErrorList": [
+        "puddle-2:somethingAhead",
+        "parked_vehicle-2:largeObstacle",
+        "parked_vehicle-3:largeObstacle",
+        "stairs-2:somethingAhead",
+        "stairs-3:somethingAhead",
+        "stairs_up-1:somethingAhead",
+        "stairs_up-2:somethingAhead",
+        "stairs_up-3:somethingAhead",
+        "pothole-1:somethingAhead",
+        "pothole-2:somethingAhead",
+        "wall-1:somethingAhead",
+        "wall-1:largeObstacle",
+        "wall-2:somethingAhead",
+        "wall-2:largeObstacle",
+        "blocked-1:somethingAhead",
+        "blocked-1:largeObstacle",
+        "blocked-2:somethingAhead",
+        "blocked-2:largeObstacle",
+        "blocked-3:somethingAhead",
+        "blocked-3:largeObstacle"
+      ]
+    },
+    {
+      "config": "[v1] dfine-s-q8",
+      "summary": {
+        "somethingAhead": {
+          "tp": 10,
+          "fp": 10,
+          "fn": 12,
+          "tn": 8,
+          "unanswered": 0,
+          "dangerousErrors": 12,
+          "accuracy": 0.45,
+          "recall": 0.45,
+          "precision": 0.5
+        },
+        "blocked": {
+          "tp": 2,
+          "fp": 2,
+          "fn": 0,
+          "tn": 0,
+          "unanswered": 36,
+          "dangerousErrors": 0,
+          "accuracy": 0.5,
+          "recall": 1,
+          "precision": 0.5
+        },
+        "sidewalk": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 0,
+          "unanswered": 40,
+          "dangerousErrors": 0,
+          "accuracy": null,
+          "recall": null,
+          "precision": null
+        },
+        "stairs": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 0,
+          "unanswered": 40,
+          "dangerousErrors": 0,
+          "accuracy": null,
+          "recall": null,
+          "precision": null
+        },
+        "largeObstacle": {
+          "tp": 3,
+          "fp": 3,
+          "fn": 7,
+          "tn": 27,
+          "unanswered": 0,
+          "dangerousErrors": 7,
+          "accuracy": 0.75,
+          "recall": 0.3,
+          "precision": 0.5
+        },
+        "traversable": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 2,
+          "tn": 2,
+          "unanswered": 36,
+          "dangerousErrors": 0,
+          "accuracy": 0.5,
+          "recall": 0,
+          "precision": null
+        }
+      },
+      "dangerousErrorList": [
+        "puddle-2:somethingAhead",
+        "parked_vehicle-2:largeObstacle",
+        "parked_vehicle-3:largeObstacle",
+        "moving_person-2:largeObstacle",
+        "stairs-2:somethingAhead",
+        "stairs-3:somethingAhead",
+        "stairs_up-2:somethingAhead",
+        "stairs_up-3:somethingAhead",
+        "pothole-1:somethingAhead",
+        "pothole-2:somethingAhead",
+        "pothole-3:somethingAhead",
+        "wall-1:somethingAhead",
+        "wall-1:largeObstacle",
+        "wall-2:somethingAhead",
+        "wall-2:largeObstacle",
+        "blocked-1:somethingAhead",
+        "blocked-1:largeObstacle",
+        "blocked-2:somethingAhead",
+        "blocked-2:largeObstacle"
+      ]
+    },
+    {
+      "config": "[v1] rtdetrv2-r18-q8",
+      "summary": {
+        "somethingAhead": {
+          "tp": 11,
+          "fp": 9,
+          "fn": 11,
+          "tn": 9,
+          "unanswered": 0,
+          "dangerousErrors": 11,
+          "accuracy": 0.5,
+          "recall": 0.5,
+          "precision": 0.55
+        },
+        "blocked": {
+          "tp": 1,
+          "fp": 2,
+          "fn": 0,
+          "tn": 0,
+          "unanswered": 37,
+          "dangerousErrors": 0,
+          "accuracy": 0.33,
+          "recall": 1,
+          "precision": 0.33
+        },
+        "sidewalk": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 0,
+          "unanswered": 40,
+          "dangerousErrors": 0,
+          "accuracy": null,
+          "recall": null,
+          "precision": null
+        },
+        "stairs": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 0,
+          "unanswered": 40,
+          "dangerousErrors": 0,
+          "accuracy": null,
+          "recall": null,
+          "precision": null
+        },
+        "largeObstacle": {
+          "tp": 3,
+          "fp": 4,
+          "fn": 7,
+          "tn": 26,
+          "unanswered": 0,
+          "dangerousErrors": 7,
+          "accuracy": 0.73,
+          "recall": 0.3,
+          "precision": 0.43
+        },
+        "traversable": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 2,
+          "tn": 1,
+          "unanswered": 37,
+          "dangerousErrors": 0,
+          "accuracy": 0.33,
+          "recall": 0,
+          "precision": null
+        }
+      },
+      "dangerousErrorList": [
+        "puddle-2:somethingAhead",
+        "obstacle-1:somethingAhead",
+        "parked_vehicle-2:largeObstacle",
+        "parked_vehicle-3:largeObstacle",
+        "stairs-2:somethingAhead",
+        "stairs-3:somethingAhead",
+        "pothole-1:somethingAhead",
+        "pothole-2:somethingAhead",
+        "pothole-3:somethingAhead",
+        "wall-1:somethingAhead",
+        "wall-1:largeObstacle",
+        "wall-2:somethingAhead",
+        "wall-2:largeObstacle",
+        "blocked-1:largeObstacle",
+        "blocked-2:somethingAhead",
+        "blocked-2:largeObstacle",
+        "blocked-3:somethingAhead",
+        "blocked-3:largeObstacle"
+      ]
+    },
+    {
+      "config": "[v1] yolos-tiny-q8",
+      "summary": {
+        "somethingAhead": {
+          "tp": 10,
+          "fp": 10,
+          "fn": 12,
+          "tn": 8,
+          "unanswered": 0,
+          "dangerousErrors": 12,
+          "accuracy": 0.45,
+          "recall": 0.45,
+          "precision": 0.5
+        },
+        "blocked": {
+          "tp": 1,
+          "fp": 3,
+          "fn": 0,
+          "tn": 0,
+          "unanswered": 36,
+          "dangerousErrors": 0,
+          "accuracy": 0.25,
+          "recall": 1,
+          "precision": 0.25
+        },
+        "sidewalk": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 0,
+          "unanswered": 40,
+          "dangerousErrors": 0,
+          "accuracy": null,
+          "recall": null,
+          "precision": null
+        },
+        "stairs": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 0,
+          "unanswered": 40,
+          "dangerousErrors": 0,
+          "accuracy": null,
+          "recall": null,
+          "precision": null
+        },
+        "largeObstacle": {
+          "tp": 4,
+          "fp": 2,
+          "fn": 6,
+          "tn": 28,
+          "unanswered": 0,
+          "dangerousErrors": 6,
+          "accuracy": 0.8,
+          "recall": 0.4,
+          "precision": 0.67
+        },
+        "traversable": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 3,
+          "tn": 1,
+          "unanswered": 36,
+          "dangerousErrors": 0,
+          "accuracy": 0.25,
+          "recall": 0,
+          "precision": null
+        }
+      },
+      "dangerousErrorList": [
+        "puddle-2:somethingAhead",
+        "parked_vehicle-3:largeObstacle",
+        "stairs-2:somethingAhead",
+        "stairs-3:somethingAhead",
+        "stairs_up-1:somethingAhead",
+        "stairs_up-2:somethingAhead",
+        "stairs_up-3:somethingAhead",
+        "pothole-1:somethingAhead",
+        "pothole-2:somethingAhead",
+        "pothole-3:somethingAhead",
+        "wall-1:largeObstacle",
+        "wall-2:somethingAhead",
+        "wall-2:largeObstacle",
+        "blocked-1:largeObstacle",
+        "blocked-2:somethingAhead",
+        "blocked-2:largeObstacle",
+        "blocked-3:somethingAhead",
+        "blocked-3:largeObstacle"
+      ]
+    },
+    {
+      "config": "[v1] dfine-n-fp32",
+      "summary": {
+        "somethingAhead": {
+          "tp": 3,
+          "fp": 3,
+          "fn": 19,
+          "tn": 15,
+          "unanswered": 0,
+          "dangerousErrors": 19,
+          "accuracy": 0.45,
+          "recall": 0.14,
+          "precision": 0.5
+        },
+        "blocked": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0,
+          "tn": 0,
+          "unanswered": 39,
+          "dangerousErrors": 0,
+          "accuracy": 1,
+          "recall": 1,
+          "precision": 1
+        },
+        "sidewalk": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 0,
+          "unanswered": 40,
+          "dangerousErrors": 0,
+          "accuracy": null,
+          "recall": null,
+          "precision": null
+        },
+        "stairs": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 0,
+          "unanswered": 40,
+          "dangerousErrors": 0,
+          "accuracy": null,
+          "recall": null,
+          "precision": null
+        },
+        "largeObstacle": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 10,
+          "tn": 30,
+          "unanswered": 0,
+          "dangerousErrors": 10,
+          "accuracy": 0.75,
+          "recall": 0,
+          "precision": null
+        },
+        "traversable": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 1,
+          "unanswered": 39,
+          "dangerousErrors": 0,
+          "accuracy": 1,
+          "recall": null,
+          "precision": null
+        }
+      },
+      "dangerousErrorList": [
+        "puddle-1:somethingAhead",
+        "puddle-2:somethingAhead",
+        "obstacle-1:somethingAhead",
+        "parked_vehicle-1:somethingAhead",
+        "parked_vehicle-1:largeObstacle",
+        "parked_vehicle-2:largeObstacle",
+        "parked_vehicle-3:somethingAhead",
+        "parked_vehicle-3:largeObstacle",
+        "moving_person-1:somethingAhead",
+        "moving_person-1:largeObstacle",
+        "moving_person-2:largeObstacle",
+        "stairs-1:somethingAhead",
+        "stairs-2:somethingAhead",
+        "stairs-3:somethingAhead",
+        "stairs_up-1:somethingAhead",
+        "stairs_up-2:somethingAhead",
+        "stairs_up-3:somethingAhead",
+        "pothole-1:somethingAhead",
+        "pothole-2:somethingAhead",
+        "pothole-3:somethingAhead",
+        "wall-1:somethingAhead",
+        "wall-1:largeObstacle",
+        "wall-2:somethingAhead",
+        "wall-2:largeObstacle",
+        "blocked-1:largeObstacle",
+        "blocked-2:somethingAhead",
+        "blocked-2:largeObstacle",
+        "blocked-3:somethingAhead",
+        "blocked-3:largeObstacle"
+      ]
+    },
+    {
+      "config": "[v1] dfine-n-q8",
+      "summary": {
+        "somethingAhead": {
+          "tp": 3,
+          "fp": 5,
+          "fn": 19,
+          "tn": 13,
+          "unanswered": 0,
+          "dangerousErrors": 19,
+          "accuracy": 0.4,
+          "recall": 0.14,
+          "precision": 0.38
+        },
+        "blocked": {
+          "tp": 2,
+          "fp": 0,
+          "fn": 0,
+          "tn": 0,
+          "unanswered": 38,
+          "dangerousErrors": 0,
+          "accuracy": 1,
+          "recall": 1,
+          "precision": 1
+        },
+        "sidewalk": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 0,
+          "unanswered": 40,
+          "dangerousErrors": 0,
+          "accuracy": null,
+          "recall": null,
+          "precision": null
+        },
+        "stairs": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 0,
+          "unanswered": 40,
+          "dangerousErrors": 0,
+          "accuracy": null,
+          "recall": null,
+          "precision": null
+        },
+        "largeObstacle": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 10,
+          "tn": 30,
+          "unanswered": 0,
+          "dangerousErrors": 10,
+          "accuracy": 0.75,
+          "recall": 0,
+          "precision": null
+        },
+        "traversable": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 2,
+          "unanswered": 38,
+          "dangerousErrors": 0,
+          "accuracy": 1,
+          "recall": null,
+          "precision": null
+        }
+      },
+      "dangerousErrorList": [
+        "puddle-1:somethingAhead",
+        "puddle-2:somethingAhead",
+        "obstacle-1:somethingAhead",
+        "parked_vehicle-1:somethingAhead",
+        "parked_vehicle-1:largeObstacle",
+        "parked_vehicle-2:largeObstacle",
+        "parked_vehicle-3:somethingAhead",
+        "parked_vehicle-3:largeObstacle",
+        "moving_person-1:somethingAhead",
+        "moving_person-1:largeObstacle",
+        "moving_person-2:largeObstacle",
+        "stairs-1:somethingAhead",
+        "stairs-2:somethingAhead",
+        "stairs-3:somethingAhead",
+        "stairs_up-1:somethingAhead",
+        "stairs_up-2:somethingAhead",
+        "stairs_up-3:somethingAhead",
+        "pothole-1:somethingAhead",
+        "pothole-2:somethingAhead",
+        "pothole-3:somethingAhead",
+        "wall-1:largeObstacle",
+        "wall-2:somethingAhead",
+        "wall-2:largeObstacle",
+        "blocked-1:somethingAhead",
+        "blocked-1:largeObstacle",
+        "blocked-2:somethingAhead",
+        "blocked-2:largeObstacle",
+        "blocked-3:somethingAhead",
+        "blocked-3:largeObstacle"
+      ]
+    },
+    {
+      "config": "[v1] depth-anything-v2-s-fp32-266",
+      "summary": {
+        "somethingAhead": {
+          "tp": 2,
+          "fp": 0,
+          "fn": 20,
+          "tn": 18,
+          "unanswered": 0,
+          "dangerousErrors": 20,
+          "accuracy": 0.5,
+          "recall": 0.09,
+          "precision": 1
+        },
+        "blocked": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 0,
+          "unanswered": 40,
+          "dangerousErrors": 0,
+          "accuracy": null,
+          "recall": null,
+          "precision": null
+        },
+        "sidewalk": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 0,
+          "unanswered": 40,
+          "dangerousErrors": 0,
+          "accuracy": null,
+          "recall": null,
+          "precision": null
+        },
+        "stairs": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 0,
+          "unanswered": 40,
+          "dangerousErrors": 0,
+          "accuracy": null,
+          "recall": null,
+          "precision": null
+        },
+        "largeObstacle": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 0,
+          "unanswered": 40,
+          "dangerousErrors": 0,
+          "accuracy": null,
+          "recall": null,
+          "precision": null
+        },
+        "traversable": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 0,
+          "unanswered": 40,
+          "dangerousErrors": 0,
+          "accuracy": null,
+          "recall": null,
+          "precision": null
+        }
+      },
+      "dangerousErrorList": [
+        "puddle-1:somethingAhead",
+        "puddle-2:somethingAhead",
+        "obstacle-1:somethingAhead",
+        "parked_vehicle-1:somethingAhead",
+        "parked_vehicle-2:somethingAhead",
+        "parked_vehicle-3:somethingAhead",
+        "moving_person-1:somethingAhead",
+        "moving_person-2:somethingAhead",
+        "stairs-1:somethingAhead",
+        "stairs-2:somethingAhead",
+        "stairs_up-1:somethingAhead",
+        "stairs_up-2:somethingAhead",
+        "stairs_up-3:somethingAhead",
+        "pothole-1:somethingAhead",
+        "pothole-2:somethingAhead",
+        "pothole-3:somethingAhead",
+        "wall-1:somethingAhead",
+        "wall-2:somethingAhead",
+        "blocked-1:somethingAhead",
+        "blocked-2:somethingAhead"
+      ]
+    },
+    {
+      "config": "[v1] depth-anything-v2-s-fp32-518",
+      "summary": {
+        "somethingAhead": {
+          "tp": 2,
+          "fp": 0,
+          "fn": 20,
+          "tn": 18,
+          "unanswered": 0,
+          "dangerousErrors": 20,
+          "accuracy": 0.5,
+          "recall": 0.09,
+          "precision": 1
+        },
+        "blocked": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0,
+          "tn": 0,
+          "unanswered": 39,
+          "dangerousErrors": 0,
+          "accuracy": 1,
+          "recall": 1,
+          "precision": 1
+        },
+        "sidewalk": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 0,
+          "unanswered": 40,
+          "dangerousErrors": 0,
+          "accuracy": null,
+          "recall": null,
+          "precision": null
+        },
+        "stairs": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 0,
+          "unanswered": 40,
+          "dangerousErrors": 0,
+          "accuracy": null,
+          "recall": null,
+          "precision": null
+        },
+        "largeObstacle": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 0,
+          "unanswered": 40,
+          "dangerousErrors": 0,
+          "accuracy": null,
+          "recall": null,
+          "precision": null
+        },
+        "traversable": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 1,
+          "unanswered": 39,
+          "dangerousErrors": 0,
+          "accuracy": 1,
+          "recall": null,
+          "precision": null
+        }
+      },
+      "dangerousErrorList": [
+        "puddle-1:somethingAhead",
+        "puddle-2:somethingAhead",
+        "obstacle-1:somethingAhead",
+        "parked_vehicle-1:somethingAhead",
+        "parked_vehicle-2:somethingAhead",
+        "parked_vehicle-3:somethingAhead",
+        "moving_person-1:somethingAhead",
+        "moving_person-2:somethingAhead",
+        "stairs-1:somethingAhead",
+        "stairs-2:somethingAhead",
+        "stairs_up-1:somethingAhead",
+        "stairs_up-2:somethingAhead",
+        "stairs_up-3:somethingAhead",
+        "pothole-1:somethingAhead",
+        "pothole-2:somethingAhead",
+        "pothole-3:somethingAhead",
+        "wall-1:somethingAhead",
+        "wall-2:somethingAhead",
+        "blocked-1:somethingAhead",
+        "blocked-2:somethingAhead"
+      ]
+    },
+    {
+      "config": "[v1] depth-anything-v2-s-q8-518",
+      "summary": {
+        "somethingAhead": {
+          "tp": 2,
+          "fp": 0,
+          "fn": 20,
+          "tn": 18,
+          "unanswered": 0,
+          "dangerousErrors": 20,
+          "accuracy": 0.5,
+          "recall": 0.09,
+          "precision": 1
+        },
+        "blocked": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0,
+          "tn": 0,
+          "unanswered": 39,
+          "dangerousErrors": 0,
+          "accuracy": 1,
+          "recall": 1,
+          "precision": 1
+        },
+        "sidewalk": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 0,
+          "unanswered": 40,
+          "dangerousErrors": 0,
+          "accuracy": null,
+          "recall": null,
+          "precision": null
+        },
+        "stairs": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 0,
+          "unanswered": 40,
+          "dangerousErrors": 0,
+          "accuracy": null,
+          "recall": null,
+          "precision": null
+        },
+        "largeObstacle": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 0,
+          "unanswered": 40,
+          "dangerousErrors": 0,
+          "accuracy": null,
+          "recall": null,
+          "precision": null
+        },
+        "traversable": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "tn": 1,
+          "unanswered": 39,
+          "dangerousErrors": 0,
+          "accuracy": 1,
+          "recall": null,
+          "precision": null
+        }
+      },
+      "dangerousErrorList": [
+        "puddle-1:somethingAhead",
+        "puddle-2:somethingAhead",
+        "obstacle-1:somethingAhead",
+        "parked_vehicle-1:somethingAhead",
+        "parked_vehicle-2:somethingAhead",
+        "parked_vehicle-3:somethingAhead",
+        "moving_person-1:somethingAhead",
+        "moving_person-2:somethingAhead",
+        "stairs-1:somethingAhead",
+        "stairs-2:somethingAhead",
+        "stairs_up-1:somethingAhead",
+        "stairs_up-2:somethingAhead",
+        "stairs_up-3:somethingAhead",
+        "pothole-1:somethingAhead",
+        "pothole-2:somethingAhead",
+        "pothole-3:somethingAhead",
+        "wall-1:somethingAhead",
+        "wall-2:somethingAhead",
+        "blocked-1:somethingAhead",
+        "blocked-2:somethingAhead"
+      ]
+    },
+    {
+      "config": "[v1] seaformer-s-ade-fp32-512 + rfdetr-nano-q8",
+      "summary": {
+        "somethingAhead": {
+          "tp": 20,
+          "fp": 15,
+          "fn": 2,
+          "tn": 3,
+          "unanswered": 0,
+          "dangerousErrors": 2,
+          "accuracy": 0.57,
+          "recall": 0.91,
+          "precision": 0.57
+        },
+        "blocked": {
+          "tp": 2,
+          "fp": 15,
+          "fn": 4,
+          "tn": 19,
+          "unanswered": 0,
+          "dangerousErrors": 4,
+          "accuracy": 0.53,
+          "recall": 0.33,
+          "precision": 0.12
+        },
+        "sidewalk": {
+          "tp": 18,
+          "fp": 0,
+          "fn": 11,
+          "tn": 11,
+          "unanswered": 0,
+          "dangerousErrors": 0,
+          "accuracy": 0.73,
+          "recall": 0.62,
+          "precision": 1
+        },
+        "stairs": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 1,
+          "tn": 34,
+          "unanswered": 0,
+          "dangerousErrors": 1,
+          "accuracy": 0.98,
+          "recall": 0.83,
+          "precision": 1
+        },
+        "largeObstacle": {
+          "tp": 7,
+          "fp": 15,
+          "fn": 3,
+          "tn": 15,
+          "unanswered": 0,
+          "dangerousErrors": 3,
+          "accuracy": 0.55,
+          "recall": 0.7,
+          "precision": 0.32
+        },
+        "traversable": {
+          "tp": 19,
+          "fp": 4,
+          "fn": 15,
+          "tn": 2,
+          "unanswered": 0,
+          "dangerousErrors": 4,
+          "accuracy": 0.53,
+          "recall": 0.56,
+          "precision": 0.83
+        }
+      },
+      "dangerousErrorList": [
+        "stairs-3:stairs",
+        "pothole-1:somethingAhead",
+        "pothole-2:somethingAhead",
+        "wall-1:blocked",
+        "wall-1:traversable",
+        "wall-2:blocked",
+        "wall-2:largeObstacle",
+        "wall-2:traversable",
+        "blocked-1:blocked",
+        "blocked-1:largeObstacle",
+        "blocked-1:traversable",
+        "blocked-2:blocked",
+        "blocked-2:largeObstacle",
+        "blocked-2:traversable"
+      ]
+    },
+    {
+      "config": "[v1] seaformer-s-ade-fp32-512 + dfine-s-q8",
+      "summary": {
+        "somethingAhead": {
+          "tp": 20,
+          "fp": 15,
+          "fn": 2,
+          "tn": 3,
+          "unanswered": 0,
+          "dangerousErrors": 2,
+          "accuracy": 0.57,
+          "recall": 0.91,
+          "precision": 0.57
+        },
+        "blocked": {
+          "tp": 2,
+          "fp": 15,
+          "fn": 4,
+          "tn": 19,
+          "unanswered": 0,
+          "dangerousErrors": 4,
+          "accuracy": 0.53,
+          "recall": 0.33,
+          "precision": 0.12
+        },
+        "sidewalk": {
+          "tp": 18,
+          "fp": 0,
+          "fn": 11,
+          "tn": 11,
+          "unanswered": 0,
+          "dangerousErrors": 0,
+          "accuracy": 0.73,
+          "recall": 0.62,
+          "precision": 1
+        },
+        "stairs": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 1,
+          "tn": 34,
+          "unanswered": 0,
+          "dangerousErrors": 1,
+          "accuracy": 0.98,
+          "recall": 0.83,
+          "precision": 1
+        },
+        "largeObstacle": {
+          "tp": 7,
+          "fp": 15,
+          "fn": 3,
+          "tn": 15,
+          "unanswered": 0,
+          "dangerousErrors": 3,
+          "accuracy": 0.55,
+          "recall": 0.7,
+          "precision": 0.32
+        },
+        "traversable": {
+          "tp": 19,
+          "fp": 4,
+          "fn": 15,
+          "tn": 2,
+          "unanswered": 0,
+          "dangerousErrors": 4,
+          "accuracy": 0.53,
+          "recall": 0.56,
+          "precision": 0.83
+        }
+      },
+      "dangerousErrorList": [
+        "stairs-3:stairs",
+        "pothole-1:somethingAhead",
+        "pothole-2:somethingAhead",
+        "wall-1:blocked",
+        "wall-1:traversable",
+        "wall-2:blocked",
+        "wall-2:largeObstacle",
+        "wall-2:traversable",
+        "blocked-1:blocked",
+        "blocked-1:largeObstacle",
+        "blocked-1:traversable",
+        "blocked-2:blocked",
+        "blocked-2:largeObstacle",
+        "blocked-2:traversable"
+      ]
+    },
+    {
+      "config": "[v1] seaformer-s-ade-fp32-512 + rfdetr-nano-q8 + depth-anything-v2-s-fp32-266",
+      "summary": {
+        "somethingAhead": {
+          "tp": 20,
+          "fp": 15,
+          "fn": 2,
+          "tn": 3,
+          "unanswered": 0,
+          "dangerousErrors": 2,
+          "accuracy": 0.57,
+          "recall": 0.91,
+          "precision": 0.57
+        },
+        "blocked": {
+          "tp": 2,
+          "fp": 15,
+          "fn": 4,
+          "tn": 19,
+          "unanswered": 0,
+          "dangerousErrors": 4,
+          "accuracy": 0.53,
+          "recall": 0.33,
+          "precision": 0.12
+        },
+        "sidewalk": {
+          "tp": 18,
+          "fp": 0,
+          "fn": 11,
+          "tn": 11,
+          "unanswered": 0,
+          "dangerousErrors": 0,
+          "accuracy": 0.73,
+          "recall": 0.62,
+          "precision": 1
+        },
+        "stairs": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 1,
+          "tn": 34,
+          "unanswered": 0,
+          "dangerousErrors": 1,
+          "accuracy": 0.98,
+          "recall": 0.83,
+          "precision": 1
+        },
+        "largeObstacle": {
+          "tp": 7,
+          "fp": 15,
+          "fn": 3,
+          "tn": 15,
+          "unanswered": 0,
+          "dangerousErrors": 3,
+          "accuracy": 0.55,
+          "recall": 0.7,
+          "precision": 0.32
+        },
+        "traversable": {
+          "tp": 19,
+          "fp": 4,
+          "fn": 15,
+          "tn": 2,
+          "unanswered": 0,
+          "dangerousErrors": 4,
+          "accuracy": 0.53,
+          "recall": 0.56,
+          "precision": 0.83
+        }
+      },
+      "dangerousErrorList": [
+        "stairs-3:stairs",
+        "pothole-1:somethingAhead",
+        "pothole-2:somethingAhead",
+        "wall-1:blocked",
+        "wall-1:traversable",
+        "wall-2:blocked",
+        "wall-2:largeObstacle",
+        "wall-2:traversable",
+        "blocked-1:blocked",
+        "blocked-1:largeObstacle",
+        "blocked-1:traversable",
+        "blocked-2:blocked",
+        "blocked-2:largeObstacle",
+        "blocked-2:traversable"
+      ]
+    },
+    {
+      "config": "[v1] segformer-b0-ade-fp32-512 + rfdetr-nano-q8",
+      "summary": {
+        "somethingAhead": {
+          "tp": 19,
+          "fp": 16,
+          "fn": 3,
+          "tn": 2,
+          "unanswered": 0,
+          "dangerousErrors": 3,
+          "accuracy": 0.53,
+          "recall": 0.86,
+          "precision": 0.54
+        },
+        "blocked": {
+          "tp": 3,
+          "fp": 13,
+          "fn": 3,
+          "tn": 21,
+          "unanswered": 0,
+          "dangerousErrors": 3,
+          "accuracy": 0.6,
+          "recall": 0.5,
+          "precision": 0.19
+        },
+        "sidewalk": {
+          "tp": 18,
+          "fp": 1,
+          "fn": 11,
+          "tn": 10,
+          "unanswered": 0,
+          "dangerousErrors": 1,
+          "accuracy": 0.7,
+          "recall": 0.62,
+          "precision": 0.95
+        },
+        "stairs": {
+          "tp": 4,
+          "fp": 0,
+          "fn": 2,
+          "tn": 34,
+          "unanswered": 0,
+          "dangerousErrors": 2,
+          "accuracy": 0.95,
+          "recall": 0.67,
+          "precision": 1
+        },
+        "largeObstacle": {
+          "tp": 8,
+          "fp": 15,
+          "fn": 2,
+          "tn": 15,
+          "unanswered": 0,
+          "dangerousErrors": 2,
+          "accuracy": 0.57,
+          "recall": 0.8,
+          "precision": 0.35
+        },
+        "traversable": {
+          "tp": 21,
+          "fp": 3,
+          "fn": 13,
+          "tn": 3,
+          "unanswered": 0,
+          "dangerousErrors": 3,
+          "accuracy": 0.6,
+          "recall": 0.62,
+          "precision": 0.88
+        }
+      },
+      "dangerousErrorList": [
+        "puddle-2:somethingAhead",
+        "stairs-1:stairs",
+        "stairs-3:stairs",
+        "pothole-1:somethingAhead",
+        "pothole-2:somethingAhead",
+        "wall-2:blocked",
+        "wall-2:traversable",
+        "road_crossing-2:sidewalk",
+        "blocked-1:blocked",
+        "blocked-1:largeObstacle",
+        "blocked-1:traversable",
+        "blocked-2:blocked",
+        "blocked-2:largeObstacle",
+        "blocked-2:traversable"
+      ]
+    },
+    {
+      "config": "[v2] seaformer-s-ade-fp32-512",
+      "summary": {
+        "somethingAhead": {
+          "tp": 20,
+          "fp": 15,
+          "fn": 2,
+          "tn": 3,
+          "unanswered": 0,
+          "dangerousErrors": 2,
+          "accuracy": 0.57,
+          "recall": 0.91,
+          "precision": 0.57
+        },
+        "blocked": {
+          "tp": 6,
+          "fp": 26,
+          "fn": 0,
+          "tn": 8,
+          "unanswered": 0,
+          "dangerousErrors": 0,
+          "accuracy": 0.35,
+          "recall": 1,
+          "precision": 0.19
+        },
+        "sidewalk": {
+          "tp": 18,
+          "fp": 0,
+          "fn": 11,
+          "tn": 11,
+          "unanswered": 0,
+          "dangerousErrors": 0,
+          "accuracy": 0.73,
+          "recall": 0.62,
+          "precision": 1
+        },
+        "stairs": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 1,
+          "tn": 34,
+          "unanswered": 0,
+          "dangerousErrors": 1,
+          "accuracy": 0.98,
+          "recall": 0.83,
+          "precision": 1
+        },
+        "largeObstacle": {
+          "tp": 7,
+          "fp": 14,
+          "fn": 3,
+          "tn": 16,
+          "unanswered": 0,
+          "dangerousErrors": 3,
+          "accuracy": 0.57,
+          "recall": 0.7,
+          "precision": 0.33
+        },
+        "traversable": {
+          "tp": 8,
+          "fp": 0,
+          "fn": 26,
+          "tn": 6,
+          "unanswered": 0,
+          "dangerousErrors": 0,
+          "accuracy": 0.35,
+          "recall": 0.24,
+          "precision": 1
+        }
+      },
+      "dangerousErrorList": [
+        "stairs-3:stairs",
+        "pothole-1:somethingAhead",
+        "pothole-2:somethingAhead",
+        "wall-2:largeObstacle",
+        "blocked-1:largeObstacle",
+        "blocked-2:largeObstacle"
+      ]
+    },
+    {
+      "config": "[v2] seaformer-s-ade-fp32-384",
+      "summary": {
+        "somethingAhead": {
+          "tp": 20,
+          "fp": 15,
+          "fn": 2,
+          "tn": 3,
+          "unanswered": 0,
+          "dangerousErrors": 2,
+          "accuracy": 0.57,
+          "recall": 0.91,
+          "precision": 0.57
+        },
+        "blocked": {
+          "tp": 6,
+          "fp": 25,
+          "fn": 0,
+          "tn": 9,
+          "unanswered": 0,
+          "dangerousErrors": 0,
+          "accuracy": 0.38,
+          "recall": 1,
+          "precision": 0.19
+        },
+        "sidewalk": {
+          "tp": 16,
+          "fp": 1,
+          "fn": 13,
+          "tn": 10,
+          "unanswered": 0,
+          "dangerousErrors": 1,
+          "accuracy": 0.65,
+          "recall": 0.55,
+          "precision": 0.94
+        },
+        "stairs": {
+          "tp": 4,
+          "fp": 0,
+          "fn": 2,
+          "tn": 34,
+          "unanswered": 0,
+          "dangerousErrors": 2,
+          "accuracy": 0.95,
+          "recall": 0.67,
+          "precision": 1
+        },
+        "largeObstacle": {
+          "tp": 8,
+          "fp": 15,
+          "fn": 2,
+          "tn": 15,
+          "unanswered": 0,
+          "dangerousErrors": 2,
+          "accuracy": 0.57,
+          "recall": 0.8,
+          "precision": 0.35
+        },
+        "traversable": {
+          "tp": 9,
+          "fp": 0,
+          "fn": 25,
+          "tn": 6,
+          "unanswered": 0,
+          "dangerousErrors": 0,
+          "accuracy": 0.38,
+          "recall": 0.26,
+          "precision": 1
+        }
+      },
+      "dangerousErrorList": [
+        "moving_person-1:largeObstacle",
+        "stairs-1:stairs",
+        "stairs-3:stairs",
+        "pothole-1:somethingAhead",
+        "pothole-2:somethingAhead",
+        "road_crossing-2:sidewalk",
+        "blocked-1:largeObstacle"
+      ]
+    },
+    {
+      "config": "[v2] segformer-b0-ade-fp32-512",
+      "summary": {
+        "somethingAhead": {
+          "tp": 19,
+          "fp": 16,
+          "fn": 3,
+          "tn": 2,
+          "unanswered": 0,
+          "dangerousErrors": 3,
+          "accuracy": 0.53,
+          "recall": 0.86,
+          "precision": 0.54
+        },
+        "blocked": {
+          "tp": 6,
+          "fp": 26,
+          "fn": 0,
+          "tn": 8,
+          "unanswered": 0,
+          "dangerousErrors": 0,
+          "accuracy": 0.35,
+          "recall": 1,
+          "precision": 0.19
+        },
+        "sidewalk": {
+          "tp": 18,
+          "fp": 1,
+          "fn": 11,
+          "tn": 10,
+          "unanswered": 0,
+          "dangerousErrors": 1,
+          "accuracy": 0.7,
+          "recall": 0.62,
+          "precision": 0.95
+        },
+        "stairs": {
+          "tp": 4,
+          "fp": 0,
+          "fn": 2,
+          "tn": 34,
+          "unanswered": 0,
+          "dangerousErrors": 2,
+          "accuracy": 0.95,
+          "recall": 0.67,
+          "precision": 1
+        },
+        "largeObstacle": {
+          "tp": 8,
+          "fp": 13,
+          "fn": 2,
+          "tn": 17,
+          "unanswered": 0,
+          "dangerousErrors": 2,
+          "accuracy": 0.63,
+          "recall": 0.8,
+          "precision": 0.38
+        },
+        "traversable": {
+          "tp": 8,
+          "fp": 0,
+          "fn": 26,
+          "tn": 6,
+          "unanswered": 0,
+          "dangerousErrors": 0,
+          "accuracy": 0.35,
+          "recall": 0.24,
+          "precision": 1
+        }
+      },
+      "dangerousErrorList": [
+        "puddle-2:somethingAhead",
+        "stairs-1:stairs",
+        "stairs-3:stairs",
+        "pothole-1:somethingAhead",
+        "pothole-2:somethingAhead",
+        "road_crossing-2:sidewalk",
+        "blocked-1:largeObstacle",
+        "blocked-2:largeObstacle"
+      ]
+    },
+    {
+      "config": "[v2] seaformer-s-ade-fp32-512 + depth-anything-v2-s-fp32-266",
+      "summary": {
+        "somethingAhead": {
+          "tp": 20,
+          "fp": 15,
+          "fn": 2,
+          "tn": 3,
+          "unanswered": 0,
+          "dangerousErrors": 2,
+          "accuracy": 0.57,
+          "recall": 0.91,
+          "precision": 0.57
+        },
+        "blocked": {
+          "tp": 2,
+          "fp": 6,
+          "fn": 4,
+          "tn": 28,
+          "unanswered": 0,
+          "dangerousErrors": 4,
+          "accuracy": 0.75,
+          "recall": 0.33,
+          "precision": 0.25
+        },
+        "sidewalk": {
+          "tp": 18,
+          "fp": 0,
+          "fn": 11,
+          "tn": 11,
+          "unanswered": 0,
+          "dangerousErrors": 0,
+          "accuracy": 0.73,
+          "recall": 0.62,
+          "precision": 1
+        },
+        "stairs": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 1,
+          "tn": 34,
+          "unanswered": 0,
+          "dangerousErrors": 1,
+          "accuracy": 0.98,
+          "recall": 0.83,
+          "precision": 1
+        },
+        "largeObstacle": {
+          "tp": 7,
+          "fp": 14,
+          "fn": 3,
+          "tn": 16,
+          "unanswered": 0,
+          "dangerousErrors": 3,
+          "accuracy": 0.57,
+          "recall": 0.7,
+          "precision": 0.33
+        },
+        "traversable": {
+          "tp": 27,
+          "fp": 4,
+          "fn": 7,
+          "tn": 2,
+          "unanswered": 0,
+          "dangerousErrors": 4,
+          "accuracy": 0.73,
+          "recall": 0.79,
+          "precision": 0.87
+        }
+      },
+      "dangerousErrorList": [
+        "parked_vehicle-2:blocked",
+        "parked_vehicle-2:traversable",
+        "stairs-3:stairs",
+        "pothole-1:somethingAhead",
+        "pothole-2:somethingAhead",
+        "wall-2:blocked",
+        "wall-2:largeObstacle",
+        "wall-2:traversable",
+        "blocked-1:blocked",
+        "blocked-1:largeObstacle",
+        "blocked-1:traversable",
+        "blocked-2:blocked",
+        "blocked-2:largeObstacle",
+        "blocked-2:traversable"
+      ]
+    },
+    {
+      "config": "[v2] seaformer-s-ade-fp32-512 + rfdetr-nano-q8 + depth-anything-v2-s-fp32-266",
+      "summary": {
+        "somethingAhead": {
+          "tp": 20,
+          "fp": 15,
+          "fn": 2,
+          "tn": 3,
+          "unanswered": 0,
+          "dangerousErrors": 2,
+          "accuracy": 0.57,
+          "recall": 0.91,
+          "precision": 0.57
+        },
+        "blocked": {
+          "tp": 3,
+          "fp": 7,
+          "fn": 3,
+          "tn": 27,
+          "unanswered": 0,
+          "dangerousErrors": 3,
+          "accuracy": 0.75,
+          "recall": 0.5,
+          "precision": 0.3
+        },
+        "sidewalk": {
+          "tp": 18,
+          "fp": 0,
+          "fn": 11,
+          "tn": 11,
+          "unanswered": 0,
+          "dangerousErrors": 0,
+          "accuracy": 0.73,
+          "recall": 0.62,
+          "precision": 1
+        },
+        "stairs": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 1,
+          "tn": 34,
+          "unanswered": 0,
+          "dangerousErrors": 1,
+          "accuracy": 0.98,
+          "recall": 0.83,
+          "precision": 1
+        },
+        "largeObstacle": {
+          "tp": 7,
+          "fp": 15,
+          "fn": 3,
+          "tn": 15,
+          "unanswered": 0,
+          "dangerousErrors": 3,
+          "accuracy": 0.55,
+          "recall": 0.7,
+          "precision": 0.32
+        },
+        "traversable": {
+          "tp": 26,
+          "fp": 3,
+          "fn": 8,
+          "tn": 3,
+          "unanswered": 0,
+          "dangerousErrors": 3,
+          "accuracy": 0.73,
+          "recall": 0.76,
+          "precision": 0.9
+        }
+      },
+      "dangerousErrorList": [
+        "stairs-3:stairs",
+        "pothole-1:somethingAhead",
+        "pothole-2:somethingAhead",
+        "wall-2:blocked",
+        "wall-2:largeObstacle",
+        "wall-2:traversable",
+        "blocked-1:blocked",
+        "blocked-1:largeObstacle",
+        "blocked-1:traversable",
+        "blocked-2:blocked",
+        "blocked-2:largeObstacle",
+        "blocked-2:traversable"
+      ]
+    },
+    {
+      "config": "[v2] segformer-b0-ade-fp32-512 + rfdetr-nano-q8 + depth-anything-v2-s-fp32-266",
+      "summary": {
+        "somethingAhead": {
+          "tp": 19,
+          "fp": 16,
+          "fn": 3,
+          "tn": 2,
+          "unanswered": 0,
+          "dangerousErrors": 3,
+          "accuracy": 0.53,
+          "recall": 0.86,
+          "precision": 0.54
+        },
+        "blocked": {
+          "tp": 4,
+          "fp": 6,
+          "fn": 2,
+          "tn": 28,
+          "unanswered": 0,
+          "dangerousErrors": 2,
+          "accuracy": 0.8,
+          "recall": 0.67,
+          "precision": 0.4
+        },
+        "sidewalk": {
+          "tp": 18,
+          "fp": 1,
+          "fn": 11,
+          "tn": 10,
+          "unanswered": 0,
+          "dangerousErrors": 1,
+          "accuracy": 0.7,
+          "recall": 0.62,
+          "precision": 0.95
+        },
+        "stairs": {
+          "tp": 4,
+          "fp": 0,
+          "fn": 2,
+          "tn": 34,
+          "unanswered": 0,
+          "dangerousErrors": 2,
+          "accuracy": 0.95,
+          "recall": 0.67,
+          "precision": 1
+        },
+        "largeObstacle": {
+          "tp": 8,
+          "fp": 15,
+          "fn": 2,
+          "tn": 15,
+          "unanswered": 0,
+          "dangerousErrors": 2,
+          "accuracy": 0.57,
+          "recall": 0.8,
+          "precision": 0.35
+        },
+        "traversable": {
+          "tp": 27,
+          "fp": 2,
+          "fn": 7,
+          "tn": 4,
+          "unanswered": 0,
+          "dangerousErrors": 2,
+          "accuracy": 0.78,
+          "recall": 0.79,
+          "precision": 0.93
+        }
+      },
+      "dangerousErrorList": [
+        "puddle-2:somethingAhead",
+        "stairs-1:stairs",
+        "stairs-3:stairs",
+        "pothole-1:somethingAhead",
+        "pothole-2:somethingAhead",
+        "road_crossing-2:sidewalk",
+        "blocked-1:blocked",
+        "blocked-1:largeObstacle",
+        "blocked-1:traversable",
+        "blocked-2:blocked",
+        "blocked-2:largeObstacle",
+        "blocked-2:traversable"
+      ]
+    }
+  ],
+  "safety": [
+    {
+      "config": "[v1] seaformer-s-ade-fp32-512",
+      "meetsFloor": 33,
+      "fixtureMeetsFloor": 40,
+      "total": 40,
+      "saidSafe": 0,
+      "unnecessaryStops": [
+        "clear-2",
+        "clear-3",
+        "clear_road-2",
+        "puddle-2",
+        "parked_vehicle-2",
+        "moving_person-2",
+        "narrow_path-1",
+        "narrow_path-2",
+        "narrow_path-3",
+        "low_light-2",
+        "uncertain-2"
+      ],
+      "mustNotBeSafeViolations": [],
+      "belowFloor": [
+        "pothole-1 (caution < danger)",
+        "pothole-2 (caution < danger)",
+        "wall-1 (caution < critical)",
+        "wall-2 (caution < critical)",
+        "road_crossing-2 (caution < danger)",
+        "blocked-1 (caution < critical)",
+        "blocked-2 (caution < critical)"
+      ],
+      "rows": [
+        {
+          "id": "clear-1",
+          "floor": "safe",
+          "fixtureLevel": "safe",
+          "localLevel": "caution",
+          "localAction": "continue_cautiously",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "clear-2",
+          "floor": "safe",
+          "fixtureLevel": "safe",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": true,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "clear-3",
+          "floor": "safe",
+          "fixtureLevel": "safe",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": true,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "clear_road-1",
+          "floor": "safe",
+          "fixtureLevel": "safe",
+          "localLevel": "caution",
+          "localAction": "continue_cautiously",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "clear_road-2",
+          "floor": "safe",
+          "fixtureLevel": "safe",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": true,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "puddle-1",
+          "floor": "caution",
+          "fixtureLevel": "caution",
+          "localLevel": "caution",
+          "localAction": "slow_down",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "puddle-2",
+          "floor": "caution",
+          "fixtureLevel": "caution",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": true,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "obstacle-1",
+          "floor": "caution",
+          "fixtureLevel": "danger",
+          "localLevel": "caution",
+          "localAction": "slow_down",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "obstacle-2",
+          "floor": "caution",
+          "fixtureLevel": "danger",
+          "localLevel": "caution",
+          "localAction": "slow_down",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "parked_vehicle-1",
+          "floor": "caution",
+          "fixtureLevel": "critical",
+          "localLevel": "caution",
+          "localAction": "slow_down",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "parked_vehicle-2",
+          "floor": "caution",
+          "fixtureLevel": "critical",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": true,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "parked_vehicle-3",
+          "floor": "caution",
+          "fixtureLevel": "critical",
+          "localLevel": "caution",
+          "localAction": "slow_down",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "moving_person-1",
+          "floor": "caution",
+          "fixtureLevel": "caution",
+          "localLevel": "caution",
+          "localAction": "slow_down",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "moving_person-2",
+          "floor": "caution",
+          "fixtureLevel": "caution",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": true,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "stairs-1",
+          "floor": "danger",
+          "fixtureLevel": "critical",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "stairs-2",
+          "floor": "danger",
+          "fixtureLevel": "critical",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "stairs-3",
+          "floor": "danger",
+          "fixtureLevel": "critical",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "stairs_up-1",
+          "floor": "danger",
+          "fixtureLevel": "critical",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "stairs_up-2",
+          "floor": "danger",
+          "fixtureLevel": "critical",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "stairs_up-3",
+          "floor": "danger",
+          "fixtureLevel": "critical",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "curb-1",
+          "floor": "caution",
+          "fixtureLevel": "caution",
+          "localLevel": "caution",
+          "localAction": "continue_cautiously",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "curb-2",
+          "floor": "caution",
+          "fixtureLevel": "caution",
+          "localLevel": "caution",
+          "localAction": "continue_cautiously",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "pothole-1",
+          "floor": "danger",
+          "fixtureLevel": "critical",
+          "localLevel": "caution",
+          "localAction": "continue_cautiously",
+          "meetsFloor": false,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "pothole-2",
+          "floor": "danger",
+          "fixtureLevel": "critical",
+          "localLevel": "caution",
+          "localAction": "continue_cautiously",
+          "meetsFloor": false,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "pothole-3",
+          "floor": "danger",
+          "fixtureLevel": "critical",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "wall-1",
+          "floor": "critical",
+          "fixtureLevel": "critical",
+          "localLevel": "caution",
+          "localAction": "slow_down",
+          "meetsFloor": false,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "wall-2",
+          "floor": "critical",
+          "fixtureLevel": "critical",
+          "localLevel": "caution",
+          "localAction": "slow_down",
+          "meetsFloor": false,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "narrow_path-1",
+          "floor": "caution",
+          "fixtureLevel": "danger",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": true,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "narrow_path-2",
+          "floor": "caution",
+          "fixtureLevel": "danger",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": true,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "narrow_path-3",
+          "floor": "caution",
+          "fixtureLevel": "danger",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": true,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "road_crossing-1",
+          "floor": "danger",
+          "fixtureLevel": "danger",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "road_crossing-2",
+          "floor": "danger",
+          "fixtureLevel": "danger",
+          "localLevel": "caution",
+          "localAction": "continue_cautiously",
+          "meetsFloor": false,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "blocked-1",
+          "floor": "critical",
+          "fixtureLevel": "critical",
+          "localLevel": "caution",
+          "localAction": "slow_down",
+          "meetsFloor": false,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "blocked-2",
+          "floor": "critical",
+          "fixtureLevel": "critical",
+          "localLevel": "caution",
+          "localAction": "slow_down",
+          "meetsFloor": false,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "blocked-3",
+          "floor": "critical",
+          "fixtureLevel": "critical",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "low_light-1",
+          "floor": "caution",
+          "fixtureLevel": "caution",
+          "localLevel": "caution",
+          "localAction": "slow_down",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "low_light-2",
+          "floor": "caution",
+          "fixtureLevel": "caution",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": true,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "low_light-3",
+          "floor": "caution",
+          "fixtureLevel": "caution",
+          "localLevel": "caution",
+          "localAction": "slow_down",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "uncertain-1",
+          "floor": "caution",
+          "fixtureLevel": "caution",
+          "localLevel": "caution",
+          "localAction": "continue_cautiously",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "uncertain-2",
+          "floor": "caution",
+          "fixtureLevel": "caution",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": true,
+          "mustNotBeSafeViolation": false
+        }
+      ]
+    },
+    {
+      "config": "[v1] seaformer-s-ade-fp32-512 + rfdetr-nano-q8",
+      "meetsFloor": 33,
+      "fixtureMeetsFloor": 40,
+      "total": 40,
+      "saidSafe": 0,
+      "unnecessaryStops": [
+        "clear-2",
+        "clear-3",
+        "clear_road-2",
+        "puddle-2",
+        "parked_vehicle-1",
+        "parked_vehicle-2",
+        "moving_person-1",
+        "moving_person-2",
+        "narrow_path-1",
+        "narrow_path-2",
+        "narrow_path-3",
+        "low_light-2",
+        "uncertain-2"
+      ],
+      "mustNotBeSafeViolations": [],
+      "belowFloor": [
+        "pothole-1 (caution < danger)",
+        "pothole-2 (caution < danger)",
+        "wall-1 (caution < critical)",
+        "wall-2 (caution < critical)",
+        "road_crossing-2 (caution < danger)",
+        "blocked-1 (caution < critical)",
+        "blocked-2 (caution < critical)"
+      ],
+      "rows": [
+        {
+          "id": "clear-1",
+          "floor": "safe",
+          "fixtureLevel": "safe",
+          "localLevel": "caution",
+          "localAction": "continue_cautiously",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "clear-2",
+          "floor": "safe",
+          "fixtureLevel": "safe",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": true,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "clear-3",
+          "floor": "safe",
+          "fixtureLevel": "safe",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": true,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "clear_road-1",
+          "floor": "safe",
+          "fixtureLevel": "safe",
+          "localLevel": "caution",
+          "localAction": "continue_cautiously",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "clear_road-2",
+          "floor": "safe",
+          "fixtureLevel": "safe",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": true,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "puddle-1",
+          "floor": "caution",
+          "fixtureLevel": "caution",
+          "localLevel": "caution",
+          "localAction": "slow_down",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "puddle-2",
+          "floor": "caution",
+          "fixtureLevel": "caution",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": true,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "obstacle-1",
+          "floor": "caution",
+          "fixtureLevel": "danger",
+          "localLevel": "caution",
+          "localAction": "slow_down",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "obstacle-2",
+          "floor": "caution",
+          "fixtureLevel": "danger",
+          "localLevel": "caution",
+          "localAction": "slow_down",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "parked_vehicle-1",
+          "floor": "caution",
+          "fixtureLevel": "critical",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": true,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "parked_vehicle-2",
+          "floor": "caution",
+          "fixtureLevel": "critical",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": true,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "parked_vehicle-3",
+          "floor": "caution",
+          "fixtureLevel": "critical",
+          "localLevel": "caution",
+          "localAction": "slow_down",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "moving_person-1",
+          "floor": "caution",
+          "fixtureLevel": "caution",
+          "localLevel": "danger",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": true,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "moving_person-2",
+          "floor": "caution",
+          "fixtureLevel": "caution",
+          "localLevel": "danger",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": true,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "stairs-1",
+          "floor": "danger",
+          "fixtureLevel": "critical",
+          "localLevel": "danger",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "stairs-2",
+          "floor": "danger",
+          "fixtureLevel": "critical",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "stairs-3",
+          "floor": "danger",
+          "fixtureLevel": "critical",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "stairs_up-1",
+          "floor": "danger",
+          "fixtureLevel": "critical",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "stairs_up-2",
+          "floor": "danger",
+          "fixtureLevel": "critical",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "stairs_up-3",
+          "floor": "danger",
+          "fixtureLevel": "critical",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "curb-1",
+          "floor": "caution",
+          "fixtureLevel": "caution",
+          "localLevel": "caution",
+          "localAction": "continue_cautiously",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "curb-2",
+          "floor": "caution",
+          "fixtureLevel": "caution",
+          "localLevel": "caution",
+          "localAction": "slow_down",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "pothole-1",
+          "floor": "danger",
+          "fixtureLevel": "critical",
+          "localLevel": "caution",
+          "localAction": "continue_cautiously",
+          "meetsFloor": false,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "pothole-2",
+          "floor": "danger",
+          "fixtureLevel": "critical",
+          "localLevel": "caution",
+          "localAction": "continue_cautiously",
+          "meetsFloor": false,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "pothole-3",
+          "floor": "danger",
+          "fixtureLevel": "critical",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "wall-1",
+          "floor": "critical",
+          "fixtureLevel": "critical",
+          "localLevel": "caution",
+          "localAction": "slow_down",
+          "meetsFloor": false,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "wall-2",
+          "floor": "critical",
+          "fixtureLevel": "critical",
+          "localLevel": "caution",
+          "localAction": "slow_down",
+          "meetsFloor": false,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "narrow_path-1",
+          "floor": "caution",
+          "fixtureLevel": "danger",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": true,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "narrow_path-2",
+          "floor": "caution",
+          "fixtureLevel": "danger",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": true,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "narrow_path-3",
+          "floor": "caution",
+          "fixtureLevel": "danger",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": true,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "road_crossing-1",
+          "floor": "danger",
+          "fixtureLevel": "danger",
+          "localLevel": "danger",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "road_crossing-2",
+          "floor": "danger",
+          "fixtureLevel": "danger",
+          "localLevel": "caution",
+          "localAction": "slow_down",
+          "meetsFloor": false,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "blocked-1",
+          "floor": "critical",
+          "fixtureLevel": "critical",
+          "localLevel": "caution",
+          "localAction": "slow_down",
+          "meetsFloor": false,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "blocked-2",
+          "floor": "critical",
+          "fixtureLevel": "critical",
+          "localLevel": "caution",
+          "localAction": "slow_down",
+          "meetsFloor": false,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "blocked-3",
+          "floor": "critical",
+          "fixtureLevel": "critical",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "low_light-1",
+          "floor": "caution",
+          "fixtureLevel": "caution",
+          "localLevel": "caution",
+          "localAction": "slow_down",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "low_light-2",
+          "floor": "caution",
+          "fixtureLevel": "caution",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": true,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "low_light-3",
+          "floor": "caution",
+          "fixtureLevel": "caution",
+          "localLevel": "caution",
+          "localAction": "slow_down",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "uncertain-1",
+          "floor": "caution",
+          "fixtureLevel": "caution",
+          "localLevel": "caution",
+          "localAction": "slow_down",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "uncertain-2",
+          "floor": "caution",
+          "fixtureLevel": "caution",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": true,
+          "mustNotBeSafeViolation": false
+        }
+      ]
+    },
+    {
+      "config": "[v1] segformer-b0-ade-fp32-512 + rfdetr-nano-q8",
+      "meetsFloor": 34,
+      "fixtureMeetsFloor": 40,
+      "total": 40,
+      "saidSafe": 0,
+      "unnecessaryStops": [
+        "clear-2",
+        "clear-3",
+        "clear_road-2",
+        "parked_vehicle-1",
+        "parked_vehicle-2",
+        "moving_person-1",
+        "moving_person-2",
+        "curb-1",
+        "narrow_path-2",
+        "narrow_path-3",
+        "low_light-2",
+        "uncertain-2"
+      ],
+      "mustNotBeSafeViolations": [],
+      "belowFloor": [
+        "pothole-1 (caution < danger)",
+        "pothole-2 (caution < danger)",
+        "wall-2 (caution < critical)",
+        "road_crossing-2 (caution < danger)",
+        "blocked-1 (caution < critical)",
+        "blocked-2 (caution < critical)"
+      ],
+      "rows": [
+        {
+          "id": "clear-1",
+          "floor": "safe",
+          "fixtureLevel": "safe",
+          "localLevel": "caution",
+          "localAction": "continue_cautiously",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "clear-2",
+          "floor": "safe",
+          "fixtureLevel": "safe",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": true,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "clear-3",
+          "floor": "safe",
+          "fixtureLevel": "safe",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": true,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "clear_road-1",
+          "floor": "safe",
+          "fixtureLevel": "safe",
+          "localLevel": "caution",
+          "localAction": "continue_cautiously",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "clear_road-2",
+          "floor": "safe",
+          "fixtureLevel": "safe",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": true,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "puddle-1",
+          "floor": "caution",
+          "fixtureLevel": "caution",
+          "localLevel": "caution",
+          "localAction": "slow_down",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "puddle-2",
+          "floor": "caution",
+          "fixtureLevel": "caution",
+          "localLevel": "caution",
+          "localAction": "continue_cautiously",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "obstacle-1",
+          "floor": "caution",
+          "fixtureLevel": "danger",
+          "localLevel": "caution",
+          "localAction": "slow_down",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "obstacle-2",
+          "floor": "caution",
+          "fixtureLevel": "danger",
+          "localLevel": "caution",
+          "localAction": "slow_down",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "parked_vehicle-1",
+          "floor": "caution",
+          "fixtureLevel": "critical",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": true,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "parked_vehicle-2",
+          "floor": "caution",
+          "fixtureLevel": "critical",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": true,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "parked_vehicle-3",
+          "floor": "caution",
+          "fixtureLevel": "critical",
+          "localLevel": "caution",
+          "localAction": "slow_down",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "moving_person-1",
+          "floor": "caution",
+          "fixtureLevel": "caution",
+          "localLevel": "danger",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": true,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "moving_person-2",
+          "floor": "caution",
+          "fixtureLevel": "caution",
+          "localLevel": "danger",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": true,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "stairs-1",
+          "floor": "danger",
+          "fixtureLevel": "critical",
+          "localLevel": "danger",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "stairs-2",
+          "floor": "danger",
+          "fixtureLevel": "critical",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "stairs-3",
+          "floor": "danger",
+          "fixtureLevel": "critical",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "stairs_up-1",
+          "floor": "danger",
+          "fixtureLevel": "critical",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "stairs_up-2",
+          "floor": "danger",
+          "fixtureLevel": "critical",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "stairs_up-3",
+          "floor": "danger",
+          "fixtureLevel": "critical",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "curb-1",
+          "floor": "caution",
+          "fixtureLevel": "caution",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": true,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "curb-2",
+          "floor": "caution",
+          "fixtureLevel": "caution",
+          "localLevel": "caution",
+          "localAction": "slow_down",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "pothole-1",
+          "floor": "danger",
+          "fixtureLevel": "critical",
+          "localLevel": "caution",
+          "localAction": "continue_cautiously",
+          "meetsFloor": false,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "pothole-2",
+          "floor": "danger",
+          "fixtureLevel": "critical",
+          "localLevel": "caution",
+          "localAction": "continue_cautiously",
+          "meetsFloor": false,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "pothole-3",
+          "floor": "danger",
+          "fixtureLevel": "critical",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "wall-1",
+          "floor": "critical",
+          "fixtureLevel": "critical",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "wall-2",
+          "floor": "critical",
+          "fixtureLevel": "critical",
+          "localLevel": "caution",
+          "localAction": "slow_down",
+          "meetsFloor": false,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "narrow_path-1",
+          "floor": "caution",
+          "fixtureLevel": "danger",
+          "localLevel": "caution",
+          "localAction": "slow_down",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "narrow_path-2",
+          "floor": "caution",
+          "fixtureLevel": "danger",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": true,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "narrow_path-3",
+          "floor": "caution",
+          "fixtureLevel": "danger",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": true,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "road_crossing-1",
+          "floor": "danger",
+          "fixtureLevel": "danger",
+          "localLevel": "danger",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "road_crossing-2",
+          "floor": "danger",
+          "fixtureLevel": "danger",
+          "localLevel": "caution",
+          "localAction": "slow_down",
+          "meetsFloor": false,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "blocked-1",
+          "floor": "critical",
+          "fixtureLevel": "critical",
+          "localLevel": "caution",
+          "localAction": "slow_down",
+          "meetsFloor": false,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "blocked-2",
+          "floor": "critical",
+          "fixtureLevel": "critical",
+          "localLevel": "caution",
+          "localAction": "slow_down",
+          "meetsFloor": false,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "blocked-3",
+          "floor": "critical",
+          "fixtureLevel": "critical",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "low_light-1",
+          "floor": "caution",
+          "fixtureLevel": "caution",
+          "localLevel": "caution",
+          "localAction": "slow_down",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "low_light-2",
+          "floor": "caution",
+          "fixtureLevel": "caution",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": true,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "low_light-3",
+          "floor": "caution",
+          "fixtureLevel": "caution",
+          "localLevel": "caution",
+          "localAction": "slow_down",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "uncertain-1",
+          "floor": "caution",
+          "fixtureLevel": "caution",
+          "localLevel": "caution",
+          "localAction": "slow_down",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "uncertain-2",
+          "floor": "caution",
+          "fixtureLevel": "caution",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": true,
+          "mustNotBeSafeViolation": false
+        }
+      ]
+    },
+    {
+      "config": "[v2] seaformer-s-ade-fp32-512 + rfdetr-nano-q8",
+      "meetsFloor": 38,
+      "fixtureMeetsFloor": 40,
+      "total": 40,
+      "saidSafe": 0,
+      "unnecessaryStops": [
+        "clear-2",
+        "clear-3",
+        "clear_road-2",
+        "puddle-1",
+        "puddle-2",
+        "obstacle-1",
+        "obstacle-2",
+        "parked_vehicle-1",
+        "parked_vehicle-2",
+        "parked_vehicle-3",
+        "moving_person-1",
+        "moving_person-2",
+        "curb-2",
+        "narrow_path-1",
+        "narrow_path-2",
+        "narrow_path-3",
+        "low_light-1",
+        "low_light-2",
+        "low_light-3",
+        "uncertain-1",
+        "uncertain-2"
+      ],
+      "mustNotBeSafeViolations": [],
+      "belowFloor": [
+        "pothole-1 (caution < danger)",
+        "pothole-2 (caution < danger)"
+      ],
+      "rows": [
+        {
+          "id": "clear-1",
+          "floor": "safe",
+          "fixtureLevel": "safe",
+          "localLevel": "caution",
+          "localAction": "continue_cautiously",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "clear-2",
+          "floor": "safe",
+          "fixtureLevel": "safe",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": true,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "clear-3",
+          "floor": "safe",
+          "fixtureLevel": "safe",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": true,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "clear_road-1",
+          "floor": "safe",
+          "fixtureLevel": "safe",
+          "localLevel": "caution",
+          "localAction": "continue_cautiously",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "clear_road-2",
+          "floor": "safe",
+          "fixtureLevel": "safe",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": true,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "puddle-1",
+          "floor": "caution",
+          "fixtureLevel": "caution",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": true,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "puddle-2",
+          "floor": "caution",
+          "fixtureLevel": "caution",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": true,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "obstacle-1",
+          "floor": "caution",
+          "fixtureLevel": "danger",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": true,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "obstacle-2",
+          "floor": "caution",
+          "fixtureLevel": "danger",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": true,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "parked_vehicle-1",
+          "floor": "caution",
+          "fixtureLevel": "critical",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": true,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "parked_vehicle-2",
+          "floor": "caution",
+          "fixtureLevel": "critical",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": true,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "parked_vehicle-3",
+          "floor": "caution",
+          "fixtureLevel": "critical",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": true,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "moving_person-1",
+          "floor": "caution",
+          "fixtureLevel": "caution",
+          "localLevel": "danger",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": true,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "moving_person-2",
+          "floor": "caution",
+          "fixtureLevel": "caution",
+          "localLevel": "danger",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": true,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "stairs-1",
+          "floor": "danger",
+          "fixtureLevel": "critical",
+          "localLevel": "danger",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "stairs-2",
+          "floor": "danger",
+          "fixtureLevel": "critical",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "stairs-3",
+          "floor": "danger",
+          "fixtureLevel": "critical",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "stairs_up-1",
+          "floor": "danger",
+          "fixtureLevel": "critical",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "stairs_up-2",
+          "floor": "danger",
+          "fixtureLevel": "critical",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "stairs_up-3",
+          "floor": "danger",
+          "fixtureLevel": "critical",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "curb-1",
+          "floor": "caution",
+          "fixtureLevel": "caution",
+          "localLevel": "caution",
+          "localAction": "continue_cautiously",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "curb-2",
+          "floor": "caution",
+          "fixtureLevel": "caution",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": true,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "pothole-1",
+          "floor": "danger",
+          "fixtureLevel": "critical",
+          "localLevel": "caution",
+          "localAction": "continue_cautiously",
+          "meetsFloor": false,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "pothole-2",
+          "floor": "danger",
+          "fixtureLevel": "critical",
+          "localLevel": "caution",
+          "localAction": "continue_cautiously",
+          "meetsFloor": false,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "pothole-3",
+          "floor": "danger",
+          "fixtureLevel": "critical",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "wall-1",
+          "floor": "critical",
+          "fixtureLevel": "critical",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "wall-2",
+          "floor": "critical",
+          "fixtureLevel": "critical",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "narrow_path-1",
+          "floor": "caution",
+          "fixtureLevel": "danger",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": true,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "narrow_path-2",
+          "floor": "caution",
+          "fixtureLevel": "danger",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": true,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "narrow_path-3",
+          "floor": "caution",
+          "fixtureLevel": "danger",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": true,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "road_crossing-1",
+          "floor": "danger",
+          "fixtureLevel": "danger",
+          "localLevel": "danger",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "road_crossing-2",
+          "floor": "danger",
+          "fixtureLevel": "danger",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "blocked-1",
+          "floor": "critical",
+          "fixtureLevel": "critical",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "blocked-2",
+          "floor": "critical",
+          "fixtureLevel": "critical",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "blocked-3",
+          "floor": "critical",
+          "fixtureLevel": "critical",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "low_light-1",
+          "floor": "caution",
+          "fixtureLevel": "caution",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": true,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "low_light-2",
+          "floor": "caution",
+          "fixtureLevel": "caution",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": true,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "low_light-3",
+          "floor": "caution",
+          "fixtureLevel": "caution",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": true,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "uncertain-1",
+          "floor": "caution",
+          "fixtureLevel": "caution",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": true,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "uncertain-2",
+          "floor": "caution",
+          "fixtureLevel": "caution",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": true,
+          "mustNotBeSafeViolation": false
+        }
+      ]
+    },
+    {
+      "config": "[v2] seaformer-s-ade-fp32-512 + rfdetr-nano-q8 + depth-anything-v2-s-fp32-266",
+      "meetsFloor": 33,
+      "fixtureMeetsFloor": 40,
+      "total": 40,
+      "saidSafe": 0,
+      "unnecessaryStops": [
+        "clear-2",
+        "clear-3",
+        "puddle-2",
+        "parked_vehicle-1",
+        "parked_vehicle-2",
+        "moving_person-1",
+        "moving_person-2"
+      ],
+      "mustNotBeSafeViolations": [],
+      "belowFloor": [
+        "stairs-3 (caution < danger)",
+        "pothole-1 (caution < danger)",
+        "pothole-2 (caution < danger)",
+        "wall-2 (caution < critical)",
+        "road_crossing-2 (caution < danger)",
+        "blocked-1 (caution < critical)",
+        "blocked-2 (caution < critical)"
+      ],
+      "rows": [
+        {
+          "id": "clear-1",
+          "floor": "safe",
+          "fixtureLevel": "safe",
+          "localLevel": "caution",
+          "localAction": "continue_cautiously",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "clear-2",
+          "floor": "safe",
+          "fixtureLevel": "safe",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": true,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "clear-3",
+          "floor": "safe",
+          "fixtureLevel": "safe",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": true,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "clear_road-1",
+          "floor": "safe",
+          "fixtureLevel": "safe",
+          "localLevel": "caution",
+          "localAction": "continue_cautiously",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "clear_road-2",
+          "floor": "safe",
+          "fixtureLevel": "safe",
+          "localLevel": "caution",
+          "localAction": "slow_down",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "puddle-1",
+          "floor": "caution",
+          "fixtureLevel": "caution",
+          "localLevel": "caution",
+          "localAction": "slow_down",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "puddle-2",
+          "floor": "caution",
+          "fixtureLevel": "caution",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": true,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "obstacle-1",
+          "floor": "caution",
+          "fixtureLevel": "danger",
+          "localLevel": "caution",
+          "localAction": "slow_down",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "obstacle-2",
+          "floor": "caution",
+          "fixtureLevel": "danger",
+          "localLevel": "caution",
+          "localAction": "slow_down",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "parked_vehicle-1",
+          "floor": "caution",
+          "fixtureLevel": "critical",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": true,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "parked_vehicle-2",
+          "floor": "caution",
+          "fixtureLevel": "critical",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": true,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "parked_vehicle-3",
+          "floor": "caution",
+          "fixtureLevel": "critical",
+          "localLevel": "caution",
+          "localAction": "slow_down",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "moving_person-1",
+          "floor": "caution",
+          "fixtureLevel": "caution",
+          "localLevel": "danger",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": true,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "moving_person-2",
+          "floor": "caution",
+          "fixtureLevel": "caution",
+          "localLevel": "danger",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": true,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "stairs-1",
+          "floor": "danger",
+          "fixtureLevel": "critical",
+          "localLevel": "danger",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "stairs-2",
+          "floor": "danger",
+          "fixtureLevel": "critical",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "stairs-3",
+          "floor": "danger",
+          "fixtureLevel": "critical",
+          "localLevel": "caution",
+          "localAction": "slow_down",
+          "meetsFloor": false,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "stairs_up-1",
+          "floor": "danger",
+          "fixtureLevel": "critical",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "stairs_up-2",
+          "floor": "danger",
+          "fixtureLevel": "critical",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "stairs_up-3",
+          "floor": "danger",
+          "fixtureLevel": "critical",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "curb-1",
+          "floor": "caution",
+          "fixtureLevel": "caution",
+          "localLevel": "caution",
+          "localAction": "continue_cautiously",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "curb-2",
+          "floor": "caution",
+          "fixtureLevel": "caution",
+          "localLevel": "caution",
+          "localAction": "slow_down",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "pothole-1",
+          "floor": "danger",
+          "fixtureLevel": "critical",
+          "localLevel": "caution",
+          "localAction": "continue_cautiously",
+          "meetsFloor": false,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "pothole-2",
+          "floor": "danger",
+          "fixtureLevel": "critical",
+          "localLevel": "caution",
+          "localAction": "continue_cautiously",
+          "meetsFloor": false,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "pothole-3",
+          "floor": "danger",
+          "fixtureLevel": "critical",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "wall-1",
+          "floor": "critical",
+          "fixtureLevel": "critical",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "wall-2",
+          "floor": "critical",
+          "fixtureLevel": "critical",
+          "localLevel": "caution",
+          "localAction": "slow_down",
+          "meetsFloor": false,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "narrow_path-1",
+          "floor": "caution",
+          "fixtureLevel": "danger",
+          "localLevel": "caution",
+          "localAction": "slow_down",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "narrow_path-2",
+          "floor": "caution",
+          "fixtureLevel": "danger",
+          "localLevel": "caution",
+          "localAction": "slow_down",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "narrow_path-3",
+          "floor": "caution",
+          "fixtureLevel": "danger",
+          "localLevel": "caution",
+          "localAction": "slow_down",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "road_crossing-1",
+          "floor": "danger",
+          "fixtureLevel": "danger",
+          "localLevel": "danger",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "road_crossing-2",
+          "floor": "danger",
+          "fixtureLevel": "danger",
+          "localLevel": "caution",
+          "localAction": "slow_down",
+          "meetsFloor": false,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "blocked-1",
+          "floor": "critical",
+          "fixtureLevel": "critical",
+          "localLevel": "caution",
+          "localAction": "slow_down",
+          "meetsFloor": false,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "blocked-2",
+          "floor": "critical",
+          "fixtureLevel": "critical",
+          "localLevel": "caution",
+          "localAction": "slow_down",
+          "meetsFloor": false,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "blocked-3",
+          "floor": "critical",
+          "fixtureLevel": "critical",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "low_light-1",
+          "floor": "caution",
+          "fixtureLevel": "caution",
+          "localLevel": "caution",
+          "localAction": "slow_down",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "low_light-2",
+          "floor": "caution",
+          "fixtureLevel": "caution",
+          "localLevel": "caution",
+          "localAction": "slow_down",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "low_light-3",
+          "floor": "caution",
+          "fixtureLevel": "caution",
+          "localLevel": "caution",
+          "localAction": "slow_down",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "uncertain-1",
+          "floor": "caution",
+          "fixtureLevel": "caution",
+          "localLevel": "caution",
+          "localAction": "slow_down",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "uncertain-2",
+          "floor": "caution",
+          "fixtureLevel": "caution",
+          "localLevel": "caution",
+          "localAction": "slow_down",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        }
+      ]
+    },
+    {
+      "config": "[v2] segformer-b0-ade-fp32-512 + rfdetr-nano-q8 + depth-anything-v2-s-fp32-266",
+      "meetsFloor": 34,
+      "fixtureMeetsFloor": 40,
+      "total": 40,
+      "saidSafe": 0,
+      "unnecessaryStops": [
+        "clear-3",
+        "parked_vehicle-1",
+        "parked_vehicle-2",
+        "moving_person-1",
+        "moving_person-2",
+        "curb-1"
+      ],
+      "mustNotBeSafeViolations": [],
+      "belowFloor": [
+        "stairs-3 (caution < danger)",
+        "pothole-1 (caution < danger)",
+        "pothole-2 (caution < danger)",
+        "road_crossing-2 (caution < danger)",
+        "blocked-1 (caution < critical)",
+        "blocked-2 (caution < critical)"
+      ],
+      "rows": [
+        {
+          "id": "clear-1",
+          "floor": "safe",
+          "fixtureLevel": "safe",
+          "localLevel": "caution",
+          "localAction": "continue_cautiously",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "clear-2",
+          "floor": "safe",
+          "fixtureLevel": "safe",
+          "localLevel": "caution",
+          "localAction": "slow_down",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "clear-3",
+          "floor": "safe",
+          "fixtureLevel": "safe",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": true,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "clear_road-1",
+          "floor": "safe",
+          "fixtureLevel": "safe",
+          "localLevel": "caution",
+          "localAction": "continue_cautiously",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "clear_road-2",
+          "floor": "safe",
+          "fixtureLevel": "safe",
+          "localLevel": "caution",
+          "localAction": "slow_down",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "puddle-1",
+          "floor": "caution",
+          "fixtureLevel": "caution",
+          "localLevel": "caution",
+          "localAction": "slow_down",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "puddle-2",
+          "floor": "caution",
+          "fixtureLevel": "caution",
+          "localLevel": "caution",
+          "localAction": "continue_cautiously",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "obstacle-1",
+          "floor": "caution",
+          "fixtureLevel": "danger",
+          "localLevel": "caution",
+          "localAction": "slow_down",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "obstacle-2",
+          "floor": "caution",
+          "fixtureLevel": "danger",
+          "localLevel": "caution",
+          "localAction": "slow_down",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "parked_vehicle-1",
+          "floor": "caution",
+          "fixtureLevel": "critical",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": true,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "parked_vehicle-2",
+          "floor": "caution",
+          "fixtureLevel": "critical",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": true,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "parked_vehicle-3",
+          "floor": "caution",
+          "fixtureLevel": "critical",
+          "localLevel": "caution",
+          "localAction": "slow_down",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "moving_person-1",
+          "floor": "caution",
+          "fixtureLevel": "caution",
+          "localLevel": "danger",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": true,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "moving_person-2",
+          "floor": "caution",
+          "fixtureLevel": "caution",
+          "localLevel": "danger",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": true,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "stairs-1",
+          "floor": "danger",
+          "fixtureLevel": "critical",
+          "localLevel": "danger",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "stairs-2",
+          "floor": "danger",
+          "fixtureLevel": "critical",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "stairs-3",
+          "floor": "danger",
+          "fixtureLevel": "critical",
+          "localLevel": "caution",
+          "localAction": "slow_down",
+          "meetsFloor": false,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "stairs_up-1",
+          "floor": "danger",
+          "fixtureLevel": "critical",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "stairs_up-2",
+          "floor": "danger",
+          "fixtureLevel": "critical",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "stairs_up-3",
+          "floor": "danger",
+          "fixtureLevel": "critical",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "curb-1",
+          "floor": "caution",
+          "fixtureLevel": "caution",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": true,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "curb-2",
+          "floor": "caution",
+          "fixtureLevel": "caution",
+          "localLevel": "caution",
+          "localAction": "slow_down",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "pothole-1",
+          "floor": "danger",
+          "fixtureLevel": "critical",
+          "localLevel": "caution",
+          "localAction": "continue_cautiously",
+          "meetsFloor": false,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "pothole-2",
+          "floor": "danger",
+          "fixtureLevel": "critical",
+          "localLevel": "caution",
+          "localAction": "continue_cautiously",
+          "meetsFloor": false,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "pothole-3",
+          "floor": "danger",
+          "fixtureLevel": "critical",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "wall-1",
+          "floor": "critical",
+          "fixtureLevel": "critical",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "wall-2",
+          "floor": "critical",
+          "fixtureLevel": "critical",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "narrow_path-1",
+          "floor": "caution",
+          "fixtureLevel": "danger",
+          "localLevel": "caution",
+          "localAction": "slow_down",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "narrow_path-2",
+          "floor": "caution",
+          "fixtureLevel": "danger",
+          "localLevel": "caution",
+          "localAction": "slow_down",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "narrow_path-3",
+          "floor": "caution",
+          "fixtureLevel": "danger",
+          "localLevel": "caution",
+          "localAction": "slow_down",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "road_crossing-1",
+          "floor": "danger",
+          "fixtureLevel": "danger",
+          "localLevel": "danger",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "road_crossing-2",
+          "floor": "danger",
+          "fixtureLevel": "danger",
+          "localLevel": "caution",
+          "localAction": "slow_down",
+          "meetsFloor": false,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "blocked-1",
+          "floor": "critical",
+          "fixtureLevel": "critical",
+          "localLevel": "caution",
+          "localAction": "slow_down",
+          "meetsFloor": false,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "blocked-2",
+          "floor": "critical",
+          "fixtureLevel": "critical",
+          "localLevel": "caution",
+          "localAction": "slow_down",
+          "meetsFloor": false,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "blocked-3",
+          "floor": "critical",
+          "fixtureLevel": "critical",
+          "localLevel": "critical",
+          "localAction": "stop",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "low_light-1",
+          "floor": "caution",
+          "fixtureLevel": "caution",
+          "localLevel": "caution",
+          "localAction": "slow_down",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "low_light-2",
+          "floor": "caution",
+          "fixtureLevel": "caution",
+          "localLevel": "caution",
+          "localAction": "slow_down",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "low_light-3",
+          "floor": "caution",
+          "fixtureLevel": "caution",
+          "localLevel": "caution",
+          "localAction": "slow_down",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "uncertain-1",
+          "floor": "caution",
+          "fixtureLevel": "caution",
+          "localLevel": "caution",
+          "localAction": "slow_down",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        },
+        {
+          "id": "uncertain-2",
+          "floor": "caution",
+          "fixtureLevel": "caution",
+          "localLevel": "caution",
+          "localAction": "slow_down",
+          "meetsFloor": true,
+          "overStop": false,
+          "mustNotBeSafeViolation": false
+        }
+      ]
+    }
+  ]
+}

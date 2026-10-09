@@ -1,0 +1,94 @@
+{
+  "reference": "seaformer-s-ade-fp32-512",
+  "rounds": 2,
+  "rows": [
+    {
+      "key": "dfine-n-fp32",
+      "threads": 4,
+      "samples": 80,
+      "medianMs": 175,
+      "p95Ms": 193.2,
+      "relativeToReference": 3.51
+    },
+    {
+      "key": "dfine-n-q8",
+      "threads": 4,
+      "samples": 80,
+      "medianMs": 208.5,
+      "p95Ms": 221.4,
+      "relativeToReference": 4.19
+    },
+    {
+      "key": "rfdetr-nano-q8",
+      "threads": 4,
+      "samples": 80,
+      "medianMs": 238.8,
+      "p95Ms": 257.3,
+      "relativeToReference": 4.8
+    },
+    {
+      "key": "dfine-s-q8",
+      "threads": 4,
+      "samples": 80,
+      "medianMs": 365.1,
+      "p95Ms": 385.6,
+      "relativeToReference": 7.33
+    },
+    {
+      "key": "rtdetrv2-r18-q8",
+      "threads": 4,
+      "samples": 80,
+      "medianMs": 549.1,
+      "p95Ms": 583.4,
+      "relativeToReference": 11.03
+    },
+    {
+      "key": "seaformer-s-ade-fp32-512",
+      "threads": 4,
+      "samples": 80,
+      "medianMs": 49.8,
+      "p95Ms": 59.3,
+      "relativeToReference": 1
+    },
+    {
+      "key": "seaformer-s-ade-fp32-384",
+      "threads": 4,
+      "samples": 80,
+      "medianMs": 30.4,
+      "p95Ms": 38.2,
+      "relativeToReference": 0.61
+    },
+    {
+      "key": "segformer-b0-ade-fp32-512",
+      "threads": 4,
+      "samples": 80,
+      "medianMs": 264.2,
+      "p95Ms": 299.5,
+      "relativeToReference": 5.31
+    },
+    {
+      "key": "segformer-b0-ade-fp32-384",
+      "threads": 4,
+      "samples": 80,
+      "medianMs": 144.1,
+      "p95Ms": 159.7,
+      "relativeToReference": 2.89
+    },
+    {
+      "key": "depth-anything-v2-s-fp32-266",
+      "threads": 4,
+      "samples": 80,
+      "medianMs": 319.7,
+      "p95Ms": 412.3,
+      "relativeToReference": 6.42
+    },
+    {
+      "key": "depth-anything-v2-s-fp32-518",
+      "threads": 4,
+      "samples": 80,
+      "medianMs": 1471.8,
+      "p95Ms": 2050.1,
+      "relativeToReference": 29.55
+    }
+  ]
+}

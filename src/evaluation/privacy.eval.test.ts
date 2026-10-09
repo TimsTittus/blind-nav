@@ -14,8 +14,6 @@ import { describe, expect, it, vi } from "vitest";
 import { ANALYZE_ENDPOINT } from "@/perception/config";
 import { FixtureVisionProvider } from "@/providers/fixture/fixture-provider";
 
-// ── 1. Frames not persisted ───────────────────────────────────────────────────
-
 describe("Privacy 1 — Frames not persisted", () => {
   it("FixtureVisionProvider does not call localStorage.setItem with image data", async () => {
     const setItem = vi.spyOn(Storage.prototype, "setItem");
@@ -44,8 +42,6 @@ describe("Privacy 1 — Frames not persisted", () => {
     expect(ANALYZE_ENDPOINT).not.toContain("telemetry");
   });
 });
-
-// ── 2. No hidden upload ───────────────────────────────────────────────────────
 
 describe("Privacy 2 — No hidden upload", () => {
   it("fetch is only called with the internal analyze endpoint", async () => {
@@ -123,8 +119,6 @@ describe("Privacy 2 — No hidden upload", () => {
   });
 });
 
-// ── 3. No accidental console logging of image data ────────────────────────────
-
 describe("Privacy 3 — No console image logging", () => {
   it("fixture provider does not log data URLs to console", async () => {
     const logSpy = vi.spyOn(console, "log").mockImplementation(() => {
@@ -169,8 +163,6 @@ describe("Privacy 3 — No console image logging", () => {
     }
   });
 });
-
-// ── 4. No sensitive location logging ─────────────────────────────────────────
 
 describe("Privacy 4 — No sensitive location logging", () => {
   it("SafetyEngine does not log location coordinates to console", async () => {

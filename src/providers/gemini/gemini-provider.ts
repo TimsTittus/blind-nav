@@ -47,7 +47,6 @@ export interface GeminiProviderOptions {
 
 const DATA_URL_RE = /^data:([^;,]+)(;base64)?,(.*)$/s;
 
-/** Pull the base64 payload and MIME type out of a `data:` URL. */
 function parseDataUrl(dataUrl: string): { mimeType: string; data: string } {
   const match = DATA_URL_RE.exec(dataUrl);
   if (!match || !match[2]) {

@@ -1,0 +1,9 @@
+node_modules/
+# Downloaded test images (CC-licensed; re-fetch with `bun run fetch-images`).
+data/images/
+# Model cache (re-downloaded on demand).
+.cache/
+models/
+# Per-image raw model outputs (regenerate with `bun run benchmark`).
+results/raw/
+results/browser-run.log

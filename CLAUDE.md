@@ -115,11 +115,19 @@ worker, icons, install prompt), capability detection layer
 five states and permission-change re-detection), CapabilityStatus UI on the
 home page, mobile UI optimizations (prominent STOP button, touch-action
 manipulation, safe-area insets, accidental-touch prevention). `docs/pwa.md`
-documents browser support, permissions, and known limitations. There is still
-no local CV.
+documents expected browser support, permissions, and known limitations; none of
+it has been verified on a real phone yet.
 
-Next up is **Phase 13 — Hardening: failure/lifecycle edge cases end-to-end**.
-Do not start it without being asked.
+**Phase 13 — Local CV research spike (complete, not integrated).** Code lives in
+`spikes/local-cv/` (own `package.json`/`tsconfig`; excluded from the root
+tsconfig, ESLint, and Vitest; nothing in `src/` imports it). Findings and
+recommendation: `docs/local-cv-evaluation.md` (ADR 0026). Gemini is still the
+only provider in the navigation loop; there is no local CV in the app.
+
+Next recommended: **real-device verification** (phones: Phase-12 PWA/camera/
+speech behaviour and the Phase-13 browser benchmark incl. real-GPU WebGPU), then
+hardening of failure/lifecycle edge cases. Do not start either without being
+asked.
 
 DO NOT:
 

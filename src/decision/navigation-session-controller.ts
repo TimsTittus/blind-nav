@@ -72,7 +72,6 @@ export class NavigationSessionController {
   private readonly config: SessionControllerConfig;
   private readonly now: () => number;
 
-  // Subsystems (created on start, torn down on stop)
   private camera: CameraController | null = null;
   private frameCapture: FrameCapture | null = null;
   private frameScheduler: FrameScheduler<CapturedFrame> | null = null;
@@ -86,12 +85,10 @@ export class NavigationSessionController {
   private sceneQueryHandler: SceneQueryHandler | null = null;
   private readonly perfMonitor: PerformanceMonitor;
 
-  // External dependencies
   private readonly analysisClient: AnalysisClient;
   private readonly queryClient: SceneQueryClient;
   private voiceSettings: VoiceSettings;
 
-  // State
   private session: NavigationSession | null = null;
   private phase: SessionPhase = "idle";
   private cameraState: CameraState = "idle";
@@ -118,17 +115,13 @@ export class NavigationSessionController {
     lastError: null,
   };
 
-  // Stats
   private frameCount = 0;
   private fpsWindowStart = 0;
   private fps = 0;
   private aiRequestCount = 0;
   private lastSpeechAt: number | null = null;
 
-  // Listeners
   private readonly listeners = new Set<Listener>();
-
-  // Cleanup registrations
   private cleanups: Array<() => void> = [];
   private safetyInterval: ReturnType<typeof setInterval> | null = null;
 
@@ -145,8 +138,6 @@ export class NavigationSessionController {
     this.now = deps.now ?? (() => Date.now());
     this.perfMonitor = new PerformanceMonitor({ now: this.now });
   }
-
-  // ── useSyncExternalStore interface ───────────────────────────────
 
   subscribe = (listener: Listener): (() => void) => {
     this.listeners.add(listener);
@@ -167,8 +158,6 @@ export class NavigationSessionController {
       query: this.querySnapshot,
     };
   };
-
-  // ── Lifecycle ────────────────────────────────────────────────────
 
   async start(session: NavigationSession): Promise<void> {
     if (this.phase !== "idle" && this.phase !== "stopped") return;
@@ -236,8 +225,6 @@ export class NavigationSessionController {
     return this.perfMonitor.getMetrics();
   }
 
-  // ── Voice settings ───────────────────────────────────────────────
-
   updateVoiceSettings(settings: VoiceSettings): void {
     this.voiceSettings = settings;
     if (this.speechEngine) {
@@ -251,8 +238,6 @@ export class NavigationSessionController {
     if (!next) this.speechEngine?.stop();
   }
 
-  // ── Scene queries ────────────────────────────────────────────────
-
   submitQuery(question: string): void {
     if (this.phase !== "running" || !this.sceneQueryHandler) return;
     void this.sceneQueryHandler.submitQuestion(question);
@@ -261,8 +246,6 @@ export class NavigationSessionController {
   cancelQuery(): void {
     this.sceneQueryHandler?.cancel();
   }
-
-  // ── Video attachment (for CameraViewport) ────────────────────────
 
   attachVideo(element: HTMLVideoElement | null): void {
     this.camera?.attachVideo(element);
@@ -287,8 +270,6 @@ export class NavigationSessionController {
   startCamera(): void {
     void this.camera?.start();
   }
-
-  // ── Private: subsystem creation ──────────────────────────────────
 
   private createSubsystems(): void {
     this.camera = new CameraController();
@@ -398,8 +379,6 @@ export class NavigationSessionController {
     this.sceneQueryHandler = null;
   }
 
-  // ── Private: frame pipeline ──────────────────────────────────────
-
   private async onFrame(frame: CapturedFrame): Promise<void> {
     const captureLatency = this.now() - frame.capturedAt;
     this.perfMonitor.recordFrameCapture(captureLatency);
@@ -424,8 +403,6 @@ export class NavigationSessionController {
     this.lastError = message;
     this.notify();
   }
-
-  // ── Private: perception → safety ─────────────────────────────────
 
   private onPerceptionUpdate(prev: PerceptionState): void {
     if (this.phase !== "running") return;
@@ -478,8 +455,6 @@ export class NavigationSessionController {
     );
   }
 
-  // ── Private: safety loop (re-evaluate on expiry) ─────────────────
-
   private startSafetyLoop(): void {
     this.safetyInterval = setInterval(() => {
       if (this.phase !== "running") return;
@@ -500,8 +475,6 @@ export class NavigationSessionController {
     }
   }
 
-  // ── Private: location → route ────────────────────────────────────
-
   private onLocationUpdate(): void {
     this.perfMonitor.recordGpsUpdate(
       this.locationSnapshot.location?.accuracyMeters ?? null,
@@ -521,8 +494,6 @@ export class NavigationSessionController {
     this.routeState = this.routeTracker.state;
   }
 
-  // ── Private: freshness ───────────────────────────────────────────
-
   private computeFreshness(): PerceptionFreshness {
     return this.computeFreshnessWith(this.perceptionState);
   }
@@ -534,8 +505,6 @@ export class NavigationSessionController {
     if (age <= this.config.agingThresholdMs) return "aging";
     return "stale";
   }
-
-  // ── Private: stats ───────────────────────────────────────────────
 
   private resetStats(): void {
     this.frameCount = 0;
@@ -564,8 +533,6 @@ export class NavigationSessionController {
       lastSpeechAt: this.lastSpeechAt,
     };
   }
-
-  // ── Private: state management ────────────────────────────────────
 
   private setPhase(phase: SessionPhase): void {
     this.phase = phase;

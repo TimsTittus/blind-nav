@@ -1,6 +1,7 @@
 # Architecture
 
-Status: **Phase 12 (Installable PWA + capability detection + mobile UI)**;
+Status: **Phase 13 (local CV research spike — evaluation only, not integrated)**;
+Phase 12 added the installable PWA, capability detection and mobile UI,
 Phase 11 added the evaluation framework, Phase 10 added performance profiling
 and optimization (PerformanceMonitor, WebP frame encoding, DuplicateSuppression
 prune timer), Phase 9 added voice input and Explore Mode, Phase 8 the decision
@@ -277,9 +278,13 @@ next phase is not started automatically.
 11. Evaluation framework — fixture scenes, TP/FP/FN scoring, latency,
     reliability, security, privacy **(done)**.
 12. Installable PWA, capability detection, and mobile UI **(done)**.
-13. Hardening: failure/lifecycle edge cases end-to-end.
+13. Local computer-vision research spike **(done; not integrated)** — see §26.
+14. Real-device verification (phones; PWA behaviour, real-GPU WebGPU) —
+    recommended next.
+15. Hardening: failure/lifecycle edge cases end-to-end.
 
-Later/future: local CV, vest-mounted camera, depth/sensor fusion.
+Later/future: hybrid local + cloud perception (gated on §26 next steps),
+vest-mounted camera, depth/sensor fusion.
 
 ## 15. Navigation Mode UI (added in Phase 2)
 
@@ -707,3 +712,25 @@ visual indicators. Users see upfront which capabilities their device supports.
 - `env(safe-area-inset-*)` padding for notched/gestured devices.
 - Light-theme STOP gets box-shadow for outdoor visibility.
 - Standalone PWA hides install prompt, tightens nav padding.
+
+## 26. Local computer-vision research spike (added in Phase 13)
+
+A research spike, not a feature: nothing in `src/` changed. Code is isolated in
+[`spikes/local-cv/`](../spikes/local-cv/README.md); the full report is
+[`docs/local-cv-evaluation.md`](local-cv-evaluation.md) (ADR 0026).
+
+- **Candidates benchmarked** (ONNX Runtime, Node CPU and in-browser WASM):
+  SeaFormer-S and SegFormer-B0 (ADE20K segmentation), RF-DETR nano, D-FINE-S/N,
+  RT-DETRv2-R18, YOLOS-tiny (COCO detection), Depth Anything V2 Small (relative
+  depth). AGPL and CC-BY-NC weights were excluded on license grounds.
+- **Result:** SeaFormer-S was fastest (≈5× SegFormer-B0) and strongest on
+  stairs; segmentation reliably answers _stairs_ and _sidewalk_, but no rule
+  achieved an acceptable miss/false-alarm trade-off for _path blocked_.
+- **Abstraction check:** a prototype `LocalVisionProvider` implements the
+  existing `VisionProvider` interface unchanged, but would be constructed in the
+  browser (not the server route). A prototype hybrid merge keeps the invariant
+  that **local evidence can only add risk** — never `clear`, never removes cloud
+  findings, never sets `recommendedImmediateAction`.
+- **Open before integration:** phone and real-GPU WebGPU measurements, a
+  held-out target-viewpoint dataset, and a legal review of ADE20K-trained
+  weights.

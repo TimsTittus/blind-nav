@@ -32,8 +32,6 @@ import type { VisionProvider } from "@/providers";
 import { createAnalyzeHandler } from "@/app/api/vision/analyze/handler";
 import { TINY_JPEG } from "./helpers";
 
-// ── Shared infrastructure ─────────────────────────────────────────────────────
-
 function errorProvider(error: unknown): VisionProvider {
   return {
     id: "stub-error",
@@ -63,8 +61,6 @@ async function parseResponse(r: Response): Promise<AnalyzeResponse> {
   return (await r.json()) as AnalyzeResponse;
 }
 
-// ── 1. Network disconnect ─────────────────────────────────────────────────────
-
 describe("Reliability 1 — Network disconnect", () => {
   it("returns a typed failure with perceptionStatus=unavailable", async () => {
     const handler = makeHandler(new NetworkError("Fetch failed."));
@@ -77,8 +73,6 @@ describe("Reliability 1 — Network disconnect", () => {
     expect(res.status).toBe(502);
   });
 });
-
-// ── 2. API timeout ────────────────────────────────────────────────────────────
 
 describe("Reliability 2 — API timeout", () => {
   it("maps timeout to HTTP 504 and marks unavailable", async () => {
@@ -93,8 +87,6 @@ describe("Reliability 2 — API timeout", () => {
   });
 });
 
-// ── 3. API rate limit ─────────────────────────────────────────────────────────
-
 describe("Reliability 3 — API rate limit", () => {
   it("maps rate-limit to HTTP 429 and marks unavailable", async () => {
     const handler = makeHandler(new RateLimitedError("Too many requests."));
@@ -108,8 +100,6 @@ describe("Reliability 3 — API rate limit", () => {
   });
 });
 
-// ── 4. Invalid / malformed AI response ───────────────────────────────────────
-
 describe("Reliability 4 — Invalid AI response", () => {
   it("maps ai_error to HTTP 502 and marks unavailable", async () => {
     const handler = makeHandler(new AiProviderError("Model returned garbage."));
@@ -122,8 +112,6 @@ describe("Reliability 4 — Invalid AI response", () => {
     expect(res.status).toBe(502);
   });
 });
-
-// ── 5. GPS unavailable ────────────────────────────────────────────────────────
 
 describe("Reliability 5 — GPS unavailable", () => {
   it("SafetyEngine handles null location without throwing", async () => {
@@ -158,8 +146,6 @@ describe("Reliability 5 — GPS unavailable", () => {
   });
 });
 
-// ── 6. Camera permission denied ───────────────────────────────────────────────
-
 describe("Reliability 6 — Camera permission denied", () => {
   it("PermissionDeniedError for camera is non-retryable", () => {
     const err = new PermissionDeniedError("camera");
@@ -181,8 +167,6 @@ describe("Reliability 6 — Camera permission denied", () => {
     expect(body.perceptionStatus).toBe("unavailable");
   });
 });
-
-// ── 7. Speech (microphone) unavailable ────────────────────────────────────────
 
 describe("Reliability 7 — Microphone / speech unavailable", () => {
   it("SpeechEngine with unsupported provider accepts speak calls without throwing", async () => {
@@ -213,8 +197,6 @@ describe("Reliability 7 — Microphone / speech unavailable", () => {
     expect(err.retryable).toBe(false);
   });
 });
-
-// ── 8. Tab backgrounding ─────────────────────────────────────────────────────
 
 describe("Reliability 8 — Tab backgrounding", () => {
   it("AnalysisClient aborts in-flight request when abort signal is fired", async () => {
@@ -247,8 +229,6 @@ describe("Reliability 8 — Tab backgrounding", () => {
   });
 });
 
-// ── 9. Device rotation / resize ───────────────────────────────────────────────
-
 describe("Reliability 9 — Device rotation", () => {
   it("FrameCapture fitWithin handles portrait orientation correctly", async () => {
     const { fitWithin } = await import("@/camera/frame-capture");
@@ -268,8 +248,6 @@ describe("Reliability 9 — Device rotation", () => {
     expect(dims.width / dims.height).toBeCloseTo(1920 / 1080, 1);
   });
 });
-
-// ── 10. Session cancellation mid-flight ───────────────────────────────────────
 
 describe("Reliability 10 — Session cancellation", () => {
   it("UnavailableError is retryable", () => {

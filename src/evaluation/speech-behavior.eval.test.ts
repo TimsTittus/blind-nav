@@ -13,8 +13,6 @@ import { DEFAULT_VOICE_SETTINGS } from "@/speech/config";
 import { SpeechEngine } from "@/speech/speech-engine";
 import type { TtsProvider, TtsUtteranceOptions } from "@/speech/tts-provider";
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
-
 function makeSink() {
   const calls: Array<{ text: string; priority: SpeechPriority }> = [];
   const sink: SpeechSink = {
@@ -94,8 +92,6 @@ afterEach(() => {
   engines.length = 0;
 });
 
-// ── Category 5a: Speech dispatch priorities ───────────────────────────────────
-
 describe("Category 5a — SpeechDispatch priority assignment", () => {
   it("critical safety level dispatches at critical priority", () => {
     const { sink, calls } = makeSink();
@@ -159,8 +155,6 @@ describe("Category 5a — SpeechDispatch priority assignment", () => {
   });
 });
 
-// ── Category 5b: SpeechEngine queue ordering ──────────────────────────────────
-
 describe("Category 5b — SpeechEngine priority ordering", () => {
   it("higher-priority messages dequeue first", () => {
     const p = fakeTtsProvider();
@@ -196,8 +190,6 @@ describe("Category 5b — SpeechEngine priority ordering", () => {
     expect(p.spoken).toEqual(["A", "B", "C"]);
   });
 });
-
-// ── Category 5c: Duplicate suppression ────────────────────────────────────────
 
 describe("Category 5c — Duplicate suppression", () => {
   it("repeated identical messages within cooldown are suppressed", () => {
@@ -246,8 +238,6 @@ describe("Category 5c — Duplicate suppression", () => {
     expect(p.spoken).toHaveLength(2);
   });
 });
-
-// ── Category 5d: Speech disabled / stop ───────────────────────────────────────
 
 describe("Category 5d — Speech control", () => {
   it("disabled engine does not speak even critical messages", () => {

@@ -153,7 +153,6 @@ export const FIXTURE_SCENES = {
     recommendedImmediateAction: "unknown",
     description: "The view is too dark and blurry to interpret reliably.",
   },
-  // ── Phase 11 evaluation scenes ────────────────────────────────────────────
   clear_road: {
     sceneType: "roadway",
     pathStatus: "clear",

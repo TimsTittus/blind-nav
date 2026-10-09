@@ -27,8 +27,6 @@ async function analyzeScene(id: FixtureSceneId) {
   return provider.analyzeFrame({ frame: FRAME });
 }
 
-// ── 1. Scene type classification ──────────────────────────────────────────────
-
 describe("Category 1 — Scene type classification", () => {
   it("every fixture scene returns the expected sceneType", async () => {
     for (const id of FIXTURE_SCENE_IDS) {
@@ -57,8 +55,6 @@ describe("Category 1 — Scene type classification", () => {
     }
   });
 });
-
-// ── 2. Object detection (obstacle presence) ───────────────────────────────────
 
 describe("Category 2 — Object / hazard detection", () => {
   const results: EvalResult[] = [];

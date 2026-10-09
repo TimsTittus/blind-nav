@@ -3,3 +3,6 @@ node_modules/
 coverage/
 pnpm-lock.yaml
 *.md
+spikes/local-cv/results/
+spikes/local-cv/.cache/
+spikes/local-cv/models/

@@ -11,6 +11,7 @@ const config = [
       "dist/**",
       "coverage/**",
       "next-env.d.ts",
+      "spikes/**",
     ],
   },
   ...next,

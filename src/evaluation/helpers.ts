@@ -1,6 +1,3 @@
-/**
- * Shared test helpers for the evaluation framework.
- */
 import type { SceneAnalysis } from "@/core";
 import {
   FIXTURE_SCENES,

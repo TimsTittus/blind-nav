@@ -52,7 +52,12 @@ event, where the browser supports it).
 
 ## Browser support matrix
 
-### Supported (tested)
+> **Verification status:** none of the rows below have been verified on a
+> real phone yet. They describe *expected* support based on each browser's
+> published API availability. Real-device testing is an open item; update
+> each row with the device, OS, and browser version once verified.
+
+### Expected to be supported
 
 | Browser             | Camera | Location | Speech out | Voice in | Orientation | Install |
 | ------------------- | ------ | -------- | ---------- | -------- | ----------- | ------- |
@@ -60,7 +65,7 @@ event, where the browser supports it).
 | **Desktop Chrome**  | ✅      | ✅        | ✅          | ✅        | ❌           | ✅       |
 | **Desktop Edge**    | ✅      | ✅        | ✅          | ✅        | ❌           | ✅       |
 
-### Partially supported
+### Expected partial support
 
 | Browser               | Notes                                                                                      |
 | --------------------- | ------------------------------------------------------------------------------------------ |
@@ -95,9 +100,8 @@ Camera requires HTTPS (or `localhost`).
 
 ### Camera
 
-- **iOS Safari**: Opening the camera in standalone (PWA) mode works but the
-  initial permission prompt may appear behind the app. Switching back to Safari
-  settings and re-opening resolves this.
+- **iOS Safari (standalone/PWA mode)**: camera behaviour in home-screen mode
+  has historically differed from in-tab behaviour. Not yet verified for this app.
 - **Android**: Some devices only expose one camera to `enumerateDevices` even
   when front and back cameras exist. The "Switch camera" button appears only
   when multiple devices are reported.
@@ -110,31 +114,32 @@ Camera requires HTTPS (or `localhost`).
   The first interaction (start session) satisfies this. Speech may be
   interrupted or silenced when the screen locks — iOS pauses the web audio
   context. There is no reliable workaround from a web page.
-- **Android Chrome**: Reliable. Works in background and with screen off as long
-  as the tab is active.
-- **Firefox**: Fewer voices available. `speechSynthesis.cancel()` may leave the
-  synthesis in a stuck state on some versions — the engine retries once on
-  error.
+- **Android Chrome**: Expected to be the most reliable target. Behaviour with
+  the screen off or the tab in the background is not yet verified.
+- **Firefox**: Typically exposes fewer voices. The speech engine has no retry
+  logic; if `speechSynthesis` stalls, speech stays silent until the next
+  `speak()` call. Not yet verified on a device.
 - **Autoplay restrictions**: All browsers require a user gesture before the
   first `speak()` call. The session-start interaction satisfies this.
 
 ### Audio interruption & screen lock
 
-- **iOS**: Screen lock pauses all web audio. Speech stops. On unlock the app
-  resumes but does not replay missed announcements (by design — stale safety
-  instructions could be dangerous).
-- **Android**: Chrome continues speech even when the screen is off if the tab
-  has focus. Firefox may silence speech on screen off depending on power-save
-  settings.
+- **iOS**: Screen lock is expected to suspend web audio and speech. What the
+  speech queue does on unlock (drop vs. replay queued items) has not been
+  verified; replaying stale safety instructions would be undesirable, so this
+  needs a real-device test.
+- **Android**: Screen-off behaviour for Chrome and Firefox is not yet
+  verified and may depend on power-saving settings.
 - **Headphone disconnect**: No API to detect this from a web page. Speech
   output switches to the device speaker automatically.
 
 ### Location
 
-- **GPS cold start**: First position may take 10–30 seconds. The app shows
-  "Acquiring location…" during this period.
-- **Indoor accuracy**: GPS may be inaccurate indoors. The safety engine treats
-  high-error readings as degraded, not absent.
+- **GPS cold start**: the first fix can take many seconds. During this time
+  the location controller is in its `acquiring` state.
+- **Indoor accuracy**: GPS may be inaccurate indoors. The safety engine does
+  not currently use the reported accuracy; it only marks assessments degraded
+  when the location is stale (older than 15 s).
 
 ### Orientation
 

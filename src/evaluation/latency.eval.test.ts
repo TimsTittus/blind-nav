@@ -39,8 +39,6 @@ async function measure(fn: () => Promise<void> | void): Promise<number> {
 }
 
 describe("Category 6 — Latency", () => {
-  // ── Stage 1: fixture AI analysis ────────────────────────────────────────────
-
   it("fixture analyze: p95 < 20ms", async () => {
     const provider = new FixtureVisionProvider({
       delayMs: 0,
@@ -63,8 +61,6 @@ describe("Category 6 — Latency", () => {
     expect(p95).toBeLessThan(20);
   });
 
-  // ── Stage 2: safety assessment ───────────────────────────────────────────────
-
   it("safety assess: p95 < 5ms", () => {
     const engine = new SafetyEngine();
     const timings: number[] = [];
@@ -80,8 +76,6 @@ describe("Category 6 — Latency", () => {
     console.log(`  safety-assess p95=${p95.toFixed(2)}ms (n=${N})`);
     expect(p95).toBeLessThan(5);
   });
-
-  // ── Stage 3: speech dispatch ─────────────────────────────────────────────────
 
   it("speech dispatch: p95 < 2ms", () => {
     const spoken: string[] = [];
@@ -112,8 +106,6 @@ describe("Category 6 — Latency", () => {
     console.log(`  speech-dispatch p95=${p95.toFixed(2)}ms (n=${N})`);
     expect(p95).toBeLessThan(2);
   });
-
-  // ── Stage 4: combined pipeline (no I/O) ─────────────────────────────────────
 
   it("combined fixture-pipeline: p95 < 30ms", async () => {
     const provider = new FixtureVisionProvider({ delayMs: 0 });

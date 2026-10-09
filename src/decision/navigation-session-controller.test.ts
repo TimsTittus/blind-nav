@@ -37,7 +37,6 @@ const session = createSession({
   destination: { id: "d1", label: "Test" },
 });
 
-// Mock browser APIs the subsystems need
 beforeEach(() => {
   const mockTrack = {
     stop: vi.fn(),
@@ -58,7 +57,6 @@ beforeEach(() => {
     geolocation: null,
   });
 
-  // SpeechSynthesis
   vi.stubGlobal("speechSynthesis", {
     speak: vi.fn(),
     cancel: vi.fn(),

@@ -85,9 +85,6 @@ function makeContext(overrides: Partial<SafetyContext> = {}): SafetyContext {
   };
 }
 
-// ---------------------------------------------------------------------------
-// evaluateObstacle — table-driven
-// ---------------------------------------------------------------------------
 describe("evaluateObstacle", () => {
   interface ObstacleCase {
     name: string;
@@ -258,9 +255,6 @@ describe("evaluateObstacle", () => {
   });
 });
 
-// ---------------------------------------------------------------------------
-// evaluateHazard — table-driven
-// ---------------------------------------------------------------------------
 describe("evaluateHazard", () => {
   interface HazardCase {
     name: string;
@@ -315,9 +309,6 @@ describe("evaluateHazard", () => {
   });
 });
 
-// ---------------------------------------------------------------------------
-// evaluatePathStatus
-// ---------------------------------------------------------------------------
 describe("evaluatePathStatus", () => {
   it("blocked → CRITICAL / STOP", () => {
     expect(evaluatePathStatus("blocked")).toMatchObject({
@@ -348,9 +339,6 @@ describe("evaluatePathStatus", () => {
   });
 });
 
-// ---------------------------------------------------------------------------
-// worstSignal
-// ---------------------------------------------------------------------------
 describe("worstSignal", () => {
   it("returns SAFE for an empty array", () => {
     expect(worstSignal([]).level).toBe("safe");
@@ -374,9 +362,6 @@ describe("worstSignal", () => {
   });
 });
 
-// ---------------------------------------------------------------------------
-// hasConflictingObstacles
-// ---------------------------------------------------------------------------
 describe("hasConflictingObstacles", () => {
   it("returns false with no obstacles", () => {
     expect(hasConflictingObstacles([])).toBe(false);
@@ -407,9 +392,6 @@ describe("hasConflictingObstacles", () => {
   });
 });
 
-// ---------------------------------------------------------------------------
-// checkNavigationFusion
-// ---------------------------------------------------------------------------
 describe("checkNavigationFusion", () => {
   it("returns null when there is no route step", () => {
     expect(checkNavigationFusion("caution", [], null)).toBeNull();
@@ -495,9 +477,6 @@ describe("checkNavigationFusion", () => {
   });
 });
 
-// ---------------------------------------------------------------------------
-// SafetyEngine.assess — full integration, table-driven
-// ---------------------------------------------------------------------------
 describe("SafetyEngine.assess", () => {
   const engine = new SafetyEngine();
 

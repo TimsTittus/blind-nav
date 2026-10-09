@@ -72,8 +72,6 @@ export class CameraController {
     this.deps = deps;
   }
 
-  // --- external-store surface (stable references for useSyncExternalStore) --
-
   subscribe = (listener: () => void): (() => void) => {
     this.listeners.add(listener);
     return () => {
@@ -82,8 +80,6 @@ export class CameraController {
   };
 
   getSnapshot = (): CameraSnapshot => this.snapshot;
-
-  // --- video element --------------------------------------------------------
 
   /** Bind (or unbind with `null`) the `<video>` that renders the stream. */
   attachVideo(video: HTMLVideoElement | null): void {
@@ -97,8 +93,6 @@ export class CameraController {
   getActiveVideo(): HTMLVideoElement | null {
     return this.snapshot.state === "active" ? this.video : null;
   }
-
-  // --- lifecycle ------------------------------------------------------------
 
   async start(): Promise<void> {
     const { state } = this.snapshot;
@@ -217,8 +211,6 @@ export class CameraController {
     this.set({ switching: false, facing: this.currentFacing() });
     return true;
   }
-
-  // --- internals ------------------------------------------------------------
 
   private mediaDevices(): MediaDevicesLike | undefined {
     if ("mediaDevices" in this.deps) return this.deps.mediaDevices;

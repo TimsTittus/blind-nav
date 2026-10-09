@@ -51,7 +51,6 @@ export function createAnalyzeHandler(
   const now = deps.now ?? Date.now;
 
   return async function POST(request: Request): Promise<Response> {
-    // Parse the JSON body. A non-JSON body is malformed input.
     let body: unknown;
     try {
       body = await request.json();

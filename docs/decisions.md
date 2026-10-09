@@ -909,3 +909,52 @@ one-handed.
 - Firefox mobile and iOS Safari have known limitations (no `SpeechRecognition`,
   no `beforeinstallprompt` on iOS). These are documented and reported to the
   user via the capability status panel.
+
+---
+
+## ADR 0026 — Phase 13: local CV evaluated as a spike; not integrated
+
+**Status:** Accepted.
+
+**Context:** Cloud AI (Gemini) adds latency and a network dependency to
+obstacle awareness. Phase 13 asked for an evaluation of local computer vision
+(object detection, semantic segmentation, monocular depth, optionally geometry)
+for fast questions — something ahead, blocked, sidewalk, stairs, large obstacle,
+traversable — without integrating a model into the navigation loop or replacing
+Gemini. SeaFormer was suggested for segmentation but was not to be assumed best.
+
+**Decision:**
+
+1. **Isolate the work in `spikes/local-cv/`** with its own dependencies,
+   tsconfig and `bun test`; exclude `spikes/` from the root tsconfig and ESLint.
+   Production code and the root quality gate are unchanged.
+2. **Use ONNX Runtime** (Node for benchmarks; onnxruntime-web for WASM/WebGPU)
+   as the single runtime, because every candidate has ONNX weights and ORT-Web
+   offers WebGPU with a CPU (WASM) fallback behind one API.
+3. **Evaluate on 40 CC-licensed photos** covering all 16 fixture scenes, hand-
+   labelled for the six questions, and score local output through the real
+   `SafetyEngine` against the Phase-11 `SAFETY_FLOOR`. Thresholds for rule v1
+   were fixed before scoring; rule v2 was designed after seeing v1 failures and
+   is reported as optimistic.
+4. **Recommend SeaFormer-S as the candidate for local fast perception** on
+   latency, memory and stairs accuracy, with blocked/large-obstacle detection
+   explicitly _not_ ready.
+5. **Keep Gemini as the only provider in the loop.** A future
+   `HybridVisionProvider` must follow the asymmetric merge prototyped in
+   `spikes/local-cv/src/hybrid.ts`: local evidence may only add risk.
+6. **Reject on license grounds** AGPL detectors (Ultralytics YOLO family) and
+   CC-BY-NC depth weights (Depth Anything V2 Base/Large). Flag SegFormer
+   (NVIDIA non-commercial) and all ADE20K-trained weights for legal review.
+
+**Consequences:**
+
+- No behaviour change in the app; no new production dependency.
+- The `VisionProvider` interface fits a local provider unchanged, but a local
+  provider would live client-side, unlike today's server-only providers.
+- Any integration is gated on: phone + real-GPU WebGPU measurements, a held-out
+  target-viewpoint dataset (collected with consent), a better approach to
+  "blocked" (temporal smoothing, orientation-sensor ground geometry, or
+  fine-tuning), and the weights license review.
+- `docs/pwa.md` was corrected in the same change: its browser matrix had been
+  labelled "tested" without real-device testing and described behaviour the
+  code does not have.

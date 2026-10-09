@@ -1,0 +1,525 @@
+{
+  "note": "Hand-labelled by a single annotator from the images (Phase 13 spike). Labels answer the six fast questions for the walking corridor ahead; they are not segmentation masks.",
+  "images": [
+    {
+      "id": "clear-1",
+      "fixture": "clear",
+      "commonsTitle": "File:Brick sidewalk (Salem, Massachusetts) Photography by David Adam Kess.jpg",
+      "labels": {
+        "somethingAhead": false,
+        "blocked": false,
+        "sidewalk": true,
+        "stairs": false,
+        "largeObstacle": false,
+        "traversable": true
+      }
+    },
+    {
+      "id": "clear-2",
+      "fixture": "clear",
+      "commonsTitle": "File:Gehweg 003 2017 11 12.jpg",
+      "labels": {
+        "somethingAhead": false,
+        "blocked": false,
+        "sidewalk": true,
+        "stairs": false,
+        "largeObstacle": false,
+        "traversable": true
+      }
+    },
+    {
+      "id": "clear-3",
+      "fixture": "clear",
+      "commonsTitle": "File:DSC 6423 A narrow city alley lined with buildings and scooters with a brightly branded Nescafé stand in the foreground.jpg",
+      "labels": {
+        "somethingAhead": false,
+        "blocked": false,
+        "sidewalk": true,
+        "stairs": false,
+        "largeObstacle": false,
+        "traversable": true
+      }
+    },
+    {
+      "id": "clear_road-1",
+      "fixture": "clear_road",
+      "commonsTitle": "File:Amboy (California, USA), Hist. Route 66 -- 2012 -- 1.jpg",
+      "labels": {
+        "somethingAhead": false,
+        "blocked": false,
+        "sidewalk": false,
+        "stairs": false,
+        "largeObstacle": false,
+        "traversable": true
+      }
+    },
+    {
+      "id": "clear_road-2",
+      "fixture": "clear_road",
+      "commonsTitle": "File:Dülmen, Kirchspiel, Dernekamp, Wirtschaftsweg -- 2021 -- 9407.jpg",
+      "labels": {
+        "somethingAhead": false,
+        "blocked": false,
+        "sidewalk": false,
+        "stairs": false,
+        "largeObstacle": false,
+        "traversable": true
+      }
+    },
+    {
+      "id": "puddle-1",
+      "fixture": "puddle",
+      "commonsTitle": "File:Aleksanterinkatu with a puddle on the sidewalk on an afternoon in August 2024.jpg",
+      "labels": {
+        "somethingAhead": true,
+        "blocked": false,
+        "sidewalk": true,
+        "stairs": false,
+        "largeObstacle": false,
+        "traversable": true
+      }
+    },
+    {
+      "id": "puddle-2",
+      "fixture": "puddle",
+      "commonsTitle": "File:2023-07-16 13 43 16 A reflection of a sodium-vapor street light on a puddle on a sidewalk along Windybush Way in the Mountainview section of Ewing Township, Mercer County, New Jersey.jpg",
+      "labels": {
+        "somethingAhead": true,
+        "blocked": false,
+        "sidewalk": true,
+        "stairs": false,
+        "largeObstacle": false,
+        "traversable": true
+      }
+    },
+    {
+      "id": "obstacle-1",
+      "fixture": "obstacle",
+      "commonsTitle": "File:Algiers NOLA Mch2014 Bollard Sidewalk.jpg",
+      "labels": {
+        "somethingAhead": true,
+        "blocked": false,
+        "sidewalk": true,
+        "stairs": false,
+        "largeObstacle": false,
+        "traversable": true
+      }
+    },
+    {
+      "id": "obstacle-2",
+      "fixture": "obstacle",
+      "commonsTitle": "File:Bollard RS Puram.jpg",
+      "labels": {
+        "somethingAhead": false,
+        "blocked": false,
+        "sidewalk": true,
+        "stairs": false,
+        "largeObstacle": false,
+        "traversable": true
+      }
+    },
+    {
+      "id": "parked_vehicle-1",
+      "fixture": "parked_vehicle",
+      "commonsTitle": "File:Parked vehicles block the sidewalk (18096397564).jpg",
+      "labels": {
+        "somethingAhead": true,
+        "blocked": false,
+        "sidewalk": true,
+        "stairs": false,
+        "largeObstacle": true,
+        "traversable": true
+      }
+    },
+    {
+      "id": "parked_vehicle-2",
+      "fixture": "parked_vehicle",
+      "commonsTitle": "File:Car on sidewalk, Kenyongasse, Vienna.jpg",
+      "labels": {
+        "somethingAhead": true,
+        "blocked": true,
+        "sidewalk": true,
+        "stairs": false,
+        "largeObstacle": true,
+        "traversable": false
+      }
+    },
+    {
+      "id": "parked_vehicle-3",
+      "fixture": "parked_vehicle",
+      "commonsTitle": "File:A car blocking the sidewalk. (6147249829).jpg",
+      "labels": {
+        "somethingAhead": true,
+        "blocked": false,
+        "sidewalk": true,
+        "stairs": false,
+        "largeObstacle": true,
+        "traversable": true
+      }
+    },
+    {
+      "id": "moving_person-1",
+      "fixture": "moving_person",
+      "commonsTitle": "File:194-365 - Seven Deadly Sins - Lust. (4696806650).jpg",
+      "labels": {
+        "somethingAhead": true,
+        "blocked": false,
+        "sidewalk": true,
+        "stairs": false,
+        "largeObstacle": true,
+        "traversable": true
+      }
+    },
+    {
+      "id": "moving_person-2",
+      "fixture": "moving_person",
+      "commonsTitle": "File:Obere Brücke (Bamberg), 2006 (01).jpg",
+      "labels": {
+        "somethingAhead": true,
+        "blocked": false,
+        "sidewalk": true,
+        "stairs": false,
+        "largeObstacle": true,
+        "traversable": true
+      }
+    },
+    {
+      "id": "stairs-1",
+      "fixture": "stairs",
+      "commonsTitle": "File:2020 Untermyer Gardens The Vista looking west to Hudson River.jpg",
+      "labels": {
+        "somethingAhead": true,
+        "blocked": false,
+        "sidewalk": true,
+        "stairs": true,
+        "largeObstacle": false,
+        "traversable": true
+      }
+    },
+    {
+      "id": "stairs-2",
+      "fixture": "stairs",
+      "commonsTitle": "File:2020 Untermyer Gardens The Vista looking east from The Overlook.jpg",
+      "labels": {
+        "somethingAhead": true,
+        "blocked": false,
+        "sidewalk": true,
+        "stairs": true,
+        "largeObstacle": false,
+        "traversable": true
+      }
+    },
+    {
+      "id": "stairs-3",
+      "fixture": "stairs",
+      "commonsTitle": "File:Treppe Enge Gasse abwärts von Wettergasse mit Wandmalerei unterhalb kleinem Restaurant 2016-03-19.JPG",
+      "labels": {
+        "somethingAhead": true,
+        "blocked": false,
+        "sidewalk": true,
+        "stairs": true,
+        "largeObstacle": false,
+        "traversable": true
+      }
+    },
+    {
+      "id": "stairs_up-1",
+      "fixture": "stairs_up",
+      "commonsTitle": "File:Spanish Steps 2 (Tacoma, Washington).jpg",
+      "labels": {
+        "somethingAhead": true,
+        "blocked": false,
+        "sidewalk": true,
+        "stairs": true,
+        "largeObstacle": false,
+        "traversable": true
+      }
+    },
+    {
+      "id": "stairs_up-2",
+      "fixture": "stairs_up",
+      "commonsTitle": "File:Outdoor steps in Seattle.JPG",
+      "labels": {
+        "somethingAhead": true,
+        "blocked": false,
+        "sidewalk": true,
+        "stairs": true,
+        "largeObstacle": false,
+        "traversable": true
+      }
+    },
+    {
+      "id": "stairs_up-3",
+      "fixture": "stairs_up",
+      "commonsTitle": "File:HKU 香港大學 Sun Yat-Sen Steps outdoor stairs 中山階 Sun Yat-sen Place 中山廣場 sign March-2017 Lnv3.jpg",
+      "labels": {
+        "somethingAhead": true,
+        "blocked": false,
+        "sidewalk": true,
+        "stairs": true,
+        "largeObstacle": false,
+        "traversable": true
+      }
+    },
+    {
+      "id": "curb-1",
+      "fixture": "curb",
+      "commonsTitle": "File:Curb in the street (23394444552).jpg",
+      "labels": {
+        "somethingAhead": false,
+        "blocked": false,
+        "sidewalk": true,
+        "stairs": false,
+        "largeObstacle": false,
+        "traversable": true
+      }
+    },
+    {
+      "id": "curb-2",
+      "fixture": "curb",
+      "commonsTitle": "File:Kerb Extension Nuffield Street.jpg",
+      "labels": {
+        "somethingAhead": false,
+        "blocked": false,
+        "sidewalk": true,
+        "stairs": false,
+        "largeObstacle": false,
+        "traversable": true
+      }
+    },
+    {
+      "id": "pothole-1",
+      "fixture": "pothole",
+      "commonsTitle": "File:Pothole in Villeray, Montréal.jpg",
+      "labels": {
+        "somethingAhead": true,
+        "blocked": false,
+        "sidewalk": false,
+        "stairs": false,
+        "largeObstacle": false,
+        "traversable": true
+      }
+    },
+    {
+      "id": "pothole-2",
+      "fixture": "pothole",
+      "commonsTitle": "File:Pothole Big.jpg",
+      "labels": {
+        "somethingAhead": true,
+        "blocked": false,
+        "sidewalk": false,
+        "stairs": false,
+        "largeObstacle": false,
+        "traversable": true
+      }
+    },
+    {
+      "id": "pothole-3",
+      "fixture": "pothole",
+      "commonsTitle": "File:A pothole in Dilova Street in Kyiv.jpg",
+      "labels": {
+        "somethingAhead": true,
+        "blocked": false,
+        "sidewalk": false,
+        "stairs": false,
+        "largeObstacle": false,
+        "traversable": true
+      }
+    },
+    {
+      "id": "wall-1",
+      "fixture": "wall",
+      "commonsTitle": "File:Dead end footpath - geograph.org.uk - 5717273.jpg",
+      "labels": {
+        "somethingAhead": true,
+        "blocked": true,
+        "sidewalk": false,
+        "stairs": false,
+        "largeObstacle": true,
+        "traversable": false
+      }
+    },
+    {
+      "id": "wall-2",
+      "fixture": "wall",
+      "commonsTitle": "File:Dead-end footpath - geograph.org.uk - 7374386.jpg",
+      "labels": {
+        "somethingAhead": true,
+        "blocked": true,
+        "sidewalk": false,
+        "stairs": false,
+        "largeObstacle": true,
+        "traversable": false
+      }
+    },
+    {
+      "id": "narrow_path-1",
+      "fixture": "narrow_path",
+      "commonsTitle": "File:Narrow footpath - geograph.org.uk - 6632222.jpg",
+      "labels": {
+        "somethingAhead": false,
+        "blocked": false,
+        "sidewalk": false,
+        "stairs": false,
+        "largeObstacle": false,
+        "traversable": true
+      }
+    },
+    {
+      "id": "narrow_path-2",
+      "fixture": "narrow_path",
+      "commonsTitle": "File:Bridge End Gardens Saffron Walden 08.jpg",
+      "labels": {
+        "somethingAhead": false,
+        "blocked": false,
+        "sidewalk": true,
+        "stairs": false,
+        "largeObstacle": false,
+        "traversable": true
+      }
+    },
+    {
+      "id": "narrow_path-3",
+      "fixture": "narrow_path",
+      "commonsTitle": "File:Brick-lined alley and back facade - Mueller Electric Company Building.jpg",
+      "labels": {
+        "somethingAhead": false,
+        "blocked": false,
+        "sidewalk": true,
+        "stairs": false,
+        "largeObstacle": false,
+        "traversable": true
+      }
+    },
+    {
+      "id": "road_crossing-1",
+      "fixture": "road_crossing",
+      "commonsTitle": "File:ICCK and Jhongjheng 4th Road zebra crossing (47271298682).jpg",
+      "labels": {
+        "somethingAhead": false,
+        "blocked": false,
+        "sidewalk": true,
+        "stairs": false,
+        "largeObstacle": false,
+        "traversable": true
+      }
+    },
+    {
+      "id": "road_crossing-2",
+      "fixture": "road_crossing",
+      "commonsTitle": "File:Zebra crossing by St Jude's Church - geograph.org.uk - 810834.jpg",
+      "labels": {
+        "somethingAhead": false,
+        "blocked": false,
+        "sidewalk": false,
+        "stairs": false,
+        "largeObstacle": false,
+        "traversable": true
+      }
+    },
+    {
+      "id": "blocked-1",
+      "fixture": "blocked",
+      "commonsTitle": "File:Union Tpke 170 St td (2021-05-17) 03.jpg",
+      "labels": {
+        "somethingAhead": true,
+        "blocked": true,
+        "sidewalk": true,
+        "stairs": false,
+        "largeObstacle": true,
+        "traversable": false
+      }
+    },
+    {
+      "id": "blocked-2",
+      "fixture": "blocked",
+      "commonsTitle": "File:Jewel Av 164th St td (2021-03-31) 11 - NYCDEP Infiltration Basin.jpg",
+      "labels": {
+        "somethingAhead": true,
+        "blocked": true,
+        "sidewalk": true,
+        "stairs": false,
+        "largeObstacle": true,
+        "traversable": false
+      }
+    },
+    {
+      "id": "blocked-3",
+      "fixture": "blocked",
+      "commonsTitle": "File:Utopia Pkwy 74th Av td (2021-01-27) 13 - NYCDEP Rain Garden.jpg",
+      "labels": {
+        "somethingAhead": true,
+        "blocked": true,
+        "sidewalk": true,
+        "stairs": false,
+        "largeObstacle": true,
+        "traversable": false
+      }
+    },
+    {
+      "id": "low_light-1",
+      "fixture": "low_light",
+      "commonsTitle": "File:Monroe Street sidewalk at night with snow (53018649535).jpg",
+      "labels": {
+        "somethingAhead": false,
+        "blocked": false,
+        "sidewalk": true,
+        "stairs": false,
+        "largeObstacle": false,
+        "traversable": true
+      }
+    },
+    {
+      "id": "low_light-2",
+      "fixture": "low_light",
+      "commonsTitle": "File:Oak Street Night Retro Active Sidewalk 2.JPG",
+      "labels": {
+        "somethingAhead": false,
+        "blocked": false,
+        "sidewalk": true,
+        "stairs": false,
+        "largeObstacle": false,
+        "traversable": true
+      }
+    },
+    {
+      "id": "low_light-3",
+      "fixture": "low_light",
+      "commonsTitle": "File:Nola Sidewalk at Night New Orleans (27833693021).jpg",
+      "labels": {
+        "somethingAhead": false,
+        "blocked": false,
+        "sidewalk": true,
+        "stairs": false,
+        "largeObstacle": false,
+        "traversable": true
+      }
+    },
+    {
+      "id": "uncertain-1",
+      "fixture": "uncertain",
+      "commonsTitle": "File:20080313 Foggy Street.jpg",
+      "labels": {
+        "somethingAhead": false,
+        "blocked": false,
+        "sidewalk": false,
+        "stairs": false,
+        "largeObstacle": false,
+        "traversable": true
+      }
+    },
+    {
+      "id": "uncertain-2",
+      "fixture": "uncertain",
+      "commonsTitle": "File:Foggy trees, Cranmore Park - geograph.org.uk - 687473.jpg",
+      "labels": {
+        "somethingAhead": false,
+        "blocked": false,
+        "sidewalk": false,
+        "stairs": false,
+        "largeObstacle": false,
+        "traversable": true
+      }
+    }
+  ]
+}

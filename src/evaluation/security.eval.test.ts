@@ -18,8 +18,6 @@ import type { AnalyzeResponse } from "@/perception";
 import type { VisionProvider } from "@/providers";
 import { SceneObservationSchema } from "@/core/perception";
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
-
 function makeHandler(provider?: VisionProvider) {
   return createAnalyzeHandler({
     resolveProvider: () =>
@@ -54,8 +52,6 @@ function validBody(sequence = 1) {
   };
 }
 
-// ── 1. API key not exposed client-side ────────────────────────────────────────
-
 describe("Security 1 — API key client-side exposure", () => {
   it("no NEXT_PUBLIC_GEMINI_API_KEY environment variable is set", () => {
     // NEXT_PUBLIC_ variables are inlined at build time and would be visible in
@@ -87,8 +83,6 @@ describe("Security 1 — API key client-side exposure", () => {
     expect(publicSecretKey).toBeUndefined();
   });
 });
-
-// ── 2. Malicious / oversized request payload ─────────────────────────────────
 
 describe("Security 2 — Malicious request payloads", () => {
   it("rejects empty body", async () => {
@@ -139,8 +133,6 @@ describe("Security 2 — Malicious request payloads", () => {
   });
 });
 
-// ── 3. Oversized image ────────────────────────────────────────────────────────
-
 describe("Security 3 — Oversized image", () => {
   it("decodeImageDataUrl throws for an image over MAX_IMAGE_BYTES", () => {
     // Construct a base64 string whose decoded size exceeds the limit.
@@ -168,8 +160,6 @@ describe("Security 3 — Oversized image", () => {
     expect(body.ok).toBe(false);
   });
 });
-
-// ── 4. Invalid MIME type ──────────────────────────────────────────────────────
 
 describe("Security 4 — Invalid MIME type", () => {
   it("decodeImageDataUrl rejects image/gif", () => {
@@ -202,8 +192,6 @@ describe("Security 4 — Invalid MIME type", () => {
   });
 });
 
-// ── 5. Malformed JSON body ────────────────────────────────────────────────────
-
 describe("Security 5 — Malformed JSON", () => {
   it("returns 400 for a non-JSON body", async () => {
     const req = new Request("http://localhost/api/vision/analyze", {
@@ -232,8 +220,6 @@ describe("Security 5 — Malformed JSON", () => {
     expect(res.status).toBe(400);
   });
 });
-
-// ── 6. Unexpected / adversarial AI output ────────────────────────────────────
 
 describe("Security 6 — Unexpected AI output validation", () => {
   it("SceneObservationSchema rejects an unknown pathStatus", () => {

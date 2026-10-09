@@ -18,16 +18,18 @@ software architecture.
 
 ## Status
 
-**Phase 9 — Navigation Mode + Explore Mode.** Both product modes are complete.
-**Navigation Mode**: destination input with recent-destination history
-(localStorage), full real-time pipeline (camera + GPS + AI analysis + safety +
-speech), route tracking with step-by-step instructions. **Explore Mode**: camera
-+ safety overlay, push-to-talk voice input and text fallback for asking
-questions about the environment (scene query pipeline: VoiceInput → question →
-SceneQueryHandler → VisionProvider → speech). `src/voice` provides a
-`VoiceInput` abstraction wrapping browser SpeechRecognition (push-to-talk, not
-always-listening). `VisionProvider.queryScene` answers free-form questions from a
-camera frame. 493 tests total.
+**Phase 13 — Local computer-vision research spike (evaluation only).** Local
+models (SeaFormer-S, SegFormer-B0, RF-DETR, D-FINE, Depth Anything V2) were
+benchmarked and scored against the fixture-scene safety floors in an isolated
+spike ([`spikes/local-cv/`](spikes/local-cv/README.md)). Nothing was integrated;
+Gemini remains the only vision provider. Findings:
+[`docs/local-cv-evaluation.md`](docs/local-cv-evaluation.md).
+
+**Phase 12** made the app an installable PWA with a capability-detection layer
+and mobile UI optimizations ([`docs/pwa.md`](docs/pwa.md); not yet verified on
+real phones). **Phase 11** added the evaluation framework. **Phase 10** added
+performance profiling. **Phase 9** completed Navigation Mode and Explore Mode
+(push-to-talk scene questions).
 
 Earlier phases: decision engine / real-time pipeline (Phase 8), deterministic
 safety engine (Phase 7), navigation engine (Phase 6), speech engine (Phase 5),

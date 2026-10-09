@@ -1,0 +1,115 @@
+{
+  "engine": "chromium",
+  "version": "153.0.8010.12",
+  "result": {
+    "env": {
+      "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.8010.12 Safari/537.36",
+      "hardwareConcurrency": 12,
+      "crossOriginIsolated": true,
+      "wasmThreads": 4,
+      "webgpu": true,
+      "adapter": {
+        "vendor": "google",
+        "architecture": "swiftshader",
+        "description": ""
+      },
+      "softwareAdapter": true
+    },
+    "results": [
+      {
+        "key": "seaformer-s-512-fp32",
+        "wasm": {
+          "createMs": 1639,
+          "coldMs": 268,
+          "medianMs": 98.8,
+          "p95Ms": 128.1
+        },
+        "webgpu": {
+          "skipped": "software WebGPU adapter (not representative)"
+        }
+      },
+      {
+        "key": "seaformer-s-384-fp32",
+        "wasm": {
+          "createMs": 337,
+          "coldMs": 73,
+          "medianMs": 63.6,
+          "p95Ms": 79.9
+        },
+        "webgpu": {
+          "skipped": "software WebGPU adapter (not representative)"
+        }
+      },
+      {
+        "key": "segformer-b0-512-fp32",
+        "wasm": {
+          "createMs": 433,
+          "coldMs": 681,
+          "medianMs": 447.6,
+          "p95Ms": 545.5
+        },
+        "webgpu": {
+          "skipped": "software WebGPU adapter (not representative)"
+        }
+      },
+      {
+        "key": "rfdetr-nano-384-fp32",
+        "wasm": {
+          "createMs": 1051,
+          "coldMs": 711,
+          "medianMs": 643.8,
+          "p95Ms": 1001.4
+        },
+        "webgpu": {
+          "skipped": "software WebGPU adapter (not representative)"
+        }
+      },
+      {
+        "key": "rfdetr-nano-384-q8",
+        "wasm": {
+          "createMs": 736,
+          "coldMs": 524,
+          "medianMs": 446.1,
+          "p95Ms": 545.2
+        },
+        "webgpu": {
+          "skipped": "software WebGPU adapter (not representative)"
+        }
+      },
+      {
+        "key": "dfine-s-640-q8",
+        "wasm": {
+          "createMs": 1353,
+          "coldMs": 680,
+          "medianMs": 566.5,
+          "p95Ms": 753
+        },
+        "webgpu": {
+          "skipped": "software WebGPU adapter (not representative)"
+        }
+      },
+      {
+        "key": "depth-anything-v2-s-266x350-fp32",
+        "wasm": {
+          "createMs": 613,
+          "coldMs": 749,
+          "medianMs": 808.3,
+          "p95Ms": 1076.9
+        },
+        "webgpu": {
+          "skipped": "software WebGPU adapter (not representative)"
+        }
+      }
+    ]
+  },
+  "console": [
+    "log: [bench] result {\"key\":\"seaformer-s-512-fp32\",\"wasm\":{\"createMs\":1639,\"coldMs\":268,\"medianMs\":98.8,\"p95Ms\":128.1},\"webgpu\":{\"skipped\":\"software WebGPU adapter (not representative)\"}}",
+    "log: [bench] result {\"key\":\"seaformer-s-384-fp32\",\"wasm\":{\"createMs\":337,\"coldMs\":73,\"medianMs\":63.6,\"p95Ms\":79.9},\"webgpu\":{\"skipped\":\"software WebGPU adapter (not representative)\"}}",
+    "log: [bench] result {\"key\":\"segformer-b0-512-fp32\",\"wasm\":{\"createMs\":433,\"coldMs\":681,\"medianMs\":447.6,\"p95Ms\":545.5},\"webgpu\":{\"skipped\":\"software WebGPU adapter (not representative)\"}}",
+    "log: [bench] result {\"key\":\"rfdetr-nano-384-fp32\",\"wasm\":{\"createMs\":1051,\"coldMs\":711,\"medianMs\":643.8,\"p95Ms\":1001.4},\"webgpu\":{\"skipped\":\"software WebGPU adapter (not representative)\"}}",
+    "log: [bench] result {\"key\":\"rfdetr-nano-384-q8\",\"wasm\":{\"createMs\":736,\"coldMs\":524,\"medianMs\":446.1,\"p95Ms\":545.2},\"webgpu\":{\"skipped\":\"software WebGPU adapter (not representative)\"}}",
+    "log: [bench] result {\"key\":\"dfine-s-640-q8\",\"wasm\":{\"createMs\":1353,\"coldMs\":680,\"medianMs\":566.5,\"p95Ms\":753},\"webgpu\":{\"skipped\":\"software WebGPU adapter (not representative)\"}}",
+    "log: [bench] depth-anything-v2-s-266x350-fp32 on wasm…",
+    "log: [bench] result {\"key\":\"depth-anything-v2-s-266x350-fp32\",\"wasm\":{\"createMs\":613,\"coldMs\":749,\"medianMs\":808.3,\"p95Ms\":1076.9},\"webgpu\":{\"skipped\":\"software WebGPU adapter (not representative)\"}}"
+  ]
+}

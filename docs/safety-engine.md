@@ -122,6 +122,25 @@ overall confidence.
 When scene availability is `ambiguous`, a `safe` result is promoted to `caution`
 with `continue_cautiously`.
 
+### Perception fusion penalty (Phase 14)
+
+When perception includes local on-device evidence (via the fusion layer), the
+safety engine receives a `PerceptionFusionInput` with `localOnly` and
+`conflicts` fields. If either is present, a `safe` result is promoted to
+`caution`:
+
+| Condition                      | Result                                    |
+| ------------------------------ | ----------------------------------------- |
+| `localOnly` (cloud unavailable)| CAUTION + "Cloud perception unavailable"  |
+| `conflicts` (sources disagree) | CAUTION + "Perception sources disagree"   |
+| Neither                        | No change                                 |
+
+Conflicted or local-only perception is always marked `degraded`. This penalty
+is applied after the ambiguity rule and before navigation fusion.
+
+The safety engine does not know anything about computer vision, models, or local
+inference. It sees only the flat `{ localOnly, conflicts }` structure.
+
 ## Assessment expiry
 
 Every assessment carries an `expiresAt` timestamp (default: 3 seconds after

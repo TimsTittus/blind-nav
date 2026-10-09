@@ -48,7 +48,7 @@ Add an ADR for any significant decision.
 - **The LLM is not the safety mechanism.** Perception only *describes* the world
   as validated structured data; the deterministic **Safety Engine** decides
   risk. The LLM never controls navigation or triggers arbitrary app actions.
-- **Layer separation:** `core` ←
+- **Layer separation:** `core` ← `camera` ←
   `providers`/`perception`/`fast-perception`/`fusion`/`safety`/`navigation`
   → `decision` → `speech` → `app`. Dependencies point toward `core`; lower
   layers never import UI. One concern per layer. See each `src/*/README.md`.

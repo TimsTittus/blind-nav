@@ -53,10 +53,7 @@ describe("BrowserCameraSource", () => {
   });
 });
 
-function orientationOf(
-  w: number,
-  h: number,
-): CameraFrame["orientation"] {
+function orientationOf(w: number, h: number): CameraFrame["orientation"] {
   if (w > h) return "landscape";
   if (h > w) return "portrait";
   return "unknown";

@@ -1,6 +1,9 @@
 # Architecture
 
-Status: **Phase 13 (local CV research spike — evaluation only, not integrated)**;
+Status: **Phase 15 (CameraSource abstraction and hardware roadmap)**;
+Phase 14 integrated local on-device vision alongside Gemini behind a trust
+policy and asymmetric fusion,
+Phase 13 evaluated local CV as a research spike,
 Phase 12 added the installable PWA, capability detection and mobile UI,
 Phase 11 added the evaluation framework, Phase 10 added performance profiling
 and optimization (PerformanceMonitor, WebP frame encoding, DuplicateSuppression
@@ -58,7 +61,15 @@ application actions.
 ## 3. Layered pipeline
 
 ```
-Camera (+ future sensors)
+Camera hardware (phone / USB / CSI / future vest-mount)
+      │
+      ▼
+CameraSource  (source-agnostic interface; Phase 15)
+      │   BrowserCameraSource (implemented)
+      │   MobileCameraSource  (planned)
+      │   ExternalCameraSource (planned)
+      │
+      │   normalized CameraFrame { id, timestamp, w, h, orientation, source, data }
       │
       ├─▶ Fast Perception ──▶ FastPerceptionFrame        (on-device, ≈6.7 FPS)
       │     (local CV; client-only; Phase 14)
@@ -107,6 +118,7 @@ Each layer has a README with detail. Summary:
 | Layer                          | Responsibility                                                   | Depends on          |
 | ------------------------------ | ---------------------------------------------------------------- | ------------------- |
 | [`core`](../src/core)          | Domain types + Zod schemas (Scene Representation); pure helpers   | —                   |
+| [`camera`](../src/camera)      | `CameraSource` abstraction, `CameraFrame`, `BrowserCameraSource` adapter; frame capture & scheduling | core |
 | [`providers`](../src/providers)| `VisionProvider` interface + concrete providers (server-only)     | core                |
 | [`perception`](../src/perception)| Frames → validated scene; multi-rate pipeline; concurrency       | core, providers     |
 | [`fast-perception`](../src/fast-perception)| On-device CV → normalized `FastPerceptionFrame`; trust policy (client-only) | core, camera |
@@ -825,3 +837,44 @@ false stops, and surfaces 4 conflicts cloud-only cannot see. Local-only misses
 4 of 16, including potholes, kerbs and crossings, which have no segmentation
 class. Real weights run at ~104–138 ms per frame (WASM single-thread, laptop).
 **Unmeasured: any phone, real-GPU WebGPU, CPU/GPU utilisation, memory, battery.**
+
+## 28. CameraSource abstraction and hardware roadmap (added in Phase 15)
+
+Phase 15 introduces a source-agnostic `CameraSource` interface so the perception
+pipeline does not care where frames come from.
+
+### CameraSource interface
+
+`src/camera/source.ts` defines:
+
+- `CameraSource` — `start`, `stop`, `pause`, `resume`, `captureFrame(signal?)`,
+  `subscribe`/`getSnapshot`. Each source declares its `kind`.
+- `CameraFrame` — Zod-validated value object: `id`, `timestamp`, `width`,
+  `height`, `orientation`, `source`, `data` (Blob). No browser-specific objects.
+- `BrowserCameraSource` — adapts the existing `CameraController` + `FrameCapture`.
+  The only code that touches `getUserMedia`, `MediaStream`, or
+  `HTMLVideoElement`.
+
+### Future sources (declared, not implemented)
+
+- `MobileCameraSource` — React Native / Capacitor bridge for a native phone
+  camera or an Android wearable compute module.
+- `ExternalCameraSource` — USB UVC (via WebUSB or Android `UsbManager`),
+  WebSocket relay from a Raspberry Pi or Jetson, or a CSI/MIPI native bridge.
+
+### Hardware evaluation
+
+[`docs/hardware-roadmap.md`](hardware-roadmap.md) evaluates five hardware
+options (phone on vest, phone + USB camera, Raspberry Pi, Jetson Orin,
+Android-based wearable compute) across latency, battery, weight, heat, compute,
+camera quality, network, cost, and maintainability. **No hardware is chosen.**
+The decision depends on real-device measurements, user research, and cost
+constraints that are not yet established.
+
+### Software isolation
+
+The existing session controller, perception pipeline, fusion layer, safety
+engine, and speech engine are not modified. The abstraction sits alongside the
+current code. Migrating the session controller to use `CameraSource` instead of
+`CameraController` directly is a future step once `CameraSource` has been proven
+with at least two implementations.

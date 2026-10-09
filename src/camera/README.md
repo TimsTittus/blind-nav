@@ -72,3 +72,40 @@ safe (React StrictMode double-mounts in dev).
   size/time varies by device.
 - **Not hardware-tested.** Tests use fakes and a canvas-backed mock stream; real
   camera behaviour across iOS Safari, Android Chrome, and Firefox is unverified.
+
+## CameraSource abstraction (Phase 15)
+
+Phase 15 adds a source-agnostic interface so the perception pipeline does not
+care whether frames come from a browser `getUserMedia`, a USB camera, or a CSI
+sensor on a Raspberry Pi or Jetson.
+
+| File                         | Role |
+| ---------------------------- | ---- |
+| `source.ts`                  | `CameraSource` interface, `CameraFrame` Zod schema, `CameraSourceSnapshot` |
+| `browser-camera-source.ts`   | `BrowserCameraSource` — adapts `CameraController` + `FrameCapture` to `CameraSource` |
+
+### CameraFrame
+
+```ts
+CameraFrame {
+  id: number            // monotonic per source
+  timestamp: number     // Date.now() at pixel read
+  width: number
+  height: number
+  orientation: "landscape" | "portrait" | "unknown"
+  source: "browser" | "mobile" | "external" | "fixture" | "unknown"
+  data: Blob            // encoded pixels
+}
+```
+
+No `MediaStream`, `HTMLVideoElement`, or other browser objects leak past the
+source adapter. The perception pipeline, safety engine, and speech engine see
+only `CameraFrame`.
+
+### Future sources (planned, not implemented)
+
+- `MobileCameraSource` — React Native / Capacitor bridge
+- `ExternalCameraSource` — WebUSB, WebSocket relay, or native bridge
+
+See [`docs/hardware-roadmap.md`](../../docs/hardware-roadmap.md) for the
+hardware evaluation.

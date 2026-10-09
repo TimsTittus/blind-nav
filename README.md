@@ -18,14 +18,20 @@ software architecture.
 
 ## Status
 
-**Phase 14 — on-device vision integrated alongside Gemini.** A small
-segmentation model (SeaFormer-S via `onnxruntime-web`, WebGPU → WASM) now runs
+**Phase 15 — CameraSource abstraction and hardware roadmap.** A source-agnostic
+`CameraSource` interface now sits between camera hardware and the perception
+pipeline. `BrowserCameraSource` adapts the existing browser camera; planned
+`MobileCameraSource` and `ExternalCameraSource` are declared but not built.
+A normalized `CameraFrame` carries no browser-specific objects. Five hardware
+options (phone on vest, phone + USB camera, Raspberry Pi, Jetson Orin,
+Android wearable) are evaluated in [`docs/hardware-roadmap.md`](docs/hardware-roadmap.md) —
+**no hardware is chosen**. Details: ADR 0028.
+
+**Phase 14** integrated on-device vision alongside Gemini. A small
+segmentation model (SeaFormer-S via `onnxruntime-web`, WebGPU → WASM) runs
 locally several times a second and its findings are merged with Gemini's before
-the deterministic Safety Engine sees anything. Local evidence can only **add**
-risk, never claim a clear path, and — because Phase 13 measured its
-`blocked` signal at precision 0.13 — cannot by itself trigger a stop.
-Disagreements between the two sources are represented explicitly rather than
-resolved away. Details: [`docs/fast-perception.md`](docs/fast-perception.md).
+the deterministic Safety Engine sees anything. Details:
+[`docs/fast-perception.md`](docs/fast-perception.md).
 
 **No model weights ship with the app**: the ADE20K/SeaFormer licence review is
 unresolved, so `public/models/` is gitignored and populated with
@@ -129,6 +135,7 @@ Each `src/*` layer has a `README.md` describing its responsibilities and rules.
 - [`docs/decisions.md`](docs/decisions.md) — decision records
 - [`docs/fast-perception.md`](docs/fast-perception.md) — on-device vision: setup, trust policy, measurements
 - [`docs/local-cv-evaluation.md`](docs/local-cv-evaluation.md) — the Phase 13 model evaluation
+- [`docs/hardware-roadmap.md`](docs/hardware-roadmap.md) — future hardware options evaluation (no choice made)
 - [`CLAUDE.md`](CLAUDE.md) — working guide for contributors and AI assistants
 
 ## Privacy

@@ -109,14 +109,33 @@ required and documented. Secrets stay on the server.
 
 ## Current status
 
-**Phase 14 — local perception integrated behind a trust policy and fusion.**
-On top of Phase 13 (local CV research spike), Phase 12 (PWA, capability
-detection, mobile UI), Phase 11 (evaluation framework), Phase 10 (performance),
-Phase 9 (Navigation + Explore modes), Phase 8 (decision engine), Phase 7 (safety
-engine), Phase 6 (navigation engine), Phase 5 (speech), Phase 4 (server-side
-Gemini vision), Phase 3 (camera), Phase 2 (mocked UI), Phase 1 (core model).
+**Phase 15 — CameraSource abstraction and hardware roadmap**, on top of
+Phase 14 (local perception + trust policy + fusion), Phase 13 (local CV research
+spike), Phase 12 (PWA, capability detection, mobile UI), Phase 11 (evaluation
+framework), Phase 10 (performance), Phase 9 (Navigation + Explore modes),
+Phase 8 (decision engine), Phase 7 (safety engine), Phase 6 (navigation engine),
+Phase 5 (speech), Phase 4 (server-side Gemini vision), Phase 3 (camera),
+Phase 2 (mocked UI), Phase 1 (core model).
 
-Phase 14 adds two new layers and keeps Gemini in charge of semantics:
+Phase 15 adds a source-agnostic camera abstraction:
+
+- **`CameraSource` interface** (`src/camera/source.ts`) — `start`, `stop`,
+  `pause`, `resume`, `captureFrame(signal?)`, `subscribe`/`getSnapshot`. Each
+  source declares its `kind`.
+- **`CameraFrame`** — Zod-validated normalized frame: `id`, `timestamp`,
+  `width`, `height`, `orientation`, `source`, `data` (Blob). No browser-specific
+  objects (`MediaStream`, `HTMLVideoElement`) leak past the adapter.
+- **`BrowserCameraSource`** — adapts the existing `CameraController` +
+  `FrameCapture` to `CameraSource`. The only code that touches `getUserMedia`.
+- **`MobileCameraSource` and `ExternalCameraSource`** are declared as planned
+  (not implemented) for future React Native, USB UVC, or WebSocket relay paths.
+- **`docs/hardware-roadmap.md`** — evaluates five hardware options (phone on
+  vest, phone + USB camera, Raspberry Pi, Jetson Orin, Android wearable) across
+  nine criteria. **No hardware is chosen.**
+
+Docs: [`docs/hardware-roadmap.md`](docs/hardware-roadmap.md), ADR 0028.
+
+Phase 14 adds two layers and keeps Gemini in charge of semantics:
 
 - **`src/fast-perception/`** — on-device segmentation (SeaFormer-S via
   `onnxruntime-web`, WebGPU → WASM) behind a `LocalVisionBackend` seam. Produces
@@ -149,9 +168,11 @@ are unmeasured. `blocked` and `large obstacle` still have no acceptable
 operating point. See `docs/fast-perception.md` §9.
 
 Next recommended: **real-device verification** (Android + iOS: Phase-12
-PWA/camera/speech, Phase-13 browser benchmark with a real GPU, and Phase-14
+PWA/camera/speech, Phase-13 browser benchmark with a real GPU, Phase-14
 local inference latency, duty cycle and battery), then hardening of
-failure/lifecycle edge cases. Do not start without being asked.
+failure/lifecycle edge cases, then migrating the session controller to use
+`CameraSource` once a second implementation exists. Do not start any of these
+without being asked.
 
 DO NOT:
 
@@ -187,3 +208,7 @@ DO NOT:
 - let model-specific shapes (tensors, class indices, ADE20K labels) leave
   `src/fast-perception`
 - resolve a cloud/local conflict by preferring a source instead of representing it
+- expose browser-specific camera objects (`MediaStream`, `HTMLVideoElement`)
+  outside the `BrowserCameraSource` adapter
+- choose hardware before real-device measurements, user research, and cost
+  constraints are established

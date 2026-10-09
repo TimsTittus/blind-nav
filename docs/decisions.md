@@ -1050,3 +1050,63 @@ feature can do, rather than being deferred to a later cleanup:
   `allowBlockedAssertion` on. `docs/fast-perception.md` §9 tracks them.
 - New production dependency and app-wide response headers are the real costs of
   this phase.
+
+## ADR 0028 — Phase 15: CameraSource abstraction and hardware roadmap
+
+**Date:** 2026-10-09
+
+**Status:** Accepted
+
+**Context:**
+
+The system currently couples frame acquisition to the browser's `getUserMedia`
+API: `CameraController` owns a `MediaStream`, `FrameCapture` reads pixels from
+an `HTMLVideoElement`, and the perception pipeline receives browser-encoded
+`CapturedFrame` objects. This works for the browser prototype but blocks any
+move to non-browser cameras: a USB UVC module, a CSI sensor on a Raspberry Pi,
+a Jetson's MIPI input, or a React Native camera bridge.
+
+Phase 15's brief asks for a `CameraSource` abstraction so the perception
+pipeline does not care where frames came from, a normalized `CameraFrame` that
+carries no browser-specific objects, and documentation of future hardware
+options without making a hardware choice.
+
+**Decision:**
+
+1. **A `CameraSource` interface** (`src/camera/source.ts`) defines the
+   source-agnostic contract: `start`, `stop`, `pause`, `resume`,
+   `captureFrame(signal?)`, `subscribe`/`getSnapshot`. Implementations declare
+   their `kind` (`"browser"`, `"mobile"`, `"external"`, `"fixture"`,
+   `"unknown"`).
+2. **`CameraFrame`** is a Zod-validated value object carrying `id`, `timestamp`,
+   `width`, `height`, `orientation` (`landscape | portrait | unknown`),
+   `source` (the source kind), and `data` (a `Blob`). No `MediaStream`, no
+   `HTMLVideoElement`, no `HTMLCanvasElement`.
+3. **`BrowserCameraSource`** adapts the existing `CameraController` +
+   `FrameCapture` to the new interface. It is the only code that touches
+   `getUserMedia`, `MediaStream`, or `HTMLVideoElement`. Everything above it sees
+   `CameraFrame`.
+4. **`MobileCameraSource` and `ExternalCameraSource` are declared as planned**
+   but not implemented. They exist only in the interface's JSDoc and in
+   `docs/hardware-roadmap.md`. No code is written for them until the
+   corresponding hardware path is chosen.
+5. **`docs/hardware-roadmap.md`** evaluates five hardware options (phone on
+   vest, phone + USB camera, Raspberry Pi, Jetson Orin, Android wearable) across
+   nine criteria, documents how each connects to the existing software layers,
+   and explicitly states that no hardware is chosen.
+6. **The existing session controller and perception pipeline are not modified.**
+   The abstraction sits alongside the current code; migrating the session
+   controller to use `CameraSource` instead of `CameraController` directly is a
+   separate, future step that should happen only once `CameraSource` has been
+   proven with at least two implementations.
+
+**Consequences:**
+
+- The browser prototype is completely unaffected: `BrowserCameraSource` wraps
+  the exact same code paths.
+- Future hardware work has a clear integration seam: implement `CameraSource`,
+  plug it in. No changes to safety, fusion, speech, or decision.
+- The `CameraFrame` schema is validated with Zod, consistent with the project's
+  "validate everything external" rule.
+- The hardware roadmap is a living document, not a decision — it will be updated
+  as real-device measurements, user research, and cost constraints arrive.

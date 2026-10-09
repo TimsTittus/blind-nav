@@ -26,3 +26,19 @@ export type { FrameConsumer, FrameMetadata } from "./frame-consumer";
 export { useCamera } from "./use-camera";
 export type { UseCamera } from "./use-camera";
 export { useFrameLoop } from "./use-frame-loop";
+export {
+  CameraFrameOrientationSchema,
+  CameraFrameSourceKindSchema,
+  CameraFrameSchema,
+  INITIAL_SOURCE_SNAPSHOT,
+} from "./source";
+export type {
+  CameraFrame,
+  CameraFrameOrientation,
+  CameraFrameSourceKind,
+  CameraSource,
+  CameraSourceSnapshot,
+  CameraSourceState,
+} from "./source";
+export { BrowserCameraSource } from "./browser-camera-source";
+export type { BrowserCameraSourceDeps } from "./browser-camera-source";

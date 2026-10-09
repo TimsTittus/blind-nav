@@ -1,13 +1,13 @@
 # Architecture
 
-Status: **Phase 11 (Evaluation framework complete)**;
-Phase 10 added performance profiling and optimization (PerformanceMonitor, WebP
-frame encoding, DuplicateSuppression prune timer), Phase 9 added voice input and
-Explore Mode, Phase 8 the decision engine / real-time pipeline, Phase 7 the
-deterministic safety engine, Phase 6 the navigation engine, Phase 5 the speech
-engine, Phase 4 the server-side Gemini vision pipeline, Phase 3 the browser
-camera subsystem, Phase 2 the mocked Navigation Mode UI, and Phase 1 the core
-domain model. This document describes
+Status: **Phase 12 (Installable PWA + capability detection + mobile UI)**;
+Phase 11 added the evaluation framework, Phase 10 added performance profiling
+and optimization (PerformanceMonitor, WebP frame encoding, DuplicateSuppression
+prune timer), Phase 9 added voice input and Explore Mode, Phase 8 the decision
+engine / real-time pipeline, Phase 7 the deterministic safety engine, Phase 6
+the navigation engine, Phase 5 the speech engine, Phase 4 the server-side
+Gemini vision pipeline, Phase 3 the browser camera subsystem, Phase 2 the
+mocked Navigation Mode UI, and Phase 1 the core domain model. This document describes
 the target software architecture the prototype is being built toward. The `core` domain model + Zod schemas exist (the Scene Representation is
 now the conservative Phase-4 shape), along with a concrete **Gemini
 `VisionProvider`** + dev fixtures (now with `queryScene` for free-form
@@ -102,6 +102,7 @@ Each layer has a README with detail. Summary:
 | [`decision`](../src/decision)  | Reconcile safety + navigation + scene → decision & cadence        | core, safety, navigation |
 | [`speech`](../src/speech)      | Speak decisions; prioritize safety; duplicate suppression; swappable TTS | core          |
 | [`performance`](../src/performance)| Dev-only metrics: FPS, latency, failure rates, end-to-end timing | —            |
+| [`capabilities`](../src/capabilities)| Runtime capability detection (camera, GPS, speech, mic, orientation) | —            |
 | [`app`](../src/app)            | UI + server route handlers (`app/api/**`)                         | all                 |
 
 Dependencies point **toward `core`**; lower layers never import UI.
@@ -275,7 +276,7 @@ next phase is not started automatically.
 10. Performance profiling and optimization **(done)**.
 11. Evaluation framework — fixture scenes, TP/FP/FN scoring, latency,
     reliability, security, privacy **(done)**.
-12. Full accessibility pass.
+12. Installable PWA, capability detection, and mobile UI **(done)**.
 13. Hardening: failure/lifecycle edge cases end-to-end.
 
 Later/future: local CV, vest-mounted camera, depth/sensor fusion.
@@ -667,3 +668,42 @@ all significant pedestrian hazard categories:
 | `privacy.eval.test.ts` | — | Frame storage, upload, console, location |
 
 Full detail: [docs/evaluation.md](evaluation.md) and [docs/testing.md](testing.md).
+
+## 25. Installable PWA, capability detection, and mobile UI (added in Phase 12)
+
+Phase 12 turns the prototype into an installable PWA suitable for mobile testing.
+No changes to core perception/safety/navigation logic. Full detail:
+[docs/pwa.md](pwa.md).
+
+### PWA infrastructure
+
+- **Web manifest** (`public/manifest.json`): standalone display, `any`
+  orientation, dark/light theme color, SVG + PNG icons.
+- **Service worker** (`public/sw.js`): network-first with shell cache for `/`,
+  `/navigate`, `/explore`. API routes are never cached.
+- **Install prompt**: `InstallPrompt` component captures
+  `beforeinstallprompt` on Android/desktop; iOS uses Add-to-Home-Screen.
+- **Metadata**: manifest link, apple-web-app-capable, viewport-fit cover,
+  dual theme-color, SVG favicon, apple-touch-icon.
+
+### Capability detection (`src/capabilities/`)
+
+Runtime detection of five browser/device capabilities: Camera, Location,
+Speech output, Voice input (microphone + SpeechRecognition), and Orientation.
+Each detector probes the relevant APIs and the Permissions API, returning a
+`CapabilityReport` with state (`checking | available | unavailable | denied |
+prompt`) and a human-readable reason. `useCapabilities()` hook re-detects on
+permission changes.
+
+The home page shows a `CapabilityStatus` panel summarising the results with
+visual indicators. Users see upfront which capabilities their device supports.
+
+### Mobile UI
+
+- STOP button: full-width + first in control group on narrow portrait screens
+  (≤ 480 px), minimum 80 px height, 1.75 rem font.
+- `touch-action: manipulation` on all buttons (prevents double-tap zoom).
+- 1 rem gap between session controls (prevents accidental adjacent taps).
+- `env(safe-area-inset-*)` padding for notched/gestured devices.
+- Light-theme STOP gets box-shadow for outdoor visibility.
+- Standalone PWA hides install prompt, tightens nav padding.

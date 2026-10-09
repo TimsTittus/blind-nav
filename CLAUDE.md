@@ -103,18 +103,47 @@ required and documented. Secrets stay on the server.
 
 ## Current status
 
-**Phase 11 — Evaluation framework complete**, on top of Phase 10 (performance
-profiling and optimization), Phase 9 (Navigation Mode + Explore Mode), Phase 8
-(decision engine / real-time pipeline), Phase 7 (safety engine), Phase 6
-(navigation engine), Phase 5 (speech engine), Phase 4 (server-side Gemini
-vision pipeline), Phase 3 (browser camera), Phase 2 (mocked Navigation Mode
-UI), and Phase 1 (core model, typed env). `src/evaluation` adds a repeatable
-evaluation framework: 16 fixture scenes (up from 6), TP/FP/FN/TN scoring with
-zero-false-negative target for safety, 7 test categories (scene understanding,
-hazard detection, safety decision, navigation instruction, speech behavior,
-latency, failure handling), 10 reliability scenarios, 6 security checks, 4
-privacy checks. `docs/testing.md` and `docs/evaluation.md` provide reference
-documentation. 84 new tests (601 total). There is still no local CV.
+**Phase 12 — Installable PWA, capability detection, and mobile UI**, on top of
+Phase 11 (evaluation framework), Phase 10 (performance profiling and
+optimization), Phase 9 (Navigation Mode + Explore Mode), Phase 8 (decision
+engine / real-time pipeline), Phase 7 (safety engine), Phase 6 (navigation
+engine), Phase 5 (speech engine), Phase 4 (server-side Gemini vision pipeline),
+Phase 3 (browser camera), Phase 2 (mocked Navigation Mode UI), and Phase 1
+(core model, typed env). Phase 12 adds: installable PWA (web manifest, service
+worker, icons, install prompt), capability detection layer
+(`src/capabilities/` — Camera, Location, Speech, Microphone, Orientation with
+five states and permission-change re-detection), CapabilityStatus UI on the
+home page, mobile UI optimizations (prominent STOP button, touch-action
+manipulation, safe-area insets, accidental-touch prevention). `docs/pwa.md`
+documents browser support, permissions, and known limitations. There is still
+no local CV.
 
-Next up is **Phase 12 — Full accessibility pass**. Do not start it without
-being asked.
+Next up is **Phase 13 — Hardening: failure/lifecycle edge cases end-to-end**.
+Do not start it without being asked.
+
+DO NOT:
+
+- put Gemini API keys in client code
+- send every video frame to Gemini
+- treat Gemini as a guaranteed collision detector
+- use arbitrary model-generated text as application state
+- trust model JSON without validation
+- convert relative AI distance into fake meter values
+- let stale AI results overwrite newer results
+- allow unlimited concurrent AI requests
+- store camera frames by default
+- store precise location unnecessarily
+- add a database before it is required
+- add authentication before it is required
+- add microservices
+- introduce tRPC unless there is an actual architectural need
+- introduce Redis unless there is an actual architectural need
+- introduce Docker just for the sake of using Docker
+- create giant React components
+- put business logic in JSX
+- silently treat unavailable perception as "clear"
+- silently swallow errors
+- claim the system guarantees safety
+- implement hardware before the software prototype works
+- introduce SeaFormer merely because it was mentioned
+- use deprecated Gemini APIs without checking current official documentation

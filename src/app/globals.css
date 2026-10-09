@@ -653,3 +653,183 @@ legend {
   bottom: 0.5rem;
   z-index: 1;
 }
+
+/* ---------- PWA standalone: safe-area insets ---------- */
+
+@supports (padding: env(safe-area-inset-top)) {
+  body {
+    padding-top: env(safe-area-inset-top);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+
+  .nav-screen__controls {
+    padding-bottom: calc(0.75rem + env(safe-area-inset-bottom));
+  }
+}
+
+/* ---------- Capability status ---------- */
+
+.capability-status {
+  margin-top: calc(var(--space) * 2);
+  border: 2px solid var(--color-border);
+  border-radius: 8px;
+  padding: var(--space);
+}
+
+.capability-status__heading {
+  margin: 0 0 0.5rem;
+  font-size: 1.1rem;
+}
+
+.capability-status__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.capability-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.5rem;
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
+.capability-row__indicator {
+  flex-shrink: 0;
+  width: 1.5rem;
+  text-align: center;
+  font-size: 1.1rem;
+}
+
+.capability-row__name {
+  flex: 1 1 auto;
+  font-weight: 600;
+}
+
+.capability-row__state {
+  flex-shrink: 0;
+  font-size: 0.9rem;
+  color: var(--color-muted);
+}
+
+.capability-row--available {
+  color: #2ecc71;
+}
+
+.capability-row--unavailable,
+.capability-row--denied {
+  color: var(--color-warning-fg);
+  background: var(--color-warning-bg);
+}
+
+.capability-status__warning {
+  margin: 0 0 0.75rem;
+  padding: 0.5rem 0.75rem;
+  background: var(--color-warning-bg);
+  color: var(--color-warning-fg);
+  border: 2px solid currentColor;
+  border-radius: 6px;
+  font-weight: 600;
+}
+
+.capability-status__ok {
+  margin: 0.5rem 0 0;
+  color: var(--color-muted);
+}
+
+/* ---------- Install prompt ---------- */
+
+.install-prompt {
+  margin-top: calc(var(--space) * 2);
+  padding: var(--space);
+  border: 2px solid var(--color-accent);
+  border-radius: 8px;
+  text-align: center;
+}
+
+.install-prompt p {
+  margin: 0 0 var(--space);
+}
+
+.install-status {
+  margin-top: var(--space);
+  color: var(--color-muted);
+  font-style: italic;
+}
+
+/* ---------- Mobile navigation: STOP prominence ---------- */
+
+.session-controls .stop-button {
+  flex: 2 1 8rem;
+  min-height: 72px;
+  font-size: 1.5rem;
+}
+
+/* Prevent double-tap zoom on control buttons. */
+.control-button,
+.stop-button {
+  touch-action: manipulation;
+}
+
+/* Prevent accidental interaction via CSS gap between buttons. */
+.session-controls {
+  gap: 1rem;
+}
+
+/* ---------- Mobile: portrait phones ---------- */
+
+@media (max-width: 480px) {
+  .primary-nav {
+    justify-content: center;
+  }
+
+  .session-controls .stop-button {
+    flex-basis: 100%;
+    order: -1;
+    min-height: 80px;
+    font-size: 1.75rem;
+  }
+
+  .session-controls {
+    gap: 0.75rem;
+  }
+
+  .session-controls > .control-button {
+    flex: 1 1 40%;
+  }
+}
+
+/* ---------- Landscape mobile: compact layout ---------- */
+
+@media (orientation: landscape) and (max-height: 520px) {
+  .session-controls .stop-button {
+    min-height: 64px;
+    font-size: 1.25rem;
+  }
+}
+
+/* ---------- High-brightness consideration ---------- */
+
+@media (prefers-color-scheme: light) {
+  .session-controls .stop-button {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  }
+}
+
+/* ---------- Standalone PWA ---------- */
+
+@media (display-mode: standalone) {
+  .primary-nav {
+    padding-top: 0.25rem;
+  }
+
+  .install-prompt,
+  .install-status {
+    display: none;
+  }
+}

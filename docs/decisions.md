@@ -840,3 +840,72 @@ outcomes per scenario, explicit scoring for the failure modes that matter most
 - 84 new tests (categories 1–7, security, privacy). Total: 601.
 - `docs/testing.md` and `docs/evaluation.md` provide reference material for
   contributors and reviewers.
+
+---
+
+## ADR 0025 — Phase 12: installable PWA, capability detection, and mobile UI
+
+**Status:** Accepted.
+
+**Context:** The prototype runs end-to-end in a desktop browser but has no PWA
+infrastructure (no manifest, no service worker, no icons), no runtime capability
+detection, and no mobile-specific UI optimizations. Before field testing on real
+devices the app must be installable, must clearly communicate which device
+capabilities are available, and must make the STOP control easy to reach
+one-handed.
+
+**Decision:**
+
+1. **PWA manifest and service worker.** `public/manifest.json` with standalone
+   display, `any` orientation, theme color matching dark/light schemes, and
+   SVG + PNG icons (192, 512, apple-touch 180). A minimal `public/sw.js`
+   using network-first strategy with a shell cache for the three app routes.
+   Service worker is registered from a client component on mount. `next.config.ts`
+   adds no-cache headers for the service worker and a `Service-Worker-Allowed`
+   header.
+
+2. **Layout metadata.** `layout.tsx` gains `manifest`, `appleWebApp`,
+   `mobile-web-app-capable` metadata, `viewportFit: "cover"` for notched
+   devices, dual `themeColor` for dark/light, and `<link>` tags for the SVG
+   favicon and apple-touch-icon.
+
+3. **Capability detection layer** (`src/capabilities/`). Five detectors:
+   `CameraCapability`, `LocationCapability`, `SpeechCapability`,
+   `MicrophoneCapability`, `OrientationCapability`. Each returns a
+   `CapabilityReport` with state (`checking | available | unavailable |
+   denied | prompt`) and a human-readable reason. `detectAll()` runs them in
+   parallel. `useCapabilities()` hook with permission-change re-detection.
+
+4. **Capability status UI.** `CapabilityStatus` component on the home page
+   showing each capability's state with a visual indicator. Warns when
+   capabilities are unavailable or denied.
+
+5. **Install prompt.** `InstallPrompt` component captures
+   `beforeinstallprompt`, shows an install button when available, and detects
+   standalone mode. Hidden in standalone mode via CSS.
+
+6. **Mobile UI optimizations.**
+   - STOP button: full-width, placed first (top of controls) on narrow
+     portrait screens (≤ 480 px), minimum 80 px tall.
+   - `touch-action: manipulation` on all buttons to prevent double-tap zoom.
+   - 1 rem gap between session controls to prevent accidental adjacent taps.
+   - `env(safe-area-inset-*)` padding for notched/gestured devices.
+   - Light-theme STOP button gets a box-shadow for outdoor visibility.
+   - Standalone PWA hides the install prompt and tightens nav padding.
+
+7. **No changes to core logic.** Perception, safety, navigation, decision,
+   and speech engines are unchanged.
+
+**Consequences:**
+
+- The app is installable as a PWA on Android Chrome and as an Add-to-Home-Screen
+  app on iOS Safari. Desktop Chrome/Edge also support install.
+- Users see upfront which capabilities their device supports before starting a
+  session. Denied permissions are clearly reported.
+- The STOP button is always reachable one-handed on mobile. Touch targets exceed
+  WCAG minimums.
+- `docs/pwa.md` documents browser support, permissions, and known limitations.
+- No new runtime dependencies. The service worker is a plain JS file.
+- Firefox mobile and iOS Safari have known limitations (no `SpeechRecognition`,
+  no `beforeinstallprompt` on iOS). These are documented and reported to the
+  user via the capability status panel.

@@ -1,3 +1,5 @@
+import { CapabilityStatus } from "./_components/capability-status";
+import { InstallPrompt } from "./_components/install-prompt";
 import { SessionPanel } from "./_components/session-panel";
 
 export default function HomePage() {
@@ -16,6 +18,8 @@ export default function HomePage() {
       </p>
 
       <SessionPanel />
+      <CapabilityStatus />
+      <InstallPrompt />
     </section>
   );
 }

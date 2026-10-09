@@ -1,0 +1,29 @@
+{
+  "name": "blind-nav — Assistive Navigation Prototype",
+  "short_name": "blind-nav",
+  "description": "AI-assisted navigation and obstacle awareness for visually impaired users. Prototype only — not a certified safety device.",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "theme_color": "#0b0b0c",
+  "background_color": "#0b0b0c",
+  "categories": ["navigation", "accessibility"],
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "type": "image/svg+xml",
+      "sizes": "any",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ]
+}

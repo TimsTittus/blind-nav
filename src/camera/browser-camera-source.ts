@@ -52,6 +52,10 @@ export class BrowserCameraSource implements CameraSource {
   private readonly frameCapture: FrameCapture;
   private readonly captureOptions: Partial<FrameCaptureCallOptions>;
   private sequence = 0;
+  private snapshot: CameraSourceSnapshot = {
+    state: "idle",
+    error: null,
+  };
 
   constructor(deps: BrowserCameraSourceDeps = {}) {
     this.camera = new CameraController();
@@ -65,10 +69,18 @@ export class BrowserCameraSource implements CameraSource {
 
   getSnapshot(): CameraSourceSnapshot {
     const snap = this.camera.getSnapshot();
-    return {
-      state: mapState(snap),
-      error: snap.error?.message ?? null,
-    };
+    const mappedState = mapState(snap);
+    const errorMsg = snap.error?.message ?? null;
+    if (
+      this.snapshot.state !== mappedState ||
+      this.snapshot.error !== errorMsg
+    ) {
+      this.snapshot = {
+        state: mappedState,
+        error: errorMsg,
+      };
+    }
+    return this.snapshot;
   }
 
   async start(): Promise<void> {

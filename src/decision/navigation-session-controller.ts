@@ -181,6 +181,7 @@ export class NavigationSessionController {
   private readonly listeners = new Set<Listener>();
   private cleanups: Array<() => void> = [];
   private safetyInterval: ReturnType<typeof setInterval> | null = null;
+  private snapshot: SessionControllerSnapshot;
 
   constructor(deps: NavigationSessionControllerDeps = {}) {
     this.analysisClient = deps.analysisClient ?? createAnalysisClient();
@@ -198,6 +199,7 @@ export class NavigationSessionController {
     this.trustPolicy = deps.trustPolicy ?? CONSERVATIVE_TRUST_POLICY;
     this.fastPerceptionConfig = deps.fastPerceptionConfig ?? {};
     this.grabFastFrameOverride = deps.grabFastFrame ?? null;
+    this.snapshot = this.buildSnapshot();
   }
 
   subscribe = (listener: Listener): (() => void) => {
@@ -206,30 +208,16 @@ export class NavigationSessionController {
   };
 
   getSnapshot = (): SessionControllerSnapshot => {
-    return {
-      phase: this.phase,
-      camera: this.cameraState,
-      perception: this.perceptionState,
-      perceptionFreshness: this.computeFreshness(),
-      safety: this.safetyAssessment,
-      location: this.locationSnapshot,
-      route: this.routeState,
-      lastError: this.lastError,
-      stats: this.getStats(),
-      query: this.querySnapshot,
-      fastPerception: this.fastState,
-      fusion: this.fusion,
-      fastPerceptionError: this.fastPerceptionError,
-    };
+    return this.snapshot;
   };
 
   async start(session: NavigationSession): Promise<void> {
     if (this.phase !== "idle" && this.phase !== "stopped") return;
 
     this.session = session;
-    this.setPhase("starting");
     this.lastError = null;
     this.resetStats();
+    this.setPhase("starting");
 
     try {
       this.createSubsystems();
@@ -659,11 +647,20 @@ export class NavigationSessionController {
   private startSafetyLoop(): void {
     this.safetyInterval = setInterval(() => {
       if (this.phase !== "running") return;
+      let shouldNotify = false;
       if (
         this.safetyEngine &&
         this.safetyEngine.isExpired(this.safetyAssessment, this.now())
       ) {
         this.runSafetyAssessment();
+        shouldNotify = true;
+      }
+      const currentFreshness = this.computeFreshness();
+      if (currentFreshness !== this.snapshot.perceptionFreshness) {
+        this.speechDispatch?.onFreshnessChange(currentFreshness, this.now());
+        shouldNotify = true;
+      }
+      if (shouldNotify) {
         this.notify();
       }
     }, this.config.safetyTtlMs);
@@ -727,6 +724,7 @@ export class NavigationSessionController {
       this.fps = Math.round((this.frameCount / elapsed) * 1_000);
       this.frameCount = 0;
       this.fpsWindowStart = this.now();
+      this.notify();
     }
   }
 
@@ -747,7 +745,26 @@ export class NavigationSessionController {
     this.notify();
   }
 
+  private buildSnapshot(): SessionControllerSnapshot {
+    return {
+      phase: this.phase,
+      camera: this.cameraState,
+      perception: this.perceptionState,
+      perceptionFreshness: this.computeFreshness(),
+      safety: this.safetyAssessment,
+      location: this.locationSnapshot,
+      route: this.routeState,
+      lastError: this.lastError,
+      stats: this.getStats(),
+      query: this.querySnapshot,
+      fastPerception: this.fastState,
+      fusion: this.fusion,
+      fastPerceptionError: this.fastPerceptionError,
+    };
+  }
+
   private notify(): void {
+    this.snapshot = this.buildSnapshot();
     for (const listener of this.listeners) listener();
   }
 }

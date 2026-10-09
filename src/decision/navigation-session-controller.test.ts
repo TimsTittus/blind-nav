@@ -90,10 +90,25 @@ afterEach(() => {
 });
 
 describe("NavigationSessionController", () => {
-  it("starts in idle phase", () => {
+  it("starts in idle phase and returns stable snapshot reference", () => {
     const client = createMockClient();
     const ctrl = new NavigationSessionController({ analysisClient: client });
-    expect(ctrl.getSnapshot().phase).toBe("idle");
+    const snap1 = ctrl.getSnapshot();
+    const snap2 = ctrl.getSnapshot();
+    expect(snap1.phase).toBe("idle");
+    expect(snap1).toBe(snap2);
+  });
+
+  it("updates snapshot reference when state transitions", async () => {
+    const client = createMockClient();
+    const ctrl = new NavigationSessionController({ analysisClient: client });
+    const snapIdle = ctrl.getSnapshot();
+
+    await ctrl.start(session);
+    const snapRunning = ctrl.getSnapshot();
+    expect(snapRunning.phase).toBe("running");
+    expect(snapRunning).not.toBe(snapIdle);
+    expect(ctrl.getSnapshot()).toBe(snapRunning);
   });
 
   it("transitions to running on start", async () => {

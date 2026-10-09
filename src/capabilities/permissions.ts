@@ -3,7 +3,11 @@ export async function requestCapabilityPermission(
 ): Promise<void> {
   if (typeof window === "undefined") return;
 
-  if (name === "location" && typeof navigator !== "undefined" && navigator.geolocation) {
+  if (
+    name === "location" &&
+    typeof navigator !== "undefined" &&
+    navigator.geolocation
+  ) {
     await new Promise<void>((resolve) => {
       navigator.geolocation.getCurrentPosition(
         () => resolve(),

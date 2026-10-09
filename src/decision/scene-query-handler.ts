@@ -23,11 +23,17 @@ export class SceneQueryHandler {
   private _lastError: string | null = null;
   private abortController: AbortController | null = null;
   private readonly listeners = new Set<Listener>();
+  private snapshot: SceneQuerySnapshot;
 
   constructor(deps: SceneQueryHandlerDeps) {
     this.queryClient = deps.queryClient;
     this.speechEngine = deps.speechEngine;
     this.captureFrame = deps.captureFrame;
+    this.snapshot = {
+      state: this._state,
+      lastAnswer: this._lastAnswer,
+      lastError: this._lastError,
+    };
   }
 
   get state(): SceneQueryState {
@@ -47,11 +53,7 @@ export class SceneQueryHandler {
     return () => this.listeners.delete(listener);
   };
 
-  getSnapshot = (): SceneQuerySnapshot => ({
-    state: this._state,
-    lastAnswer: this._lastAnswer,
-    lastError: this._lastError,
-  });
+  getSnapshot = (): SceneQuerySnapshot => this.snapshot;
 
   async submitQuestion(question: string): Promise<void> {
     if (this._state === "querying" || this._state === "capturing") {
@@ -121,8 +123,19 @@ export class SceneQueryHandler {
   }
 
   private setState(state: SceneQueryState): void {
-    if (state === this._state) return;
+    if (
+      state === this._state &&
+      this.snapshot.lastAnswer === this._lastAnswer &&
+      this.snapshot.lastError === this._lastError
+    ) {
+      return;
+    }
     this._state = state;
+    this.snapshot = {
+      state: this._state,
+      lastAnswer: this._lastAnswer,
+      lastError: this._lastError,
+    };
     for (const listener of this.listeners) listener();
   }
 }

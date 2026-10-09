@@ -36,7 +36,10 @@ export function useCapabilities(): CapabilitySet {
       navigator.mediaDevices &&
       typeof navigator.mediaDevices.addEventListener === "function"
     ) {
-      navigator.mediaDevices.addEventListener("devicechange", onPermissionChange);
+      navigator.mediaDevices.addEventListener(
+        "devicechange",
+        onPermissionChange,
+      );
       unsubscribers.push(() => {
         navigator.mediaDevices?.removeEventListener(
           "devicechange",
